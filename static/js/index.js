@@ -1,5 +1,6 @@
 import GridHelper from "./helpers/GridHelper";
 import NavigationController from "./components/NavigationController";
+import TimelineSlider from "./components/TimelineSlider";
 import Dummy from "./components/Dummy";
 
 const ready = (callbackFunc) => {
@@ -49,4 +50,8 @@ ready(() => {
 
     const navigation = new NavigationController();
     navigation.init();
+
+    if (document.getElementById("timeline-slider") !== null) {
+        const timelineSlider = new TimelineSlider();
+    }
 });

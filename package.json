@@ -62,6 +62,7 @@
   "dependencies": {
     "@bornfight/b-reset": "^1.0.4",
     "gsap": "^3.2.6",
-    "poly-fluid-sizing": "^1.1.0"
+    "poly-fluid-sizing": "^1.1.0",
+    "three": "^0.116.1"
   }
 }
