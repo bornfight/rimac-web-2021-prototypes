@@ -41,3 +41,7 @@ $settings-transitions: (
     "zoom": all 1s,
     "zoom-slow": all 2.4s,
 );
+
+//transitions
+$settings-hover: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+$settings-hover-delay: all 0.2s 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);

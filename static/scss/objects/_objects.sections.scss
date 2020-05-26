@@ -21,6 +21,18 @@
     }
 
     //modifiers
+    &--homepage {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        overflow: hidden;
+
+        .o-container {
+            position: relative;
+        }
+    }
+
     &--homepage-slider {
     }
 }
