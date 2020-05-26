@@ -1,0 +1,17 @@
+// SUPERMOLOT
+@include font-face("TTSupermolotNeue-Light", "TTSupermolotNeue-Light");
+@include font-face("TTSupermolotNeue-Regular", "TTSupermolotNeue-Regular");
+@include font-face("TTSupermolotNeue-Medium", "TTSupermolotNeue-Medium");
+
+// FONT VARIABLES
+$supermolot-light: "TTSupermolotNeue-Light", sans-serif;
+$supermolot-regular: "TTSupermolotNeue-Regular", sans-serif;
+$supermolot-medium: "TTSupermolotNeue-Medium", sans-serif;
+
+$base-size: 16;
+$base-line-height: 24;
+
+$font-primary: $supermolot-regular;
+$font-secondary: $supermolot-medium;
+//
+$font-heading: $supermolot-light;
