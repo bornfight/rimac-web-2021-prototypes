@@ -21,6 +21,13 @@ body {
     color: $white;
     position: relative;
 
+    &.has-bg-image {
+        background-image: url("../ui/rimac-bg.jpg");
+        background-attachment: fixed;
+        background-size: cover;
+        background-position: center;
+    }
+
     &.is-light {
         background-color: $white;
         color: $black;

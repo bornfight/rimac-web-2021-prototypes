@@ -543,6 +543,12 @@ body {
   color: #ffffff;
   position: relative; }
 
+body.has-bg-image {
+  background-image: url("../ui/rimac-bg.jpg");
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center; }
+
 body.is-light {
   background-color: #ffffff;
   color: #000000; }
@@ -607,7 +613,7 @@ a {
   opacity: 0.4;
   max-width: 460px; }
 
-.o-section--homepage {
+.o-section--homepage, .o-section--homepage-slider {
   min-height: 100vh;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -621,7 +627,7 @@ a {
           justify-content: center;
   overflow: hidden; }
 
-.o-section--homepage .o-container {
+.o-section--homepage .o-container, .o-section--homepage-slider .o-container {
   position: relative; }
 
 /**
