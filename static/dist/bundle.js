@@ -7779,7 +7779,97 @@ var TimelineSlider = /*#__PURE__*/function () {
       states: {}
     };
     this.timeline = document.querySelector(this.DOM.timeline);
-    this.timelineItems = ["2008", "Lorem ipsum dolor sit.", "Makes example posts, pages, custom terms, helps to style and develop new and current themes.", "2009", "Rimac grows to over 100 employees.", "A simple to use Lorem Ipsum generator. A simple to use Lorem Ipsum generator.", "2010", "Rimac has 1914HP.", " It's based on the Lolita framework. A simple to use Lorem Ipsum generator.", "2011", "Lorem ipsum dolor sit.", "Makes example posts, pages, custom terms, helps to style and develop new and current themes.", "2012", "Rimac grows to over 100 employees.", "A simple to use Lorem Ipsum generator. A simple to use Lorem Ipsum generator.", "2013", "Rimac has 1914HP.", " It's based on the Lolita framework. A simple to use Lorem Ipsum generator.", "2014", "Lorem ipsum dolor sit.", "Makes example posts, pages, custom terms, helps to style and develop new and current themes."];
+    this.timelineItems = [{
+      image: "timeline-01.jpg",
+      year: "2008",
+      title: "Lorem ipsum dolor sit.",
+      text: "Makes example posts, pages, custom terms, helps to style and develop new and current themes."
+    }, {
+      image: "timeline-02.jpg",
+      year: "2009",
+      title: "Rimac grows to over 100 employees.",
+      text: "A simple to use Lorem Ipsum generator. A simple to use Lorem Ipsum generator."
+    }, {
+      image: "timeline-03.jpg",
+      year: "2010",
+      title: "Rimac has 1914HP.",
+      text: "It's based on the Lolita framework. A simple to use Lorem Ipsum generator."
+    }, {
+      image: "timeline-01.jpg",
+      year: "2011",
+      title: "Lorem ipsum dolor sit.",
+      text: "Makes example posts, pages, custom terms, helps to style and develop new and current themes."
+    }, {
+      image: "timeline-02.jpg",
+      year: "2012",
+      title: "Rimac grows to over 100 employees.",
+      text: "A simple to use Lorem Ipsum generator. A simple to use Lorem Ipsum generator."
+    }, {
+      image: "timeline-03.jpg",
+      year: "2013",
+      title: "Rimac has 1914HP.",
+      text: "It's based on the Lolita framework. A simple to use Lorem Ipsum generator."
+    }, {
+      image: "timeline-01.jpg",
+      year: "2014",
+      title: "Lorem ipsum dolor sit.",
+      text: "Makes example posts, pages, custom terms, helps to style and develop new and current themes."
+    }, {
+      image: "timeline-02.jpg",
+      year: "2015",
+      title: "Rimac grows to over 100 employees.",
+      text: "A simple to use Lorem Ipsum generator. A simple to use Lorem Ipsum generator."
+    }, {
+      image: "timeline-03.jpg",
+      year: "2016",
+      title: "Rimac has 1914HP.",
+      text: "It's based on the Lolita framework. A simple to use Lorem Ipsum generator."
+    }, {
+      image: "timeline-01.jpg",
+      year: "2008",
+      title: "Lorem ipsum dolor sit.",
+      text: "Makes example posts, pages, custom terms, helps to style and develop new and current themes."
+    }, {
+      image: "timeline-02.jpg",
+      year: "2009",
+      title: "Rimac grows to over 100 employees.",
+      text: "A simple to use Lorem Ipsum generator. A simple to use Lorem Ipsum generator."
+    }, {
+      image: "timeline-03.jpg",
+      year: "2010",
+      title: "Rimac has 1914HP.",
+      text: "It's based on the Lolita framework. A simple to use Lorem Ipsum generator."
+    }, {
+      image: "timeline-01.jpg",
+      year: "2011",
+      title: "Lorem ipsum dolor sit.",
+      text: "Makes example posts, pages, custom terms, helps to style and develop new and current themes."
+    }, {
+      image: "timeline-02.jpg",
+      year: "2012",
+      title: "Rimac grows to over 100 employees.",
+      text: "A simple to use Lorem Ipsum generator. A simple to use Lorem Ipsum generator."
+    }, {
+      image: "timeline-03.jpg",
+      year: "2013",
+      title: "Rimac has 1914HP.",
+      text: "It's based on the Lolita framework. A simple to use Lorem Ipsum generator."
+    }, {
+      image: "timeline-01.jpg",
+      year: "2014",
+      title: "Lorem ipsum dolor sit.",
+      text: "Makes example posts, pages, custom terms, helps to style and develop new and current themes."
+    }, {
+      image: "timeline-02.jpg",
+      year: "2015",
+      title: "Rimac grows to over 100 employees.",
+      text: "A simple to use Lorem Ipsum generator. A simple to use Lorem Ipsum generator."
+    }, {
+      image: "timeline-03.jpg",
+      year: "2016",
+      title: "Rimac has 1914HP.",
+      text: "It's based on the Lolita framework. A simple to use Lorem Ipsum generator."
+    }];
     this.timelineSlider = document.querySelector(this.DOM.timelineSlider);
     this.camera = null;
     this.scene = null;
@@ -7795,26 +7885,33 @@ var TimelineSlider = /*#__PURE__*/function () {
       var _this = this;
 
       console.log("TimelineSlider init()");
-      this.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 10000);
-      this.camera.position.z = 3000;
+      this.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 10, 8000);
+      this.camera.position.z = 1600;
       this.scene = new THREE.Scene();
       var vector = new THREE.Vector3();
 
-      for (var i = 0, l = this.timelineItems.length; i < l; i += 3) {
-        var element = document.createElement("div");
-        element.className = "element";
-        element.style.backgroundColor = "rgba(0,127,127," + (Math.random() * 0.5 + 0.25) + ")";
+      for (var i = 0, l = this.timelineItems.length; i < l; i++) {
+        var timelineItem = document.createElement("div");
+        timelineItem.className = "c-timeline-item";
         var year = document.createElement("div");
-        year.className = "year";
-        year.textContent = i / 3 + 1;
-        element.appendChild(year);
-        var object = new _CSS3DRenderer.CSS3DObject(element);
+        year.className = "c-timeline-item__year";
+        year.textContent = this.timelineItems[i].year;
+        timelineItem.appendChild(year);
+        var title = document.createElement("div");
+        title.className = "c-timeline-item__title";
+        title.textContent = this.timelineItems[i].title;
+        timelineItem.appendChild(title); // let text = document.createElement("div");
+        // text.className = "c-timeline-item__text";
+        // text.textContent = this.timelineItems[i].text;
+        // timelineItem.appendChild(text);
+
+        var object = new _CSS3DRenderer.CSS3DObject(timelineItem);
         this.scene.add(object);
         this.timelineItems.push(object);
         this.helix.push(object);
-        var theta = i * 0.175 + Math.PI;
-        var y = -(i * 8) + 450;
-        object.position.setFromCylindricalCoords(900, theta, y);
+        var theta = i * 0.5 + Math.PI;
+        var y = -(i * 48) + 400;
+        object.position.setFromCylindricalCoords(680, theta, y);
         vector.x = object.position.x * 2;
         vector.y = object.position.y;
         vector.z = object.position.z * 2;
@@ -7826,15 +7923,16 @@ var TimelineSlider = /*#__PURE__*/function () {
       this.renderer.setSize(window.innerWidth, window.innerHeight);
       this.timeline.appendChild(this.renderer.domElement);
       this.controls = new _TrackballControls.TrackballControls(this.camera, this.renderer.domElement);
-      this.controls.minDistance = 500;
+      this.controls.minDistance = 800;
       this.controls.maxDistance = 6000;
-      console.log(this.controls);
       this.controls.addEventListener("change", function () {
         _this.render();
       });
       this.animate();
       this.render();
-      window.addEventListener("resize", this.onWindowResize, false);
+      window.addEventListener("resize", function () {
+        _this.onWindowResize;
+      }, false);
     }
   }, {
     key: "onWindowResize",
