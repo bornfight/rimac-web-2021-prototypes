@@ -1,5 +1,40 @@
 .c-timeline {
+	position: relative;
 
+	&__canvas {
+
+	}
+
+	&__navigation {
+		position: absolute;
+		bottom: 80px;
+		left: 0;
+		width: 100%;
+	}
+
+	&__buttons {
+		width: 100%;
+		display: flex;
+		align-items: flex-end;
+	}
+
+	&__button {
+		background-color: transparent;
+		border: none;
+		outline: none;
+		cursor: pointer;
+
+		//modifiers
+		&--previous {
+			margin-right: 40px;
+			margin-left: auto;
+		}
+
+		//overrides
+		&.c-link {
+			color: $white;
+		}
+	}
 }
 
 .c-timeline-item {
@@ -18,6 +53,8 @@
 		background-color: rgb(0, 45, 44);
 		right: 0;
 		bottom: 0;
+		opacity: 0.75;
+		filter: blur(2px);
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -86,3 +123,4 @@
 
 	}
 }
+

@@ -730,6 +730,37 @@ a {
 .c-link-list {
   padding-bottom: 60px; }
 
+.c-timeline {
+  position: relative; }
+
+.c-timeline__navigation {
+  position: absolute;
+  bottom: 80px;
+  left: 0;
+  width: 100%; }
+
+.c-timeline__buttons {
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: end;
+      -ms-flex-align: end;
+          align-items: flex-end; }
+
+.c-timeline__button {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer; }
+
+.c-timeline__button--previous {
+  margin-right: 40px;
+  margin-left: auto; }
+
+.c-timeline__button.c-link {
+  color: #ffffff; }
+
 .c-timeline-item {
   width: 304px;
   min-height: 171px;
@@ -748,6 +779,9 @@ a {
   background-color: #002d2c;
   right: 0;
   bottom: 0;
+  opacity: 0.75;
+  -webkit-filter: blur(2px);
+          filter: blur(2px);
   position: absolute;
   top: 0;
   left: 0;

@@ -7,11 +7,15 @@ import {
 
 import * as dat from 'dat.gui';
 
+import gsap from "gsap";
+
 export default class TimelineSlider {
     constructor() {
         this.DOM = {
             timeline: ".js-timeline",
             timelineSlider: ".js-timeline-slider",
+            timelineSliderPrev: ".js-timeline-slider-previous",
+            timelineSliderNext: ".js-timeline-slider-next",
             states: {},
         };
 
@@ -113,6 +117,8 @@ export default class TimelineSlider {
         ];
 
         this.timelineSlider = document.querySelector(this.DOM.timelineSlider);
+        this.timelineSliderPrev = document.querySelector(this.DOM.timelineSliderPrev);
+        this.timelineSliderNext = document.querySelector(this.DOM.timelineSliderNext);
 
         this.camera = null;
         this.scene = null;
@@ -122,6 +128,7 @@ export default class TimelineSlider {
         this.helix = [];
 
         this.init();
+        this.sliderNavigation();
     }
 
     init() {
@@ -272,5 +279,24 @@ export default class TimelineSlider {
 
     render() {
         this.renderer.render(this.scene, this.camera);
+    }
+
+    sliderNavigation() {
+        this.timelineSliderPrev.addEventListener("click", () => {
+            console.log("click Prev");
+
+            gsap.to(this.camera.position, {
+                duration: 1,
+                x: "-=200"
+            });
+        })
+        this.timelineSliderNext.addEventListener("click", () => {
+            console.log("click Next");
+
+            gsap.to(this.camera.position, {
+                duration: 1,
+                x: "+=200"
+            });
+        })
     }
 }
