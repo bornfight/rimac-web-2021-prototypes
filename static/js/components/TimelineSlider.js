@@ -1,5 +1,5 @@
 //import * as THREE from "three";
-import { TrackballControls } from "three/examples/jsm/controls/TrackballControls.js";
+
 import {
     CSS3DRenderer,
     CSS3DObject,
@@ -123,12 +123,12 @@ export default class TimelineSlider {
         this.camera = null;
         this.scene = null;
         this.renderer = null;
-        this.controls = null;
 
-        this.helix = [];
+        this.helixItems = [];
+
+        this.helix = null;
 
         this.init();
-        this.sliderNavigation();
     }
 
     init() {
@@ -156,8 +156,8 @@ export default class TimelineSlider {
 
         this.camera.lookAt(this.scene.position);
 
-        this.camera.position.x = -180;
-        this.camera.position.y = 100;
+        this.camera.position.x = 0;
+        this.camera.position.y = 300;
         this.camera.position.z = 1080;
 
         const vector = new THREE.Vector3();
@@ -192,52 +192,28 @@ export default class TimelineSlider {
             // text.textContent = this.timelineItems[i].text;
             // timelineItem.appendChild(text);
 
-            let object = new CSS3DObject(timelineItem);
+            this.helix = new CSS3DObject(timelineItem);
 
-            this.scene.add(object);
-
-            this.timelineItems.push(object);
-
+            this.scene.add(this.helix);
 
             let theta = i * 0.5 + Math.PI;
-            let y = -(i * 48) + 400
+            let y = -(i * 48) + 600
 
-            object.position.setFromCylindricalCoords(640, theta, y);
+            this.helix.position.setFromCylindricalCoords(640, theta, y);
 
-            vector.x = object.position.x * 2;
-            vector.y = object.position.y;
+            vector.x = this.helix.position.x * 2;
+            vector.y = this.helix.position.y;
             // vector.y = 0;
-            vector.z = object.position.z * 2;
+            vector.z = this.helix.position.z * 2;
 
-            object.lookAt(vector);
+            this.helix.lookAt(vector);
 
-            this.helix.push(object);
+            this.helixItems.push(this.helix);
         }
 
         this.renderer = new CSS3DRenderer();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.timeline.appendChild(this.renderer.domElement);
-
-        this.controls = new TrackballControls(
-            this.camera,
-            this.renderer.domElement,
-        );
-
-        this.controls.noZoom = true;
-        this.controls.noPan = true;
-
-        document.addEventListener(
-            "mousewheel",
-            () => {
-                this.onDocumentMouseWheel();
-            },
-            false,
-        );
-
-        this.controls.addEventListener("change", () => {
-            this.render();
-
-        });
 
         window.addEventListener(
             "resize",
@@ -248,7 +224,7 @@ export default class TimelineSlider {
         );
 
         this.animate();
-        this.render();
+        this.sliderNavigation();
 
         //GUI
         this.gui = new dat.GUI();
@@ -263,31 +239,25 @@ export default class TimelineSlider {
         this.camera.updateProjectionMatrix();
 
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-
-        this.render();
-    }
-
-    onDocumentMouseWheel() {
-        //console.log("tutttuut");
     }
 
     animate() {
         requestAnimationFrame(() => this.animate());
 
-        this.controls.update();
-    }
-
-    render() {
         this.renderer.render(this.scene, this.camera);
     }
 
     sliderNavigation() {
+        console.log(this.camera);
+
+        let rotationSpeed = 0.2;
+
         this.timelineSliderPrev.addEventListener("click", () => {
             console.log("click Prev");
 
             gsap.to(this.camera.position, {
                 duration: 1,
-                x: "-=200"
+                x: this.camera.position.x * Math.cos(rotationSpeed) + this.camera.position.z * Math.sin(rotationSpeed)
             });
         })
         this.timelineSliderNext.addEventListener("click", () => {
@@ -295,7 +265,7 @@ export default class TimelineSlider {
 
             gsap.to(this.camera.position, {
                 duration: 1,
-                x: "+=200"
+                x: this.camera.position.x * Math.cos(rotationSpeed) - this.camera.position.z * Math.sin(rotationSpeed)
             });
         })
     }
