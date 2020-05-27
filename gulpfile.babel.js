@@ -48,9 +48,10 @@ export const clean = () => del(["static/dist"]);
  * Watch SCSS task
  */
 export function watchStyles() {
-    return gulp.src(paths.styles.src)
+    return gulp
+        .src(paths.styles.src)
         .pipe(sourcemaps.init())
-        .pipe(sass({includePaths: paths.includes.node_modules}))
+        .pipe(sass({ includePaths: paths.includes.node_modules }))
         .pipe(sass().on("error", sass.logError))
         .pipe(autoprefixer())
         .pipe(sourcemaps.write("./"))
@@ -62,14 +63,17 @@ export function watchStyles() {
  * Build SCSS task
  */
 export function buildStyles() {
-    return gulp.src(paths.styles.src)
-        .pipe(sass({includePaths: paths.includes.node_modules}))
+    return gulp
+        .src(paths.styles.src)
+        .pipe(sass({ includePaths: paths.includes.node_modules }))
         .pipe(sass().on("error", sass.logError))
         .pipe(autoprefixer())
-        .pipe(cleanCSS({level: {1: {specialComments: 0}}}))
-        .pipe(rename({
-            basename: "style",
-        }))
+        .pipe(cleanCSS({ level: { 1: { specialComments: 0 } } }))
+        .pipe(
+            rename({
+                basename: "style",
+            }),
+        )
         .pipe(gulp.dest(paths.styles.dest));
 }
 
@@ -84,12 +88,13 @@ export function watchScripts() {
             plugins: [
                 "@babel/plugin-syntax-dynamic-import",
                 "@babel/proposal-class-properties",
-                "@babel/proposal-object-rest-spread"],
+                "@babel/proposal-object-rest-spread",
+            ],
         })
         .bundle()
         .pipe(source("bundle.js"))
         .pipe(buffer())
-        .pipe(sourcemaps.init({"loadMaps": true}))
+        .pipe(sourcemaps.init({ loadMaps: true }))
         .pipe(sourcemaps.write("."))
         .pipe(gulp.dest(paths.scripts.dest))
         .pipe(server.stream());
@@ -106,16 +111,19 @@ export function buildScripts() {
             plugins: [
                 "@babel/plugin-syntax-dynamic-import",
                 "@babel/proposal-class-properties",
-                "@babel/proposal-object-rest-spread"],
+                "@babel/proposal-object-rest-spread",
+            ],
         })
         .bundle()
         .pipe(source("bundle.js"))
         .pipe(buffer())
-        .pipe(uglify({
-            compress: {
-                pure_funcs: ["console.log"],
-            },
-        }))
+        .pipe(
+            uglify({
+                compress: {
+                    pure_funcs: ["console.log"],
+                },
+            }),
+        )
         .pipe(gulp.dest(paths.scripts.dest));
 }
 
@@ -151,12 +159,20 @@ export function watchFiles() {
 /**
  * Watch task
  */
-const watch = gulp.series(clean, gulp.parallel(watchStyles, watchScripts), serve, watchFiles);
+const watch = gulp.series(
+    clean,
+    gulp.parallel(watchStyles, watchScripts),
+    serve,
+    watchFiles,
+);
 
 /**
  * Build task
  */
-export const build = gulp.series(clean, gulp.parallel(buildStyles, buildScripts));
+export const build = gulp.series(
+    clean,
+    gulp.parallel(buildStyles, buildScripts),
+);
 
 /**
  * Default task
