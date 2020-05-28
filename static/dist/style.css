@@ -733,6 +733,12 @@ a {
 .c-timeline {
   position: relative; }
 
+.c-timeline__canvas canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1; }
+
 .c-timeline__navigation {
   position: absolute;
   bottom: 80px;

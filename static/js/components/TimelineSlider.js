@@ -140,7 +140,7 @@ export default class TimelineSlider {
             camera: {
                 fov: 60,
                 near: 10,
-                far: 1000,
+                far: 3000,
                 posX: -180,
                 posY: 100,
                 posZ: 1080,
@@ -154,11 +154,23 @@ export default class TimelineSlider {
             options.camera.far,
         );
 
-        this.camera.lookAt(this.scene.position);
+        this.camera.lookAt(0, 0, 0);
 
         this.camera.position.x = 0;
-        this.camera.position.y = 300;
+        this.camera.position.y = 250;
         this.camera.position.z = 1080;
+
+
+        ////////////
+        this.cameraWrapper = new THREE.Object3D();
+        this.cameraWrapper.position.set(0, 0, 0);
+        // TODO: isto zahartkodirano da odmah jedan element bude ljepo vidljiv
+        this.cameraWrapper.rotation.y = -0.17;
+        this.cameraWrapper.name = "camera wrapper";
+
+        this.cameraWrapper.add(this.camera);
+        this.scene.add(this.cameraWrapper);
+        //////////////
 
         const vector = new THREE.Vector3();
 
@@ -193,11 +205,12 @@ export default class TimelineSlider {
             // timelineItem.appendChild(text);
 
             this.helix = new CSS3DObject(timelineItem);
+            this.helix.name = `${this.timelineItems[i].title}, index: ${i}`;
 
             this.scene.add(this.helix);
 
             let theta = i * 0.5 + Math.PI;
-            let y = -(i * 48) + 600
+            let y = -(i * 48) + 600;
 
             this.helix.position.setFromCylindricalCoords(640, theta, y);
 
@@ -226,12 +239,11 @@ export default class TimelineSlider {
         this.animate();
         this.sliderNavigation();
 
-        //GUI
-        this.gui = new dat.GUI();
-
-        let cameraGUI = this.gui.addFolder("Camera:");
-        cameraGUI.add(this.camera.position, "x", -100, 100);
-
+        // //GUI
+        // this.gui = new dat.GUI();
+        //
+        // let cameraGUI = this.gui.addFolder("Camera:");
+        // cameraGUI.add(this.camera.position, "x", -100, 100);
     }
 
     onWindowResize() {
@@ -243,30 +255,27 @@ export default class TimelineSlider {
 
     animate() {
         requestAnimationFrame(() => this.animate());
-
         this.renderer.render(this.scene, this.camera);
     }
 
     sliderNavigation() {
-        console.log(this.camera);
-
-        let rotationSpeed = 0.2;
-
+        // TODO: tu ces trebati jos i y poziciju i lookAt mjenjati ovisno o pozici planea (ako sam dobro skuzio to imas na 212 liniji)
+        // TODO: rotaciju ces dobiti (Math.PI * 2) / broj poligona u punom krugu - iako realno moze ostati zahartkodirano
         this.timelineSliderPrev.addEventListener("click", () => {
             console.log("click Prev");
-
-            gsap.to(this.camera.position, {
+            gsap.to(this.cameraWrapper.rotation, {
                 duration: 1,
-                x: this.camera.position.x * Math.cos(rotationSpeed) + this.camera.position.z * Math.sin(rotationSpeed)
+                y: this.cameraWrapper.rotation.y - 0.5,
             });
-        })
+        });
+
         this.timelineSliderNext.addEventListener("click", () => {
             console.log("click Next");
 
-            gsap.to(this.camera.position, {
+            gsap.to(this.cameraWrapper.rotation, {
                 duration: 1,
-                x: this.camera.position.x * Math.cos(rotationSpeed) - this.camera.position.z * Math.sin(rotationSpeed)
+                y: this.cameraWrapper.rotation.y + 0.5,
             });
-        })
+        });
     }
 }
