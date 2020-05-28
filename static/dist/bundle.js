@@ -11828,17 +11828,26 @@ var TimelineSlider = /*#__PURE__*/function () {
         camera: {
           fov: 60,
           near: 10,
-          far: 1000,
+          far: 3000,
           posX: -180,
           posY: 100,
           posZ: 1080
         }
       };
       this.camera = new THREE.PerspectiveCamera(options.camera.fov, window.innerWidth / window.innerHeight, options.camera.near, options.camera.far);
-      this.camera.lookAt(this.scene.position);
+      this.camera.lookAt(0, 0, 0);
       this.camera.position.x = 0;
-      this.camera.position.y = 300;
-      this.camera.position.z = 1080;
+      this.camera.position.y = 250;
+      this.camera.position.z = 1080; ////////////
+
+      this.cameraWrapper = new THREE.Object3D();
+      this.cameraWrapper.position.set(0, 0, 0); // TODO: isto zahartkodirano da odmah jedan element bude ljepo vidljiv
+
+      this.cameraWrapper.rotation.y = -0.17;
+      this.cameraWrapper.name = "camera wrapper";
+      this.cameraWrapper.add(this.camera);
+      this.scene.add(this.cameraWrapper); //////////////
+
       var vector = new THREE.Vector3();
 
       for (var i = 0, l = this.timelineItems.length; i < l; i++) {
@@ -11864,6 +11873,7 @@ var TimelineSlider = /*#__PURE__*/function () {
         // timelineItem.appendChild(text);
 
         this.helix = new _CSS3DRenderer.CSS3DObject(timelineItem);
+        this.helix.name = "".concat(this.timelineItems[i].title, ", index: ").concat(i);
         this.scene.add(this.helix);
         var theta = i * 0.5 + Math.PI;
         var y = -(i * 48) + 600;
@@ -11883,11 +11893,11 @@ var TimelineSlider = /*#__PURE__*/function () {
         _this.onWindowResize;
       }, false);
       this.animate();
-      this.sliderNavigation(); //GUI
-
-      this.gui = new dat.GUI();
-      var cameraGUI = this.gui.addFolder("Camera:");
-      cameraGUI.add(this.camera.position, "x", -100, 100);
+      this.sliderNavigation(); // //GUI
+      // this.gui = new dat.GUI();
+      //
+      // let cameraGUI = this.gui.addFolder("Camera:");
+      // cameraGUI.add(this.camera.position, "x", -100, 100);
     }
   }, {
     key: "onWindowResize",
@@ -11911,22 +11921,22 @@ var TimelineSlider = /*#__PURE__*/function () {
     value: function sliderNavigation() {
       var _this3 = this;
 
-      console.log(this.camera);
-      var rotationSpeed = 0.2;
+      // TODO: tu ces trebati jos i y poziciju i lookAt mjenjati ovisno o pozici planea (ako sam dobro skuzio to imas na 212 liniji)
+      // TODO: rotaciju ces dobiti (Math.PI * 2) / broj poligona u punom krugu - iako realno moze ostati zahartkodirano
       this.timelineSliderPrev.addEventListener("click", function () {
         console.log("click Prev");
 
-        _gsap.default.to(_this3.camera.position, {
+        _gsap.default.to(_this3.cameraWrapper.rotation, {
           duration: 1,
-          x: _this3.camera.position.x * Math.cos(rotationSpeed) + _this3.camera.position.z * Math.sin(rotationSpeed)
+          y: _this3.cameraWrapper.rotation.y - 0.5
         });
       });
       this.timelineSliderNext.addEventListener("click", function () {
         console.log("click Next");
 
-        _gsap.default.to(_this3.camera.position, {
+        _gsap.default.to(_this3.cameraWrapper.rotation, {
           duration: 1,
-          x: _this3.camera.position.x * Math.cos(rotationSpeed) - _this3.camera.position.z * Math.sin(rotationSpeed)
+          y: _this3.cameraWrapper.rotation.y + 0.5
         });
       });
     }

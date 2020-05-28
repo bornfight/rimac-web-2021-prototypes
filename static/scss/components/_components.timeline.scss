@@ -1,126 +1,126 @@
 .c-timeline {
-	position: relative;
+    position: relative;
 
-	&__canvas {
+    &__canvas {
 
-	}
+    }
 
-	&__navigation {
-		position: absolute;
-		bottom: 80px;
-		left: 0;
-		width: 100%;
-	}
+    &__navigation {
+        position: absolute;
+        bottom: 80px;
+        left: 0;
+        width: 100%;
+    }
 
-	&__buttons {
-		width: 100%;
-		display: flex;
-		align-items: flex-end;
-	}
+    &__buttons {
+        width: 100%;
+        display: flex;
+        align-items: flex-end;
+    }
 
-	&__button {
-		background-color: transparent;
-		border: none;
-		outline: none;
-		cursor: pointer;
+    &__button {
+        background-color: transparent;
+        border: none;
+        outline: none;
+        cursor: pointer;
 
-		//modifiers
-		&--previous {
-			margin-right: 40px;
-			margin-left: auto;
-		}
+        //modifiers
+        &--previous {
+            margin-right: 40px;
+            margin-left: auto;
+        }
 
-		//overrides
-		&.c-link {
-			color: $white;
-		}
-	}
+        //overrides
+        &.c-link {
+            color: $white;
+        }
+    }
 }
 
 .c-timeline-item {
-	width: 320px * 0.95;
-	min-height: 180px * 0.95;
-	text-align: center;
-	line-height: normal;
-	cursor: pointer;
-	position: relative;
-	transform-style: preserve-3d;
-	backface-visibility: hidden;
+    width: 320px * 0.95;
+    min-height: 180px * 0.95;
+    text-align: center;
+    line-height: normal;
+    cursor: pointer;
+    position: relative;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
 
-	&:before {
-		content: "";
-		display: block;
-		background-color: rgb(0, 45, 44);
-		right: 0;
-		bottom: 0;
-		opacity: 0.75;
-		filter: blur(2px);
-		position: absolute;
-		top: 0;
-		left: 0;
-		transform: rotateY( 180deg );
-		transform-style: preserve-3d;
-		backface-visibility: hidden;
-	}
+    &:before {
+        content: "";
+        display: block;
+        background-color: rgb(0, 45, 44);
+        right: 0;
+        bottom: 0;
+        opacity: 0.75;
+        filter: blur(2px);
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform: rotateY(180deg);
+        transform-style: preserve-3d;
+        backface-visibility: hidden;
+    }
 
-	&__img {
-		display: block;
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background-size: cover;
-		background-position: center;
-		background-color: rgb(0, 76, 74);
-		box-shadow: 0 0 12px rgba(0,255,255,0.5);
-		border: 1px solid rgba(127,255,255,0.25);
-		transition: getTransition();
+    &__img {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        background-color: rgb(0, 76, 74);
+        box-shadow: 0 0 12px rgba(0, 255, 255, 0.5);
+        border: 1px solid rgba(127, 255, 255, 0.25);
+        transition: getTransition();
 
-	}
+    }
 
-	&__inner {
-		position: absolute;
-		top: 100%;
-		margin-top: -35px;
-		padding: 20px 40px;
-		transform: translateZ(10px);
-	}
+    &__inner {
+        position: absolute;
+        top: 100%;
+        margin-top: -35px;
+        padding: 20px 40px;
+        transform: translateZ(10px);
+    }
 
-	&:hover {
+    &:hover {
 
-		.c-timeline-item__img {
-			border: 1px solid rgba(255,255,255,0.5);
-			transform: scale(1.1);
-		}
+        .c-timeline-item__img {
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transform: scale(1.1);
+        }
 
-		.c-timeline-item__year {
-			transform: translateY(-20px);
-		}
+        .c-timeline-item__year {
+            transform: translateY(-20px);
+        }
 
-		.c-timeline-item__title {
-			transform: translateY(-25px);
-			transition-delay: 0.05s;
-		}
-	}
+        .c-timeline-item__title {
+            transform: translateY(-25px);
+            transition-delay: 0.05s;
+        }
+    }
 
-	&__year {
-		position: absolute;
-		top: 0;
-		left: 40px;
-		transition: transform 0.2s cubic-bezier(0.455, 0.03, 0.515, 0.955);
-		@extend .u-b2;
-	}
+    &__year {
+        position: absolute;
+        top: 0;
+        left: 40px;
+        transition: transform 0.2s cubic-bezier(0.455, 0.03, 0.515, 0.955);
+        @extend .u-b2;
+    }
 
-	&__title {
-		text-align: left;
-		max-width: 240px;
-		transition: transform 0.3s cubic-bezier(0.455, 0.03, 0.515, 0.955);
-		@extend .u-a5;
-	}
+    &__title {
+        text-align: left;
+        max-width: 240px;
+        transition: transform 0.3s cubic-bezier(0.455, 0.03, 0.515, 0.955);
+        @extend .u-a5;
+    }
 
-	&__text {
+    &__text {
 
-	}
+    }
 }
 
