@@ -22,7 +22,8 @@
 
     //modifiers
     &--homepage,
-    &--homepage-slider {
+    &--homepage-slider,
+    &--gradient {
         min-height: 100vh;
         display: flex;
         flex-direction: column;
