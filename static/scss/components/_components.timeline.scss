@@ -16,6 +16,11 @@
         width: 100%;
         display: flex;
         align-items: flex-end;
+
+        .is-rotating-left &,
+        .is-rotating-right & {
+            pointer-events: none;
+        }
     }
 
     &__button {
@@ -54,7 +59,6 @@
         right: 0;
         bottom: 0;
         opacity: 0.75;
-        filter: blur(2px);
         position: absolute;
         top: 0;
         left: 0;
@@ -91,7 +95,7 @@
 
         .c-timeline-item__img {
             border: 1px solid rgba(255, 255, 255, 0.5);
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
 
         .c-timeline-item__year {
@@ -124,3 +128,15 @@
     }
 }
 
+.c-timeline-slider-container {
+
+}
+
+.c-timeline-slider {
+
+    &__slide {
+        &.swiper-slide-active {
+            text-shadow: 0 0 12px rgba(0, 255, 255, 0.5);
+        }
+    }
+}

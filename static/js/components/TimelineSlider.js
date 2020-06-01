@@ -9,14 +9,21 @@ import * as dat from 'dat.gui';
 
 import gsap from "gsap";
 
+import Swiper from "swiper";
+
 export default class TimelineSlider {
     constructor() {
         this.DOM = {
             timeline: ".js-timeline",
+
             timelineSlider: ".js-timeline-slider",
-            timelineSliderPrev: ".js-timeline-slider-previous",
             timelineSliderNext: ".js-timeline-slider-next",
+            timelineSliderPrev: ".js-timeline-slider-previous",
             states: {},
+        };
+
+        this.options = {
+            transitionSpeed: 1000,
         };
 
         this.timeline = document.querySelector(this.DOM.timeline);
@@ -117,6 +124,7 @@ export default class TimelineSlider {
         ];
 
         this.timelineSlider = document.querySelector(this.DOM.timelineSlider);
+
         this.timelineSliderPrev = document.querySelector(this.DOM.timelineSliderPrev);
         this.timelineSliderNext = document.querySelector(this.DOM.timelineSliderNext);
 
@@ -129,6 +137,7 @@ export default class TimelineSlider {
         this.helix = null;
 
         this.init();
+        this.initSwiper();
     }
 
     init() {
@@ -157,20 +166,16 @@ export default class TimelineSlider {
         this.camera.lookAt(0, 0, 0);
 
         this.camera.position.x = 0;
-        this.camera.position.y = 250;
-        this.camera.position.z = 1080;
+        this.camera.position.y = 275;
+        this.camera.position.z = 1020;
 
 
-        ////////////
         this.cameraWrapper = new THREE.Object3D();
-        this.cameraWrapper.position.set(0, 0, 0);
-        // TODO: isto zahartkodirano da odmah jedan element bude ljepo vidljiv
-        this.cameraWrapper.rotation.y = -0.17;
+        this.cameraWrapper.position.set(0, 275, 0);
+        this.cameraWrapper.rotation.y = 3.150;
         this.cameraWrapper.name = "camera wrapper";
-
         this.cameraWrapper.add(this.camera);
         this.scene.add(this.cameraWrapper);
-        //////////////
 
         const vector = new THREE.Vector3();
 
@@ -199,11 +204,6 @@ export default class TimelineSlider {
             title.textContent = this.timelineItems[i].title;
             timelineItemInner.appendChild(title);
 
-            // let text = document.createElement("div");
-            // text.className = "c-timeline-item__text";
-            // text.textContent = this.timelineItems[i].text;
-            // timelineItem.appendChild(text);
-
             this.helix = new CSS3DObject(timelineItem);
             this.helix.name = `${this.timelineItems[i].title}, index: ${i}`;
 
@@ -216,7 +216,6 @@ export default class TimelineSlider {
 
             vector.x = this.helix.position.x * 2;
             vector.y = this.helix.position.y;
-            // vector.y = 0;
             vector.z = this.helix.position.z * 2;
 
             this.helix.lookAt(vector);
@@ -237,7 +236,7 @@ export default class TimelineSlider {
         );
 
         this.animate();
-        this.sliderNavigation();
+        this.helixNavigation();
 
         // //GUI
         // this.gui = new dat.GUI();
@@ -258,24 +257,72 @@ export default class TimelineSlider {
         this.renderer.render(this.scene, this.camera);
     }
 
-    sliderNavigation() {
+    helixNavigation() {
         // TODO: tu ces trebati jos i y poziciju i lookAt mjenjati ovisno o pozici planea (ako sam dobro skuzio to imas na 212 liniji)
         // TODO: rotaciju ces dobiti (Math.PI * 2) / broj poligona u punom krugu - iako realno moze ostati zahartkodirano
-        this.timelineSliderPrev.addEventListener("click", () => {
-            console.log("click Prev");
-            gsap.to(this.cameraWrapper.rotation, {
-                duration: 1,
-                y: this.cameraWrapper.rotation.y - 0.5,
-            });
+
+        // this.timelineSliderPrev.addEventListener("click", () => {
+        //     console.log("click Prev");
+        //     gsap.to(this.cameraWrapper.rotation, {
+        //         duration: 1,
+        //         y: "-=0.5",
+        //         onStart: () => {
+        //             document.documentElement.classList.add("is-rotating-right");
+        //         },
+        //         onComplete: () => {
+        //             document.documentElement.classList.remove("is-rotating-right");
+        //         }
+        //     });
+        //     gsap.to(this.cameraWrapper.position, {
+        //         duration: 1,
+        //         y: "+=50",
+        //     });
+        // });
+
+        // this.timelineSliderNext.addEventListener("click", () => {
+        //     console.log("click Next");
+        //
+        //     gsap.to(this.cameraWrapper.rotation, {
+        //         duration: 1,
+        //         y: "+=0.5",
+        //         onStart: () => {
+        //             document.documentElement.classList.add("is-rotating-left");
+        //         },
+        //         onComplete: () => {
+        //             document.documentElement.classList.remove("is-rotating-left");
+        //         }
+        //     });
+        //
+        //     gsap.to(this.cameraWrapper.position, {
+        //         duration: 1,
+        //         y: "-=50",
+        //     });
+        // });
+    }
+
+    initSwiper() {
+
+        let timelineSlider = new Swiper(this.DOM.timelineSlider, {
+            init: false,
+            slidesPerView: 13,
+            speed: this.options.transitionSpeed,
+            navigation: {
+                nextEl: this.DOM.timelineSliderNext,
+                prevEl: this.DOM.timelineSliderPrev,
+            },
         });
 
-        this.timelineSliderNext.addEventListener("click", () => {
-            console.log("click Next");
-
-            gsap.to(this.cameraWrapper.rotation, {
-                duration: 1,
-                y: this.cameraWrapper.rotation.y + 0.5,
-            });
+        timelineSlider.on("init", () => {
         });
+
+        timelineSlider.on("slideNextTransitionStart", () => {
+
+        });
+
+        timelineSlider.on("slidePrevTransitionStart", () => {
+
+        });
+
+        timelineSlider.init();
     }
 }
