@@ -223,6 +223,8 @@ var THREE = _interopRequireWildcard(require("three"));
 
 var _CSS3DRenderer = require("three/examples/jsm/renderers/CSS3DRenderer.js");
 
+var _gsap = _interopRequireDefault(require("gsap"));
+
 var _swiper = _interopRequireDefault(require("swiper"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -420,44 +422,49 @@ var TimelineSlider = /*#__PURE__*/function () {
     }
   }, {
     key: "helixNavigation",
-    value: function helixNavigation() {// TODO: tu ces trebati jos i y poziciju i lookAt mjenjati ovisno o pozici planea (ako sam dobro skuzio to imas na 212 liniji)
+    value: function helixNavigation() {
+      var _this3 = this;
+
+      // TODO: tu ces trebati jos i y poziciju i lookAt mjenjati ovisno o pozici planea (ako sam dobro skuzio to imas na 212 liniji)
       // TODO: rotaciju ces dobiti (Math.PI * 2) / broj poligona u punom krugu - iako realno moze ostati zahartkodirano
-      // this.timelineSliderPrev.addEventListener("click", () => {
-      //     console.log("click Prev");
-      //     gsap.to(this.cameraWrapper.rotation, {
-      //         duration: 1,
-      //         y: "-=0.5",
-      //         onStart: () => {
-      //             document.documentElement.classList.add("is-rotating-right");
-      //         },
-      //         onComplete: () => {
-      //             document.documentElement.classList.remove("is-rotating-right");
-      //         }
-      //     });
-      //     gsap.to(this.cameraWrapper.position, {
-      //         duration: 1,
-      //         y: "+=50",
-      //     });
-      // });
-      // this.timelineSliderNext.addEventListener("click", () => {
-      //     console.log("click Next");
-      //
-      //     gsap.to(this.cameraWrapper.rotation, {
-      //         duration: 1,
-      //         y: "+=0.5",
-      //         onStart: () => {
-      //             document.documentElement.classList.add("is-rotating-left");
-      //         },
-      //         onComplete: () => {
-      //             document.documentElement.classList.remove("is-rotating-left");
-      //         }
-      //     });
-      //
-      //     gsap.to(this.cameraWrapper.position, {
-      //         duration: 1,
-      //         y: "-=50",
-      //     });
-      // });
+      this.timelineSliderPrev.addEventListener("click", function () {
+        console.log("click Prev");
+
+        _gsap.default.to(_this3.cameraWrapper.rotation, {
+          duration: 1,
+          y: "-=0.5",
+          onStart: function onStart() {
+            document.documentElement.classList.add("is-rotating-right");
+          },
+          onComplete: function onComplete() {
+            document.documentElement.classList.remove("is-rotating-right");
+          }
+        });
+
+        _gsap.default.to(_this3.cameraWrapper.position, {
+          duration: 1,
+          y: "+=50"
+        });
+      });
+      this.timelineSliderNext.addEventListener("click", function () {
+        console.log("click Next");
+
+        _gsap.default.to(_this3.cameraWrapper.rotation, {
+          duration: 1,
+          y: "+=0.5",
+          onStart: function onStart() {
+            document.documentElement.classList.add("is-rotating-left");
+          },
+          onComplete: function onComplete() {
+            document.documentElement.classList.remove("is-rotating-left");
+          }
+        });
+
+        _gsap.default.to(_this3.cameraWrapper.position, {
+          duration: 1,
+          y: "-=50"
+        });
+      });
     }
   }, {
     key: "initSwiper",
@@ -483,7 +490,7 @@ var TimelineSlider = /*#__PURE__*/function () {
 
 exports.default = TimelineSlider;
 
-},{"swiper":"swiper","three":"three","three/examples/jsm/renderers/CSS3DRenderer.js":"three/examples/jsm/renderers/CSS3DRenderer.js"}],4:[function(require,module,exports){
+},{"gsap":"gsap","swiper":"swiper","three":"three","three/examples/jsm/renderers/CSS3DRenderer.js":"three/examples/jsm/renderers/CSS3DRenderer.js"}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
