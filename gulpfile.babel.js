@@ -11,6 +11,8 @@ import sass from "gulp-sass";
 import sourcemaps from "gulp-sourcemaps";
 import source from "vinyl-source-stream";
 import uglify from "gulp-uglify";
+import watchify from "watchify";
+import { plugins } from "./plugins";
 
 /**
  * Paths object
@@ -35,6 +37,11 @@ const paths = {
 };
 
 /**
+ * Read dependencies from plugins.js
+ */
+const dependencies = plugins;
+
+/**
  * browserSync create
  */
 const server = browserSync.create();
@@ -42,7 +49,7 @@ const server = browserSync.create();
 /**
  * Clean dist task
  */
-export const clean = () => del(["static/dist"]);
+export const clean = () => del(["static/dist/*", "!static/dist/vendor.js"]);
 
 /**
  * Watch SCSS task
@@ -78,49 +85,106 @@ export function buildStyles() {
 }
 
 /**
- * Watch JS task
+ * Browserify config for watching files
  */
-export function watchScripts() {
-    return browserify(paths.scripts.main)
-        .transform("babelify", {
-            global: true,
+const browserifyWatch = browserify({
+    entries: [paths.scripts.main],
+    cache: {},
+    packageCache: {},
+    plugin: [watchify],
+    debug: true,
+    transform: [
+        babelify.configure({
             presets: ["@babel/preset-env"],
             plugins: [
                 "@babel/plugin-syntax-dynamic-import",
                 "@babel/proposal-class-properties",
                 "@babel/proposal-object-rest-spread",
             ],
-        })
+        }),
+    ],
+});
+browserifyWatch.external(dependencies);
+browserifyWatch.on("update", watchScripts);
+
+/**
+ * Watch JS task
+ */
+export function watchScripts() {
+    return browserifyWatch
         .bundle()
+        .on("error", console.error)
         .pipe(source("bundle.js"))
         .pipe(buffer())
         .pipe(sourcemaps.init({ loadMaps: true }))
-        .pipe(sourcemaps.write("."))
+        .pipe(sourcemaps.write("./"))
         .pipe(gulp.dest(paths.scripts.dest))
         .pipe(server.stream());
 }
 
 /**
- * Build JS task
+ * Browserify config for building files
  */
-export function buildScripts() {
-    return browserify(paths.scripts.main)
-        .transform("babelify", {
-            global: true,
+const browserifyBuild = browserify({
+    entries: [paths.scripts.main],
+    cache: {},
+    packageCache: {},
+    debug: true,
+    transform: [
+        babelify.configure({
             presets: ["@babel/preset-env"],
             plugins: [
                 "@babel/plugin-syntax-dynamic-import",
                 "@babel/proposal-class-properties",
                 "@babel/proposal-object-rest-spread",
             ],
-        })
+        }),
+    ],
+});
+browserifyBuild.external(dependencies);
+
+/**
+ * Build JS task
+ */
+export function buildScripts() {
+    return browserifyBuild
         .bundle()
+        .on("error", console.error)
         .pipe(source("bundle.js"))
         .pipe(buffer())
         .pipe(
             uglify({
                 compress: {
                     pure_funcs: ["console.log"],
+                },
+            }),
+        )
+        .pipe(gulp.dest(paths.scripts.dest));
+}
+
+/**
+ * Build vendor JS
+ */
+export function buildVendorScripts() {
+    return browserify()
+        .require(dependencies)
+        .transform("babelify", {
+            global: true,
+            presets: ["@babel/preset-env"],
+            plugins: [
+                "@babel/plugin-syntax-dynamic-import",
+                "@babel/proposal-class-properties",
+                "@babel/proposal-object-rest-spread",
+            ],
+        })
+        .bundle()
+        .on("error", (err) => console.log(err))
+        .pipe(source("vendor.js"))
+        .pipe(buffer())
+        .pipe(
+            uglify({
+                compress: {
+                    drop_console: true,
                 },
             }),
         )
@@ -152,7 +216,6 @@ export function serve(done) {
  */
 export function watchFiles() {
     gulp.watch(paths.styles.src, gulp.series(watchStyles));
-    gulp.watch(paths.scripts.src, gulp.series(watchScripts, reload));
     gulp.watch(paths.markup.src, reload);
 }
 
@@ -172,7 +235,13 @@ const watch = gulp.series(
 export const build = gulp.series(
     clean,
     gulp.parallel(buildStyles, buildScripts),
+    buildVendorScripts,
 );
+
+/**
+ * Build vendor task
+ */
+export const buildVendor = gulp.series(buildVendorScripts);
 
 /**
  * Default task

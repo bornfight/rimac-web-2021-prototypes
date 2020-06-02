@@ -1,29 +1,32 @@
 {
   "name": "rimac-web-2020-prototypes",
   "version": "0.0.0",
-  "description": "Bornfight frontend project template based on gulp, es6 and scss",
-  "author": "Bornfight FE team",
-  "email": "frontend@bornfight.com",
   "private": true,
-  "engines": {
-    "node": ">=12.16.1",
-    "npm": ">=6.14.2"
+  "description": "Bornfight frontend project template based on gulp, es6 and scss",
+  "repository": {
+    "type": "git",
+    "url": ""
   },
+  "author": "Bornfight FE team",
   "scripts": {
     "build": "gulp build",
+    "build:vendor": "gulp buildVendor",
     "dev": "gulp",
     "esdoc": "./node_modules/.bin/esdoc",
     "format": "prettier --write \"static/**/*.{scss,js}\"",
     "lint:scss": "stylelint 'static/**/*.scss'"
   },
-  "repository": {
-    "type": "git",
-    "url": ""
-  },
   "browserslist": [
     "> 0.5%",
     "last 2 versions"
   ],
+  "dependencies": {
+    "@bornfight/b-reset": "^1.0.4",
+    "gsap": "^3.2.6",
+    "poly-fluid-sizing": "^1.1.0",
+    "swiper": "^5.4.1",
+    "three": "^0.117.1"
+  },
   "devDependencies": {
     "@babel/core": "^7.9.6",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
@@ -57,14 +60,12 @@
     "stylelint-prettier": "^1.1.2",
     "stylelint-scss": "^3.17.2",
     "vinyl-buffer": "^1.0.1",
-    "vinyl-source-stream": "^2.0.0"
+    "vinyl-source-stream": "^2.0.0",
+    "watchify": "^3.11.1"
   },
-  "dependencies": {
-    "@bornfight/b-reset": "^1.0.4",
-    "dat.gui": "^0.7.7",
-    "gsap": "^3.2.6",
-    "poly-fluid-sizing": "^1.1.0",
-    "swiper": "^5.4.1",
-    "three": "^0.116.1"
-  }
+  "engines": {
+    "node": ">=12.16.1",
+    "npm": ">=6.14.2"
+  },
+  "email": "frontend@bornfight.com"
 }

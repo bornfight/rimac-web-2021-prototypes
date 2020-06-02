@@ -1,13 +1,8 @@
-//import * as THREE from "three";
-
+import * as THREE from "three";
 import {
-    CSS3DRenderer,
     CSS3DObject,
+    CSS3DRenderer,
 } from "three/examples/jsm/renderers/CSS3DRenderer.js";
-
-import * as dat from 'dat.gui';
-
-import gsap from "gsap";
 
 import Swiper from "swiper";
 
@@ -237,12 +232,6 @@ export default class TimelineSlider {
 
         this.animate();
         this.helixNavigation();
-
-        // //GUI
-        // this.gui = new dat.GUI();
-        //
-        // let cameraGUI = this.gui.addFolder("Camera:");
-        // cameraGUI.add(this.camera.position, "x", -100, 100);
     }
 
     onWindowResize() {
