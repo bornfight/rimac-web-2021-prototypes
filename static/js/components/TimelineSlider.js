@@ -4,6 +4,7 @@ import {
     CSS3DRenderer,
 } from "three/examples/jsm/renderers/CSS3DRenderer.js";
 
+import gsap from "gsap";
 import Swiper from "swiper";
 
 export default class TimelineSlider {
@@ -250,43 +251,43 @@ export default class TimelineSlider {
         // TODO: tu ces trebati jos i y poziciju i lookAt mjenjati ovisno o pozici planea (ako sam dobro skuzio to imas na 212 liniji)
         // TODO: rotaciju ces dobiti (Math.PI * 2) / broj poligona u punom krugu - iako realno moze ostati zahartkodirano
 
-        // this.timelineSliderPrev.addEventListener("click", () => {
-        //     console.log("click Prev");
-        //     gsap.to(this.cameraWrapper.rotation, {
-        //         duration: 1,
-        //         y: "-=0.5",
-        //         onStart: () => {
-        //             document.documentElement.classList.add("is-rotating-right");
-        //         },
-        //         onComplete: () => {
-        //             document.documentElement.classList.remove("is-rotating-right");
-        //         }
-        //     });
-        //     gsap.to(this.cameraWrapper.position, {
-        //         duration: 1,
-        //         y: "+=50",
-        //     });
-        // });
+        this.timelineSliderPrev.addEventListener("click", () => {
+            console.log("click Prev");
+            gsap.to(this.cameraWrapper.rotation, {
+                duration: 1,
+                y: "-=0.5",
+                onStart: () => {
+                    document.documentElement.classList.add("is-rotating-right");
+                },
+                onComplete: () => {
+                    document.documentElement.classList.remove("is-rotating-right");
+                }
+            });
+            gsap.to(this.cameraWrapper.position, {
+                duration: 1,
+                y: "+=50",
+            });
+        });
 
-        // this.timelineSliderNext.addEventListener("click", () => {
-        //     console.log("click Next");
-        //
-        //     gsap.to(this.cameraWrapper.rotation, {
-        //         duration: 1,
-        //         y: "+=0.5",
-        //         onStart: () => {
-        //             document.documentElement.classList.add("is-rotating-left");
-        //         },
-        //         onComplete: () => {
-        //             document.documentElement.classList.remove("is-rotating-left");
-        //         }
-        //     });
-        //
-        //     gsap.to(this.cameraWrapper.position, {
-        //         duration: 1,
-        //         y: "-=50",
-        //     });
-        // });
+        this.timelineSliderNext.addEventListener("click", () => {
+            console.log("click Next");
+
+            gsap.to(this.cameraWrapper.rotation, {
+                duration: 1,
+                y: "+=0.5",
+                onStart: () => {
+                    document.documentElement.classList.add("is-rotating-left");
+                },
+                onComplete: () => {
+                    document.documentElement.classList.remove("is-rotating-left");
+                }
+            });
+
+            gsap.to(this.cameraWrapper.position, {
+                duration: 1,
+                y: "-=50",
+            });
+        });
     }
 
     initSwiper() {
