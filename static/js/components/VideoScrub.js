@@ -15,35 +15,12 @@ export default class VideoScrub {
         };
 
         this.video = document.querySelector(this.DOM.video);
-        // this.vh = document.documentElement.getBoundingClientRect().height;
-        // this.scrollHeight = document.querySelector(this.DOM.page).clientHeight;
     }
 
     init() {
         console.log("VideoScrub init()");
         this.gsapScrollTriggerVideoPlay();
-
-        // this.video.addEventListener("loadeddata", () => {
-        //     this.requestAnimationFrameVideoPlay();
-        // });
     }
-
-    /**
-     *
-     */
-    // requestAnimationFrameVideoPlay() {
-    //     requestAnimationFrame(() => this.scrollPlay());
-    // }
-    //
-    // scrollPlay() {
-    //     this.video.currentTime = window.pageYOffset / 500;
-    //
-    //     requestAnimationFrame(() => this.scrollPlay());
-    // }
-
-    /**
-     *
-     */
     gsapScrollTriggerVideoPlay() {
         this.video.addEventListener("loadeddata", () => {
             this.video.pause();
@@ -55,34 +32,17 @@ export default class VideoScrub {
                 overwrite: true,
                 pause: true,
                 onUpdate: () => {
-                    console.log(this.video.currentTime);
-                    console.log(this.video.duration);
+                    // console.log(this.video.currentTime);
+                    // console.log(this.video.duration);
                 },
             });
 
             ScrollTrigger.create({
-                //trigger: this.DOM.videoScrubTrigger,
-                markers: true,
+                // trigger: this.DOM.videoScrubTrigger,
+                // markers: true,
                 animation: videoScrub,
-                scrub: true,
+                scrub: 0.1,
             });
-
-            console.log();
-
-            // gsap.to(this.video, {
-            //     scrollTrigger: {
-            //         // trigger: this.DOM.videoScrubTrigger,
-            //         markers: true,
-            //         scrub: true,
-            //     },
-            //     duration: this.video.duration,
-            //     currentTime: this.video.duration,
-            //     ease: "none",
-            //     onUpdate: () => {
-            //         console.log(this.video.currentTime);
-            //         console.log(this.video.duration);
-            //     },
-            // });
         });
     }
 }

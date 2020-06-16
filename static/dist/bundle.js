@@ -6356,35 +6356,15 @@ var VideoScrub = /*#__PURE__*/function () {
         isPlaying: "is-video-playing"
       }
     };
-    this.video = document.querySelector(this.DOM.video); // this.vh = document.documentElement.getBoundingClientRect().height;
-    // this.scrollHeight = document.querySelector(this.DOM.page).clientHeight;
+    this.video = document.querySelector(this.DOM.video);
   }
 
   _createClass(VideoScrub, [{
     key: "init",
     value: function init() {
       console.log("VideoScrub init()");
-      this.gsapScrollTriggerVideoPlay(); // this.video.addEventListener("loadeddata", () => {
-      //     this.requestAnimationFrameVideoPlay();
-      // });
+      this.gsapScrollTriggerVideoPlay();
     }
-    /**
-     *
-     */
-    // requestAnimationFrameVideoPlay() {
-    //     requestAnimationFrame(() => this.scrollPlay());
-    // }
-    //
-    // scrollPlay() {
-    //     this.video.currentTime = window.pageYOffset / 500;
-    //
-    //     requestAnimationFrame(() => this.scrollPlay());
-    // }
-
-    /**
-     *
-     */
-
   }, {
     key: "gsapScrollTriggerVideoPlay",
     value: function gsapScrollTriggerVideoPlay() {
@@ -6399,33 +6379,17 @@ var VideoScrub = /*#__PURE__*/function () {
           ease: "none",
           overwrite: true,
           pause: true,
-          onUpdate: function onUpdate() {
-            console.log(_this.video.currentTime);
-            console.log(_this.video.duration);
+          onUpdate: function onUpdate() {// console.log(this.video.currentTime);
+            // console.log(this.video.duration);
           }
         });
 
         _ScrollTrigger.ScrollTrigger.create({
-          //trigger: this.DOM.videoScrubTrigger,
-          markers: true,
+          // trigger: this.DOM.videoScrubTrigger,
+          // markers: true,
           animation: videoScrub,
-          scrub: true
+          scrub: 0.1
         });
-
-        console.log(); // gsap.to(this.video, {
-        //     scrollTrigger: {
-        //         // trigger: this.DOM.videoScrubTrigger,
-        //         markers: true,
-        //         scrub: true,
-        //     },
-        //     duration: this.video.duration,
-        //     currentTime: this.video.duration,
-        //     ease: "none",
-        //     onUpdate: () => {
-        //         console.log(this.video.currentTime);
-        //         console.log(this.video.duration);
-        //     },
-        // });
       });
     }
   }]);
@@ -6624,7 +6588,7 @@ var _Dummy = _interopRequireDefault(require("./components/Dummy"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// import TimelineSlider from "./components/TimelineSlider";
+//import TimelineSlider from "./components/TimelineSlider";
 var ready = function ready(callbackFunc) {
   if (document.readyState !== "loading") {
     /**
@@ -6664,7 +6628,7 @@ ready(function () {
   var navigation = new _NavigationController.default();
   navigation.init();
 
-  if (document.getElementById("timeline-slider") !== null) {// const timelineSlider = new TimelineSlider();
+  if (document.getElementById("timeline-slider") !== null) {//const timelineSlider = new TimelineSlider();
   }
 
   if (document.getElementById("video-scrub") !== null) {
