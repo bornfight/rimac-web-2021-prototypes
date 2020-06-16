@@ -1,3 +1,11 @@
+.o-section-wrapper {
+
+    &--video-scrub {
+        position: relative;
+        z-index: 2;
+    }
+}
+
 .o-section {
     &__heading {
         padding-bottom: 20px;
@@ -23,6 +31,7 @@
     //modifiers
     &--homepage,
     &--homepage-slider,
+    &--video-scrub,
     &--gradient {
         min-height: 100vh;
         display: flex;
@@ -36,5 +45,12 @@
     }
 
     &--homepage-slider {
+    }
+
+    &--dummy {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        text-align: center;
     }
 }

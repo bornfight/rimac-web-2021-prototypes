@@ -1,6 +1,8 @@
 import GridHelper from "./helpers/GridHelper";
+import DarkModeHelper from "./helpers/DarkModeHelper";
 import NavigationController from "./components/NavigationController";
-import TimelineSlider from "./components/TimelineSlider";
+// import TimelineSlider from "./components/TimelineSlider";
+import VideoScrub from "./components/VideoScrub";
 import Dummy from "./components/Dummy";
 
 const ready = (callbackFunc) => {
@@ -45,6 +47,9 @@ ready(() => {
     const gridHelper = new GridHelper();
     gridHelper.init();
 
+    const darkModeHelper = new DarkModeHelper();
+    darkModeHelper.init();
+
     const dummy = new Dummy();
     dummy.init();
 
@@ -52,6 +57,11 @@ ready(() => {
     navigation.init();
 
     if (document.getElementById("timeline-slider") !== null) {
-        const timelineSlider = new TimelineSlider();
+        // const timelineSlider = new TimelineSlider();
+    }
+
+    if (document.getElementById("video-scrub") !== null) {
+        const videoScrub = new VideoScrub();
+        videoScrub.init();
     }
 });
