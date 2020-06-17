@@ -3,6 +3,7 @@ import DarkModeHelper from "./helpers/DarkModeHelper";
 import NavigationController from "./components/NavigationController";
 //import TimelineSlider from "./components/TimelineSlider";
 import VideoScrub from "./components/VideoScrub";
+import ScrollProgress from "./components/ScrollProgress";
 import Dummy from "./components/Dummy";
 
 const ready = (callbackFunc) => {
@@ -63,5 +64,10 @@ ready(() => {
     if (document.getElementById("video-scrub") !== null) {
         const videoScrub = new VideoScrub();
         videoScrub.init();
+    }
+
+    if (document.getElementById("scroll-progress") !== null) {
+        const scrollProgress = new ScrollProgress();
+        scrollProgress.init();
     }
 });

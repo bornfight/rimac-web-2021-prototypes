@@ -4,6 +4,11 @@
         position: relative;
         z-index: 2;
     }
+
+    &--scroll-progress {
+        position: relative;
+        z-index: 2;
+    }
 }
 
 .o-section {
@@ -32,6 +37,7 @@
     &--homepage,
     &--homepage-slider,
     &--video-scrub,
+    &--scroll-progress,
     &--gradient {
         min-height: 100vh;
         display: flex;

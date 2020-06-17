@@ -6344,6 +6344,74 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 _gsap.gsap.registerPlugin(_ScrollTrigger.ScrollTrigger);
 
+var ScrollProgress = /*#__PURE__*/function () {
+  function ScrollProgress() {
+    _classCallCheck(this, ScrollProgress);
+
+    this.DOM = {
+      scrollProgress: ".js-scroll-progress",
+      scrollProgressItem: ".js-scroll-progress-item",
+      scrollProgressTrigger: ".js-scroll-progress-trigger",
+      states: {
+        isActive: "is-active"
+      }
+    };
+    this.scrollProgress = document.querySelector(this.DOM.scrollProgress);
+    this.scrollProgressItems = document.querySelectorAll(this.DOM.scrollProgressItem);
+    this.scrollProgressTriggers = document.querySelectorAll(this.DOM.scrollProgressTrigger);
+  }
+
+  _createClass(ScrollProgress, [{
+    key: "init",
+    value: function init() {
+      console.log("ScrollProgress init()");
+
+      for (var i = 0, l = this.scrollProgressItems.length; i < l; i++) {
+        var progress = _gsap.gsap.to(this.scrollProgressItems[i], {
+          duration: 1,
+          scaleY: 1,
+          ease: "none",
+          onUpdate: function onUpdate() {// console.log("tutu");
+          }
+        });
+
+        _ScrollTrigger.ScrollTrigger.create({
+          trigger: this.scrollProgressTriggers[i],
+          // markers: true,
+          start: "top bottom",
+          end: "bottom bottom",
+          animation: progress,
+          scrub: 0.4
+        });
+      }
+    }
+  }]);
+
+  return ScrollProgress;
+}();
+
+exports.default = ScrollProgress;
+
+},{"gsap/dist/ScrollTrigger":1,"gsap/dist/gsap":2}],6:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _gsap = require("gsap/dist/gsap");
+
+var _ScrollTrigger = require("gsap/dist/ScrollTrigger");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+_gsap.gsap.registerPlugin(_ScrollTrigger.ScrollTrigger);
+
 var VideoScrub = /*#__PURE__*/function () {
   function VideoScrub() {
     _classCallCheck(this, VideoScrub);
@@ -6399,7 +6467,7 @@ var VideoScrub = /*#__PURE__*/function () {
 
 exports.default = VideoScrub;
 
-},{"gsap/dist/ScrollTrigger":1,"gsap/dist/gsap":2}],6:[function(require,module,exports){
+},{"gsap/dist/ScrollTrigger":1,"gsap/dist/gsap":2}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6459,7 +6527,7 @@ var DarkModeHelper = /*#__PURE__*/function () {
 
 exports.default = DarkModeHelper;
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6573,7 +6641,7 @@ var GridHelper = /*#__PURE__*/function () {
 
 exports.default = GridHelper;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 var _GridHelper = _interopRequireDefault(require("./helpers/GridHelper"));
@@ -6583,6 +6651,8 @@ var _DarkModeHelper = _interopRequireDefault(require("./helpers/DarkModeHelper")
 var _NavigationController = _interopRequireDefault(require("./components/NavigationController"));
 
 var _VideoScrub = _interopRequireDefault(require("./components/VideoScrub"));
+
+var _ScrollProgress = _interopRequireDefault(require("./components/ScrollProgress"));
 
 var _Dummy = _interopRequireDefault(require("./components/Dummy"));
 
@@ -6635,8 +6705,13 @@ ready(function () {
     var videoScrub = new _VideoScrub.default();
     videoScrub.init();
   }
+
+  if (document.getElementById("scroll-progress") !== null) {
+    var scrollProgress = new _ScrollProgress.default();
+    scrollProgress.init();
+  }
 });
 
-},{"./components/Dummy":3,"./components/NavigationController":4,"./components/VideoScrub":5,"./helpers/DarkModeHelper":6,"./helpers/GridHelper":7}]},{},[8])
+},{"./components/Dummy":3,"./components/NavigationController":4,"./components/ScrollProgress":5,"./components/VideoScrub":6,"./helpers/DarkModeHelper":7,"./helpers/GridHelper":8}]},{},[9])
 
 //# sourceMappingURL=bundle.js.map
