@@ -1,7 +1,7 @@
 import GridHelper from "./helpers/GridHelper";
 import DarkModeHelper from "./helpers/DarkModeHelper";
 import NavigationController from "./components/NavigationController";
-//import TimelineSlider from "./components/TimelineSlider";
+import TimelineSlider from "./components/TimelineSlider";
 import VideoScrub from "./components/VideoScrub";
 import ScrollProgress from "./components/ScrollProgress";
 import Dummy from "./components/Dummy";
@@ -58,7 +58,7 @@ ready(() => {
     navigation.init();
 
     if (document.getElementById("timeline-slider") !== null) {
-        //const timelineSlider = new TimelineSlider();
+        const timelineSlider = new TimelineSlider();
     }
 
     if (document.getElementById("video-scrub") !== null) {

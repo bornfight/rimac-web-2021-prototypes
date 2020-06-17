@@ -4,7 +4,7 @@ import {
     CSS3DRenderer,
 } from "three/examples/jsm/renderers/CSS3DRenderer.js";
 
-import gsap from "gsap";
+import { gsap } from "gsap";
 import Swiper from "swiper";
 
 export default class TimelineSlider {
