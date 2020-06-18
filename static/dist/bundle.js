@@ -1,1 +1,885 @@
-!function o(s,a,l){function c(t,e){if(!a[t]){if(!s[t]){var i="function"==typeof require&&require;if(!e&&i)return i(t,!0);if(d)return d(t,!0);var n=new Error("Cannot find module '"+t+"'");throw n.code="MODULE_NOT_FOUND",n}var r=a[t]={exports:{}};s[t][0].call(r.exports,function(e){return c(s[t][1][e]||e)},r,r.exports,o,s,a,l)}return a[t].exports}for(var d="function"==typeof require&&require,e=0;e<l.length;e++)c(l[e]);return c}({1:[function(e,t,i){"use strict";function r(e,t){for(var i=0;i<t.length;i++){var n=t[i];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(e,n.key,n)}}Object.defineProperty(i,"__esModule",{value:!0}),i.default=void 0;var n=function(){function e(){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,e)}var t,i,n;return t=e,(i=[{key:"init",value:function(){}}])&&r(t.prototype,i),n&&r(t,n),e}();i.default=n},{}],2:[function(e,t,i){"use strict";function r(e,t){for(var i=0;i<t.length;i++){var n=t[i];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(e,n.key,n)}}Object.defineProperty(i,"__esModule",{value:!0}),i.default=void 0;var n=function(){function e(){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,e),this.DOM={navigation:".js-navigation-wrapper",states:{navigationScrolled:"has-scrolled",navigationFixed:"is-fixed",navigationSlideUp:"slide-up"}},this.scrolling=!1,this.scrollNavigationOffset=200,this.previousTop=0,this.currentTop=0,this.scrollDelta=0,this.scrollOffset=0,this.navigation=document.querySelector(this.DOM.navigation)}var t,i,n;return t=e,(i=[{key:"init",value:function(){null!==this.navigation?this.navigationController():console.error("".concat(this.DOM.navigation," does not exist in the DOM!"))}},{key:"navigationController",value:function(){var e=this;document.addEventListener("scroll",function(){e.scrolling||(e.scrolling=!0,window.requestAnimationFrame?requestAnimationFrame(function(){return e.checkScroll()}):setTimeout(e.checkScroll(),250))})}},{key:"checkScroll",value:function(){var e=window.pageYOffset|document.body.scrollTop;this.changeNavigationState(e),this.previousTop=e,this.scrolling=!1}},{key:"changeNavigationState",value:function(e){e>this.scrollNavigationOffset?this.navigation.classList.add(this.DOM.states.navigationScrolled):this.navigation.classList.remove(this.DOM.states.navigationScrolled),this.previousTop>=e?this.scrollingUp(e):this.scrollingDown(e)}},{key:"scrollingUp",value:function(e){(e<this.scrollNavigationOffset||this.previousTop-e>this.scrollDelta)&&this.navigation.classList.remove(this.DOM.states.navigationSlideUp)}},{key:"scrollingDown",value:function(e){e>this.scrollNavigationOffset+this.scrollOffset?this.navigation.classList.add(this.DOM.states.navigationSlideUp):e>this.scrollNavigationOffset&&this.navigation.classList.remove(this.DOM.states.navigationSlideUp)}}])&&r(t.prototype,i),n&&r(t,n),e}();i.default=n},{}],3:[function(e,t,i){"use strict";Object.defineProperty(i,"__esModule",{value:!0}),i.default=void 0;var r=e("gsap"),o=e("gsap/ScrollTrigger");function s(e,t){for(var i=0;i<t.length;i++){var n=t[i];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(e,n.key,n)}}r.gsap.registerPlugin(o.ScrollTrigger);var n=function(){function e(){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,e),this.DOM={scrollProgress:".js-scroll-progress",scrollProgressItem:".js-scroll-progress-item",scrollProgressTrigger:".js-scroll-progress-trigger",states:{isActive:"is-active"}},this.scrollProgress=document.querySelector(this.DOM.scrollProgress),this.scrollProgressItems=document.querySelectorAll(this.DOM.scrollProgressItem),this.scrollProgressTriggers=document.querySelectorAll(this.DOM.scrollProgressTrigger)}var t,i,n;return t=e,(i=[{key:"init",value:function(){for(var e=0,t=this.scrollProgressItems.length;e<t;e++){var i=r.gsap.to(this.scrollProgressItems[e],{duration:1,scaleY:1,ease:"none",onUpdate:function(){}});o.ScrollTrigger.create({trigger:this.scrollProgressTriggers[e],start:"top bottom",end:"bottom bottom",animation:i,scrub:.4})}}}])&&s(t.prototype,i),n&&s(t,n),e}();i.default=n},{gsap:"gsap","gsap/ScrollTrigger":"gsap/ScrollTrigger"}],4:[function(e,t,i){"use strict";function s(e){return(s="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e})(e)}Object.defineProperty(i,"__esModule",{value:!0}),i.default=void 0;var n,m=function(e){if(e&&e.__esModule)return e;if(null===e||"object"!==s(e)&&"function"!=typeof e)return{default:e};var t=a();if(t&&t.has(e))return t.get(e);var i={},n=Object.defineProperty&&Object.getOwnPropertyDescriptor;for(var r in e){var o;Object.prototype.hasOwnProperty.call(e,r)&&((o=n?Object.getOwnPropertyDescriptor(e,r):null)&&(o.get||o.set)?Object.defineProperty(i,r,o):i[r]=e[r])}i.default=e,t&&t.set(e,i);return i}(e("three")),g=e("three/examples/jsm/renderers/CSS3DRenderer.js"),r=e("gsap"),o=(n=e("swiper"))&&n.__esModule?n:{default:n};function a(){if("function"!=typeof WeakMap)return null;var e=new WeakMap;return a=function(){return e},e}function l(e,t){for(var i=0;i<t.length;i++){var n=t[i];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(e,n.key,n)}}var c=function(){function e(){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,e),this.DOM={timeline:".js-timeline",timelineSlider:".js-timeline-slider",timelineSliderNext:".js-timeline-slider-next",timelineSliderPrev:".js-timeline-slider-previous",states:{}},this.options={transitionSpeed:1e3},this.timeline=document.querySelector(this.DOM.timeline),this.timelineItemsImagePath="static/images/",this.timelineItems=[{image:"timeline-01.jpg",year:"2008",title:"Lorem ipsum dolor sit.",text:"Makes example posts, pages, custom terms, helps to style and develop new and current themes."},{image:"timeline-02.jpg",year:"2009",title:"Rimac grows to over 100 employees.",text:"A simple to use Lorem Ipsum generator. A simple to use Lorem Ipsum generator."},{image:"timeline-03.jpg",year:"2010",title:"Rimac has 1914HP.",text:"It's based on the Lolita framework. A simple to use Lorem Ipsum generator."},{image:"timeline-01.jpg",year:"2011",title:"Lorem ipsum dolor sit.",text:"Makes example posts, pages, custom terms, helps to style and develop new and current themes."},{image:"timeline-02.jpg",year:"2012",title:"Rimac grows to over 100 employees.",text:"A simple to use Lorem Ipsum generator. A simple to use Lorem Ipsum generator."},{image:"timeline-03.jpg",year:"2013",title:"Rimac has 1914HP.",text:"It's based on the Lolita framework. A simple to use Lorem Ipsum generator."},{image:"timeline-01.jpg",year:"2014",title:"Lorem ipsum dolor sit.",text:"Makes example posts, pages, custom terms, helps to style and develop new and current themes."},{image:"timeline-02.jpg",year:"2015",title:"Rimac grows to over 100 employees.",text:"A simple to use Lorem Ipsum generator. A simple to use Lorem Ipsum generator."},{image:"timeline-03.jpg",year:"2016",title:"Rimac has 1914HP.",text:"It's based on the Lolita framework. A simple to use Lorem Ipsum generator."},{image:"timeline-01.jpg",year:"2017",title:"Lorem ipsum dolor sit.",text:"Makes example posts, pages, custom terms, helps to style and develop new and current themes."},{image:"timeline-02.jpg",year:"2018",title:"Rimac grows to over 100 employees.",text:"A simple to use Lorem Ipsum generator. A simple to use Lorem Ipsum generator."},{image:"timeline-03.jpg",year:"2019",title:"Rimac has 1914HP.",text:"It's based on the Lolita framework. A simple to use Lorem Ipsum generator."},{image:"timeline-01.jpg",year:"2020",title:"Lorem ipsum dolor sit.",text:"Makes example posts, pages, custom terms, helps to style and develop new and current themes."}],this.timelineSlider=document.querySelector(this.DOM.timelineSlider),this.timelineSliderPrev=document.querySelector(this.DOM.timelineSliderPrev),this.timelineSliderNext=document.querySelector(this.DOM.timelineSliderNext),this.camera=null,this.scene=null,this.renderer=null,this.helixItems=[],this.helix=null,this.init(),this.initSwiper()}var t,i,n;return t=e,(i=[{key:"init",value:function(){var e=this;this.scene=new m.Scene;var t={fov:60,near:10,far:3e3,posX:-180,posY:100,posZ:1080};this.camera=new m.PerspectiveCamera(t.fov,window.innerWidth/window.innerHeight,t.near,t.far),this.camera.lookAt(0,0,0),this.camera.position.x=0,this.camera.position.y=275,this.camera.position.z=1020,this.cameraWrapper=new m.Object3D,this.cameraWrapper.position.set(0,275,0),this.cameraWrapper.rotation.y=3.15,this.cameraWrapper.name="camera wrapper",this.cameraWrapper.add(this.camera),this.scene.add(this.cameraWrapper);for(var i=new m.Vector3,n=0,r=this.timelineItems.length;n<r;n++){var o=document.createElement("div");o.className="c-timeline-item";var s=document.createElement("i");s.className="c-timeline-item__img",s.style.backgroundImage="url(".concat(this.timelineItemsImagePath+this.timelineItems[n].image,")"),o.appendChild(s);var a=document.createElement("div");a.className="c-timeline-item__inner",o.appendChild(a);var l=document.createElement("div");l.className="c-timeline-item__year",l.textContent=this.timelineItems[n].year,a.appendChild(l);var c=document.createElement("div");c.className="c-timeline-item__title",c.textContent=this.timelineItems[n].title,a.appendChild(c),this.helix=new g.CSS3DObject(o),this.helix.name="".concat(this.timelineItems[n].title,", index: ").concat(n),this.scene.add(this.helix);var d=.5*n+Math.PI,u=-48*n+600;this.helix.position.setFromCylindricalCoords(640,d,u),i.x=2*this.helix.position.x,i.y=this.helix.position.y,i.z=2*this.helix.position.z,this.helix.lookAt(i),this.helixItems.push(this.helix)}this.renderer=new g.CSS3DRenderer,this.renderer.setSize(window.innerWidth,window.innerHeight),this.timeline.appendChild(this.renderer.domElement),window.addEventListener("resize",function(){e.onWindowResize},!1),this.animate(),this.helixNavigation()}},{key:"onWindowResize",value:function(){this.camera.aspect=window.innerWidth/window.innerHeight,this.camera.updateProjectionMatrix(),this.renderer.setSize(window.innerWidth,window.innerHeight)}},{key:"animate",value:function(){var e=this;requestAnimationFrame(function(){return e.animate()}),this.renderer.render(this.scene,this.camera)}},{key:"helixNavigation",value:function(){var e=this;this.timelineSliderPrev.addEventListener("click",function(){r.gsap.to(e.cameraWrapper.rotation,{duration:1,y:"-=0.5",onStart:function(){document.documentElement.classList.add("is-rotating-right")},onComplete:function(){document.documentElement.classList.remove("is-rotating-right")}}),r.gsap.to(e.cameraWrapper.position,{duration:1,y:"+=50"})}),this.timelineSliderNext.addEventListener("click",function(){r.gsap.to(e.cameraWrapper.rotation,{duration:1,y:"+=0.5",onStart:function(){document.documentElement.classList.add("is-rotating-left")},onComplete:function(){document.documentElement.classList.remove("is-rotating-left")}}),r.gsap.to(e.cameraWrapper.position,{duration:1,y:"-=50"})})}},{key:"initSwiper",value:function(){var e=new o.default(this.DOM.timelineSlider,{init:!1,slidesPerView:13,speed:this.options.transitionSpeed,navigation:{nextEl:this.DOM.timelineSliderNext,prevEl:this.DOM.timelineSliderPrev}});e.on("init",function(){}),e.on("slideNextTransitionStart",function(){}),e.on("slidePrevTransitionStart",function(){}),e.init()}}])&&l(t.prototype,i),n&&l(t,n),e}();i.default=c},{gsap:"gsap",swiper:"swiper",three:"three","three/examples/jsm/renderers/CSS3DRenderer.js":"three/examples/jsm/renderers/CSS3DRenderer.js"}],5:[function(e,t,i){"use strict";Object.defineProperty(i,"__esModule",{value:!0}),i.default=void 0;var r=e("gsap"),o=e("gsap/ScrollTrigger");function s(e,t){for(var i=0;i<t.length;i++){var n=t[i];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(e,n.key,n)}}r.gsap.registerPlugin(o.ScrollTrigger);var n=function(){function e(){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,e),this.DOM={video:".js-video-scrub",page:"#video-scrub",videoScrubTrigger:".js-video-scrub-trigger",states:{isPlaying:"is-video-playing"}},this.video=document.querySelector(this.DOM.video)}var t,i,n;return t=e,(i=[{key:"init",value:function(){this.gsapScrollTriggerVideoPlay()}},{key:"gsapScrollTriggerVideoPlay",value:function(){var t=this;this.video.addEventListener("loadeddata",function(){t.video.pause();var e=r.gsap.to(t.video,{duration:t.video.duration,currentTime:t.video.duration,ease:"none",overwrite:!0,pause:!0,onUpdate:function(){}});o.ScrollTrigger.create({animation:e,scrub:.1})})}}])&&s(t.prototype,i),n&&s(t,n),e}();i.default=n},{gsap:"gsap","gsap/ScrollTrigger":"gsap/ScrollTrigger"}],6:[function(e,t,i){"use strict";function r(e,t){for(var i=0;i<t.length;i++){var n=t[i];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(e,n.key,n)}}Object.defineProperty(i,"__esModule",{value:!0}),i.default=void 0;var n=function(){function t(){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,t),this.DOM={body:"body",states:{isLight:"is-light"}};var e=["background-color: #a6a6a6","color: black","display: block","line-height: 24px","text-align: center","border: 1px solid #ffffff","font-weight: bold"].join(";");this.body=document.getElementsByTagName(this.DOM.body)[0],console.info("toggle dark mode: %c Alt/Option + D ",e)}var e,i,n;return e=t,(i=[{key:"init",value:function(){this.toggleDarkMode()}},{key:"toggleDarkMode",value:function(){var t=this;document.addEventListener("keyup",function(e){68===e.keyCode&&e.altKey&&(t.body.classList.contains(t.DOM.states.isLight)?t.body.classList.remove(t.DOM.states.isLight):t.body.classList.add(t.DOM.states.isLight))})}}])&&r(e.prototype,i),n&&r(e,n),t}();i.default=n},{}],7:[function(e,t,i){"use strict";function r(e,t){for(var i=0;i<t.length;i++){var n=t[i];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(e,n.key,n)}}Object.defineProperty(i,"__esModule",{value:!0}),i.default=void 0;var n=function(){function t(){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,t),this.DOM={grid:"grid"},this.gridOptions={initialDisplay:"none",gridWidth:1440,columnCount:24,gridColor:"rgb(255, 0, 255, 0.15)",columnBgColor:"rgb(255, 0, 255, 0.025)",gutterWidth:0,gutterFixed:!1};var e=["background-color: #a6a6a6","color: black","display: block","line-height: 24px","text-align: center","border: 1px solid #ffffff","font-weight: bold"].join(";");console.info("toggle grid: %c Alt/Option + G ",e),this.grid=null,this.columnWidth=(this.gridOptions.gridWidth-(this.gridOptions.columnCount-1)*this.gridOptions.gutterWidth)/this.gridOptions.columnCount,this.columnWidthPercentage="".concat(this.columnWidth/this.gridOptions.gridWidth*100,"%"),this.gutterWidthPercentage="".concat(this.gridOptions.gutterWidth/this.gridOptions.gridWidth*100,"%")}var e,i,n;return e=t,(i=[{key:"init",value:function(){this.initGrid(),this.keyboardShortcut()}},{key:"initGrid",value:function(){this.grid=document.createElement("div"),this.grid.id=this.DOM.grid,this.grid.style.cssText="\n            pointer-events: none;\n            display: ".concat(this.gridOptions.initialDisplay,";\n            flex-direction: row;\n            width: 100%;\n            max-width: ").concat(this.gridOptions.gridWidth,"px;\n            height: 100%;\n            position: absolute;\n            top: 0;\n            left: 50%;\n            transform: translateX(-50%);\n            z-index: 999;\n        "),0<!this.gridOptions.gutterWidth&&(this.grid.style.borderLeft="none"),document.body.appendChild(this.grid);for(var e=0;e<this.gridOptions.columnCount;e++){var t=document.createElement("i");this.grid.appendChild(t),t.style.cssText="\n                height: auto;\n                flex-grow: 1;\n                background-color: ".concat(this.gridOptions.columnBgColor,";\n                border-left: 1px solid ").concat(this.gridOptions.gridColor,";\n            "),0<this.gridOptions.gutterWidth?t.style.borderRight="1px solid ".concat(this.gridOptions.gridColor):this.grid.style.borderRight="1px solid ".concat(this.gridOptions.gridColor),!0===this.gridOptions.gutterFixed?t.style.marginRight="".concat(this.gridOptions.gutterWidth,"px"):(t.style.marginRight=this.gutterWidthPercentage,t.style.width=this.columnWidthPercentage)}this.grid.lastChild.style.marginRight=0}},{key:"keyboardShortcut",value:function(){var t=this;document.addEventListener("keyup",function(e){71===e.keyCode&&e.altKey&&("none"===t.grid.style.display?t.grid.style.display="flex":t.grid.style.display="none")})}}])&&r(e.prototype,i),n&&r(e,n),t}();i.default=n},{}],8:[function(e,t,i){"use strict";var n=d(e("./helpers/GridHelper")),r=d(e("./helpers/DarkModeHelper")),o=d(e("./components/NavigationController")),s=d(e("./components/TimelineSlider")),a=d(e("./components/VideoScrub")),l=d(e("./components/ScrollProgress")),c=d(e("./components/Dummy"));function d(e){return e&&e.__esModule?e:{default:e}}var u;u=function(){var e=["background-color: #000000","color: white","display: block","line-height: 24px","text-align: center","border: 1px solid #ffffff","font-weight: bold"].join(";");console.info("dev by: %c Bornfight ",e),(new n.default).init(),(new r.default).init(),(new c.default).init(),(new o.default).init(),null!==document.getElementById("timeline-slider")&&new s.default,null!==document.getElementById("video-scrub")&&(new a.default).init(),null!==document.getElementById("scroll-progress")&&(new l.default).init()},"loading"!==document.readyState?u():document.addEventListener?document.addEventListener("DOMContentLoaded",u):document.attachEvent("onreadystatechange",function(){"complete"===document.readyState&&u()})},{"./components/Dummy":1,"./components/NavigationController":2,"./components/ScrollProgress":3,"./components/TimelineSlider":4,"./components/VideoScrub":5,"./helpers/DarkModeHelper":6,"./helpers/GridHelper":7}]},{},[8]);
+(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Dummy = /*#__PURE__*/function () {
+  function Dummy() {
+    _classCallCheck(this, Dummy);
+  }
+
+  _createClass(Dummy, [{
+    key: "init",
+    value: function init() {
+      console.log("Loaded!");
+    }
+  }]);
+
+  return Dummy;
+}();
+
+exports.default = Dummy;
+
+},{}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+/**
+ * "smart" navigation which goes off screen when scrolling down for a better overview of content and UX
+ * navigation appears when scrolling up
+ */
+var NavigationController = /*#__PURE__*/function () {
+  function NavigationController() {
+    _classCallCheck(this, NavigationController);
+
+    /**
+     * Navigation DOM selectors
+     * Navigation DOM state CSS classes
+     * @type {{navigation: string, states: {navigationSlideUp: string, navigationScrolled: string, navigationFixed: string}}}
+     */
+    this.DOM = {
+      navigation: ".js-navigation-wrapper",
+      states: {
+        navigationScrolled: "has-scrolled",
+        navigationFixed: "is-fixed",
+        navigationSlideUp: "slide-up"
+      }
+    };
+    /**
+     * flag, state variable for scrolling event
+     * @type {boolean}
+     */
+
+    this.scrolling = false;
+    /**
+     * amount of pixels to scroll from top for adding "has-scrolled" state class
+     * @type {number}
+     */
+
+    this.scrollNavigationOffset = 200;
+    /**
+     * variable for storing amount of scroll from top position value
+     * @type {number}
+     */
+
+    this.previousTop = 0;
+    /**
+     * variable for storing current scroll position value
+     * @type {number}
+     */
+
+    this.currentTop = 0;
+    this.scrollDelta = 0;
+    this.scrollOffset = 0;
+    /**
+     * fetch navigation element DOM element
+     * @type {Element}
+     */
+
+    this.navigation = document.querySelector(this.DOM.navigation);
+  } //region methods
+
+  /**
+   *
+   */
+
+
+  _createClass(NavigationController, [{
+    key: "init",
+    value: function init() {
+      console.log("Navigation init()");
+
+      if (this.navigation !== null) {
+        this.navigationController();
+      } else {
+        console.error("".concat(this.DOM.navigation, " does not exist in the DOM!"));
+      }
+    }
+    /**
+     *
+     */
+
+  }, {
+    key: "navigationController",
+    value: function navigationController() {
+      var _this = this;
+
+      document.addEventListener("scroll", function () {
+        if (!_this.scrolling) {
+          _this.scrolling = true;
+
+          if (!window.requestAnimationFrame) {
+            setTimeout(_this.checkScroll(), 250);
+          } else {
+            requestAnimationFrame(function () {
+              return _this.checkScroll();
+            });
+          }
+        }
+      });
+    }
+    /**
+     *
+     */
+
+  }, {
+    key: "checkScroll",
+    value: function checkScroll() {
+      /**
+       *
+       * @type {number}
+       */
+      var currentTop = window.pageYOffset | document.body.scrollTop;
+      this.changeNavigationState(currentTop);
+      this.previousTop = currentTop;
+      this.scrolling = false;
+    }
+    /**
+     *
+     * @param currentTop
+     */
+
+  }, {
+    key: "changeNavigationState",
+    value: function changeNavigationState(currentTop) {
+      if (currentTop > this.scrollNavigationOffset) {
+        this.navigation.classList.add(this.DOM.states.navigationScrolled);
+      } else {
+        this.navigation.classList.remove(this.DOM.states.navigationScrolled);
+      }
+
+      if (this.previousTop >= currentTop) {
+        this.scrollingUp(currentTop);
+      } else {
+        this.scrollingDown(currentTop);
+      }
+    }
+    /**
+     *
+     * @param currentTop
+     */
+
+  }, {
+    key: "scrollingUp",
+    value: function scrollingUp(currentTop) {
+      if (currentTop < this.scrollNavigationOffset) {
+        this.navigation.classList.remove(this.DOM.states.navigationSlideUp);
+      } else if (this.previousTop - currentTop > this.scrollDelta) {
+        this.navigation.classList.remove(this.DOM.states.navigationSlideUp);
+      }
+    }
+    /**
+     *
+     * @param currentTop
+     */
+
+  }, {
+    key: "scrollingDown",
+    value: function scrollingDown(currentTop) {
+      if (currentTop > this.scrollNavigationOffset + this.scrollOffset) {
+        this.navigation.classList.add(this.DOM.states.navigationSlideUp);
+      } else if (currentTop > this.scrollNavigationOffset) {
+        this.navigation.classList.remove(this.DOM.states.navigationSlideUp);
+      }
+    } //endregion
+
+  }]);
+
+  return NavigationController;
+}();
+
+exports.default = NavigationController;
+
+},{}],3:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _gsap = require("gsap");
+
+var _ScrollTrigger = require("gsap/ScrollTrigger");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+_gsap.gsap.registerPlugin(_ScrollTrigger.ScrollTrigger);
+
+var ScrollProgress = /*#__PURE__*/function () {
+  function ScrollProgress() {
+    _classCallCheck(this, ScrollProgress);
+
+    this.DOM = {
+      scrollProgress: ".js-scroll-progress",
+      scrollProgressItem: ".js-scroll-progress-item",
+      scrollProgressTrigger: ".js-scroll-progress-trigger",
+      states: {
+        isActive: "is-active"
+      }
+    };
+    this.scrollProgress = document.querySelector(this.DOM.scrollProgress);
+    this.scrollProgressItems = document.querySelectorAll(this.DOM.scrollProgressItem);
+    this.scrollProgressTriggers = document.querySelectorAll(this.DOM.scrollProgressTrigger);
+  }
+
+  _createClass(ScrollProgress, [{
+    key: "init",
+    value: function init() {
+      console.log("ScrollProgress init()");
+
+      for (var i = 0, l = this.scrollProgressItems.length; i < l; i++) {
+        var progress = _gsap.gsap.to(this.scrollProgressItems[i], {
+          duration: 1,
+          scaleY: 1,
+          ease: "none",
+          onUpdate: function onUpdate() {// console.log("tutu");
+          }
+        });
+
+        _ScrollTrigger.ScrollTrigger.create({
+          trigger: this.scrollProgressTriggers[i],
+          // markers: true,
+          start: "top bottom",
+          end: "bottom bottom",
+          animation: progress,
+          scrub: 0.4
+        });
+      }
+    }
+  }]);
+
+  return ScrollProgress;
+}();
+
+exports.default = ScrollProgress;
+
+},{"gsap":"gsap","gsap/ScrollTrigger":"gsap/ScrollTrigger"}],4:[function(require,module,exports){
+"use strict";
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var THREE = _interopRequireWildcard(require("three"));
+
+var _CSS3DRenderer = require("three/examples/jsm/renderers/CSS3DRenderer.js");
+
+var _gsap = require("gsap");
+
+var _swiper = _interopRequireDefault(require("swiper"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var TimelineSlider = /*#__PURE__*/function () {
+  function TimelineSlider() {
+    _classCallCheck(this, TimelineSlider);
+
+    this.DOM = {
+      timeline: ".js-timeline",
+      timelineSlider: ".js-timeline-slider",
+      timelineSliderNext: ".js-timeline-slider-next",
+      timelineSliderPrev: ".js-timeline-slider-previous",
+      states: {}
+    };
+    this.options = {
+      transitionSpeed: 1000
+    };
+    this.timeline = document.querySelector(this.DOM.timeline);
+    this.timelineItemsImagePath = "static/images/";
+    this.timelineItems = [{
+      image: "timeline-01.jpg",
+      year: "2008",
+      title: "Lorem ipsum dolor sit.",
+      text: "Makes example posts, pages, custom terms, helps to style and develop new and current themes."
+    }, {
+      image: "timeline-02.jpg",
+      year: "2009",
+      title: "Rimac grows to over 100 employees.",
+      text: "A simple to use Lorem Ipsum generator. A simple to use Lorem Ipsum generator."
+    }, {
+      image: "timeline-03.jpg",
+      year: "2010",
+      title: "Rimac has 1914HP.",
+      text: "It's based on the Lolita framework. A simple to use Lorem Ipsum generator."
+    }, {
+      image: "timeline-01.jpg",
+      year: "2011",
+      title: "Lorem ipsum dolor sit.",
+      text: "Makes example posts, pages, custom terms, helps to style and develop new and current themes."
+    }, {
+      image: "timeline-02.jpg",
+      year: "2012",
+      title: "Rimac grows to over 100 employees.",
+      text: "A simple to use Lorem Ipsum generator. A simple to use Lorem Ipsum generator."
+    }, {
+      image: "timeline-03.jpg",
+      year: "2013",
+      title: "Rimac has 1914HP.",
+      text: "It's based on the Lolita framework. A simple to use Lorem Ipsum generator."
+    }, {
+      image: "timeline-01.jpg",
+      year: "2014",
+      title: "Lorem ipsum dolor sit.",
+      text: "Makes example posts, pages, custom terms, helps to style and develop new and current themes."
+    }, {
+      image: "timeline-02.jpg",
+      year: "2015",
+      title: "Rimac grows to over 100 employees.",
+      text: "A simple to use Lorem Ipsum generator. A simple to use Lorem Ipsum generator."
+    }, {
+      image: "timeline-03.jpg",
+      year: "2016",
+      title: "Rimac has 1914HP.",
+      text: "It's based on the Lolita framework. A simple to use Lorem Ipsum generator."
+    }, {
+      image: "timeline-01.jpg",
+      year: "2017",
+      title: "Lorem ipsum dolor sit.",
+      text: "Makes example posts, pages, custom terms, helps to style and develop new and current themes."
+    }, {
+      image: "timeline-02.jpg",
+      year: "2018",
+      title: "Rimac grows to over 100 employees.",
+      text: "A simple to use Lorem Ipsum generator. A simple to use Lorem Ipsum generator."
+    }, {
+      image: "timeline-03.jpg",
+      year: "2019",
+      title: "Rimac has 1914HP.",
+      text: "It's based on the Lolita framework. A simple to use Lorem Ipsum generator."
+    }, {
+      image: "timeline-01.jpg",
+      year: "2020",
+      title: "Lorem ipsum dolor sit.",
+      text: "Makes example posts, pages, custom terms, helps to style and develop new and current themes."
+    }];
+    this.timelineSlider = document.querySelector(this.DOM.timelineSlider);
+    this.timelineSliderPrev = document.querySelector(this.DOM.timelineSliderPrev);
+    this.timelineSliderNext = document.querySelector(this.DOM.timelineSliderNext);
+    this.camera = null;
+    this.scene = null;
+    this.renderer = null;
+    this.helixItems = [];
+    this.helix = null;
+    this.init();
+    this.initSwiper();
+  }
+
+  _createClass(TimelineSlider, [{
+    key: "init",
+    value: function init() {
+      var _this = this;
+
+      console.log("TimelineSlider init()");
+      this.scene = new THREE.Scene();
+      var options = {
+        camera: {
+          fov: 60,
+          near: 10,
+          far: 3000,
+          posX: -180,
+          posY: 100,
+          posZ: 1080
+        }
+      };
+      this.camera = new THREE.PerspectiveCamera(options.camera.fov, window.innerWidth / window.innerHeight, options.camera.near, options.camera.far);
+      this.camera.lookAt(0, 0, 0);
+      this.camera.position.x = 0;
+      this.camera.position.y = 275;
+      this.camera.position.z = 1020;
+      this.cameraWrapper = new THREE.Object3D();
+      this.cameraWrapper.position.set(0, 275, 0);
+      this.cameraWrapper.rotation.y = 3.150;
+      this.cameraWrapper.name = "camera wrapper";
+      this.cameraWrapper.add(this.camera);
+      this.scene.add(this.cameraWrapper);
+      var vector = new THREE.Vector3();
+
+      for (var i = 0, l = this.timelineItems.length; i < l; i++) {
+        var timelineItem = document.createElement("div");
+        timelineItem.className = "c-timeline-item";
+        var timelineItemImage = document.createElement("i");
+        timelineItemImage.className = "c-timeline-item__img";
+        timelineItemImage.style.backgroundImage = "url(".concat(this.timelineItemsImagePath + this.timelineItems[i].image, ")");
+        timelineItem.appendChild(timelineItemImage);
+        var timelineItemInner = document.createElement("div");
+        timelineItemInner.className = "c-timeline-item__inner";
+        timelineItem.appendChild(timelineItemInner);
+        var year = document.createElement("div");
+        year.className = "c-timeline-item__year";
+        year.textContent = this.timelineItems[i].year;
+        timelineItemInner.appendChild(year);
+        var title = document.createElement("div");
+        title.className = "c-timeline-item__title";
+        title.textContent = this.timelineItems[i].title;
+        timelineItemInner.appendChild(title);
+        this.helix = new _CSS3DRenderer.CSS3DObject(timelineItem);
+        this.helix.name = "".concat(this.timelineItems[i].title, ", index: ").concat(i);
+        this.scene.add(this.helix);
+        var theta = i * 0.5 + Math.PI;
+        var y = -(i * 32) + 600;
+        this.helix.position.setFromCylindricalCoords(640, theta, y);
+        vector.x = this.helix.position.x * 2;
+        vector.y = this.helix.position.y;
+        vector.z = this.helix.position.z * 2;
+        this.helix.lookAt(vector);
+        this.helixItems.push(this.helix);
+      }
+
+      this.renderer = new _CSS3DRenderer.CSS3DRenderer();
+      this.renderer.setSize(window.innerWidth, window.innerHeight);
+      this.timeline.appendChild(this.renderer.domElement);
+      window.addEventListener("resize", function () {
+        _this.onWindowResize;
+      }, false);
+      this.animate();
+      this.helixNavigation();
+    }
+  }, {
+    key: "onWindowResize",
+    value: function onWindowResize() {
+      this.camera.aspect = window.innerWidth / window.innerHeight;
+      this.camera.updateProjectionMatrix();
+      this.renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+  }, {
+    key: "animate",
+    value: function animate() {
+      var _this2 = this;
+
+      requestAnimationFrame(function () {
+        return _this2.animate();
+      });
+      this.renderer.render(this.scene, this.camera);
+    }
+  }, {
+    key: "helixNavigation",
+    value: function helixNavigation() {
+      var _this3 = this;
+
+      // TODO: tu ces trebati jos i y poziciju i lookAt mjenjati ovisno o pozici planea (ako sam dobro skuzio to imas na 212 liniji)
+      // TODO: rotaciju ces dobiti (Math.PI * 2) / broj poligona u punom krugu - iako realno moze ostati zahartkodirano
+      this.timelineSliderPrev.addEventListener("click", function () {
+        console.log("click Prev");
+
+        _gsap.gsap.to(_this3.cameraWrapper.rotation, {
+          duration: 1,
+          y: "-=0.5",
+          onStart: function onStart() {
+            document.documentElement.classList.add("is-rotating-right");
+          },
+          onComplete: function onComplete() {
+            document.documentElement.classList.remove("is-rotating-right");
+          }
+        });
+
+        _gsap.gsap.to(_this3.cameraWrapper.position, {
+          duration: 1,
+          y: "+=50"
+        });
+      });
+      this.timelineSliderNext.addEventListener("click", function () {
+        console.log("click Next");
+
+        _gsap.gsap.to(_this3.cameraWrapper.rotation, {
+          duration: 1,
+          y: "+=0.5",
+          onStart: function onStart() {
+            document.documentElement.classList.add("is-rotating-left");
+          },
+          onComplete: function onComplete() {
+            document.documentElement.classList.remove("is-rotating-left");
+          }
+        });
+
+        _gsap.gsap.to(_this3.cameraWrapper.position, {
+          duration: 1,
+          y: "-=50"
+        });
+      });
+    }
+  }, {
+    key: "initSwiper",
+    value: function initSwiper() {
+      var timelineSlider = new _swiper.default(this.DOM.timelineSlider, {
+        init: false,
+        slidesPerView: 13,
+        speed: this.options.transitionSpeed,
+        navigation: {
+          nextEl: this.DOM.timelineSliderNext,
+          prevEl: this.DOM.timelineSliderPrev
+        }
+      });
+      timelineSlider.on("init", function () {});
+      timelineSlider.on("slideNextTransitionStart", function () {});
+      timelineSlider.on("slidePrevTransitionStart", function () {});
+      timelineSlider.init();
+    }
+  }]);
+
+  return TimelineSlider;
+}();
+
+exports.default = TimelineSlider;
+
+},{"gsap":"gsap","swiper":"swiper","three":"three","three/examples/jsm/renderers/CSS3DRenderer.js":"three/examples/jsm/renderers/CSS3DRenderer.js"}],5:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _gsap = require("gsap");
+
+var _ScrollTrigger = require("gsap/ScrollTrigger");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+_gsap.gsap.registerPlugin(_ScrollTrigger.ScrollTrigger);
+
+var VideoScrub = /*#__PURE__*/function () {
+  function VideoScrub() {
+    _classCallCheck(this, VideoScrub);
+
+    this.DOM = {
+      video: ".js-video-scrub",
+      page: "#video-scrub",
+      videoScrubTrigger: ".js-video-scrub-trigger",
+      states: {
+        isPlaying: "is-video-playing"
+      }
+    };
+    this.video = document.querySelector(this.DOM.video);
+  }
+
+  _createClass(VideoScrub, [{
+    key: "init",
+    value: function init() {
+      console.log("VideoScrub init()");
+      this.gsapScrollTriggerVideoPlay();
+    }
+  }, {
+    key: "gsapScrollTriggerVideoPlay",
+    value: function gsapScrollTriggerVideoPlay() {
+      var _this = this;
+
+      this.video.addEventListener("loadeddata", function () {
+        _this.video.pause();
+
+        var videoScrub = _gsap.gsap.to(_this.video, {
+          duration: _this.video.duration,
+          currentTime: _this.video.duration,
+          ease: "none",
+          overwrite: true,
+          pause: true,
+          onUpdate: function onUpdate() {// console.log(this.video.currentTime);
+            // console.log(this.video.duration);
+          }
+        });
+
+        _ScrollTrigger.ScrollTrigger.create({
+          // trigger: this.DOM.videoScrubTrigger,
+          // markers: true,
+          animation: videoScrub,
+          scrub: 0.1
+        });
+      });
+    }
+  }]);
+
+  return VideoScrub;
+}();
+
+exports.default = VideoScrub;
+
+},{"gsap":"gsap","gsap/ScrollTrigger":"gsap/ScrollTrigger"}],6:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var DarkModeHelper = /*#__PURE__*/function () {
+  /**
+   *
+   */
+  function DarkModeHelper() {
+    _classCallCheck(this, DarkModeHelper);
+
+    this.DOM = {
+      body: "body",
+      states: {
+        isLight: "is-light"
+      }
+    };
+    var consoleLogStyle = ["background-color: #a6a6a6", "color: black", "display: block", "line-height: 24px", "text-align: center", "border: 1px solid #ffffff", "font-weight: bold"].join(";");
+    this.body = document.getElementsByTagName(this.DOM.body)[0];
+    console.info("toggle dark mode: %c Alt/Option + D ", consoleLogStyle);
+  }
+
+  _createClass(DarkModeHelper, [{
+    key: "init",
+    value: function init() {
+      // console.log("DarkModeHelper init()");
+      this.toggleDarkMode();
+    }
+  }, {
+    key: "toggleDarkMode",
+    value: function toggleDarkMode() {
+      var _this = this;
+
+      document.addEventListener("keyup", function (ev) {
+        if (ev.keyCode === 68 && ev.altKey) {
+          if (_this.body.classList.contains(_this.DOM.states.isLight)) {
+            _this.body.classList.remove(_this.DOM.states.isLight);
+          } else {
+            _this.body.classList.add(_this.DOM.states.isLight);
+          }
+        }
+      });
+    }
+  }]);
+
+  return DarkModeHelper;
+}();
+
+exports.default = DarkModeHelper;
+
+},{}],7:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var GridHelper = /*#__PURE__*/function () {
+  /**
+   *
+   */
+  function GridHelper() {
+    _classCallCheck(this, GridHelper);
+
+    this.DOM = {
+      grid: "grid"
+    };
+    this.gridOptions = {
+      initialDisplay: "none",
+      //"flex" or "none"
+      gridWidth: 1440,
+      // px
+      columnCount: 24,
+      gridColor: "rgb(255, 0, 255, 0.15)",
+      columnBgColor: "rgb(255, 0, 255, 0.025)",
+      gutterWidth: 0,
+      // px
+      gutterFixed: false
+    };
+    var consoleLogStyle = ["background-color: #a6a6a6", "color: black", "display: block", "line-height: 24px", "text-align: center", "border: 1px solid #ffffff", "font-weight: bold"].join(";");
+    console.info("toggle grid: %c Alt/Option + G ", consoleLogStyle);
+    this.grid = null;
+    this.columnWidth = (this.gridOptions.gridWidth - (this.gridOptions.columnCount - 1) * this.gridOptions.gutterWidth) / this.gridOptions.columnCount;
+    this.columnWidthPercentage = "".concat(this.columnWidth / this.gridOptions.gridWidth * 100, "%");
+    this.gutterWidthPercentage = "".concat(this.gridOptions.gutterWidth / this.gridOptions.gridWidth * 100, "%");
+  }
+
+  _createClass(GridHelper, [{
+    key: "init",
+    value: function init() {
+      console.log("GridHelper init()");
+      this.initGrid();
+      this.keyboardShortcut();
+    }
+  }, {
+    key: "initGrid",
+    value: function initGrid() {
+      // create grid overlay element
+      this.grid = document.createElement("div");
+      this.grid.id = this.DOM.grid; // style grid element
+
+      this.grid.style.cssText = "\n            pointer-events: none;\n            display: ".concat(this.gridOptions.initialDisplay, ";\n            flex-direction: row;\n            width: 100%;\n            max-width: ").concat(this.gridOptions.gridWidth, "px;\n            height: 100%;\n            position: absolute;\n            top: 0;\n            left: 50%;\n            transform: translateX(-50%);\n            z-index: 999;\n        ");
+
+      if (!this.gridOptions.gutterWidth > 0) {
+        this.grid.style.borderLeft = "none";
+      } // add grid container to page
+
+
+      document.body.appendChild(this.grid); // add columns to grid
+
+      for (var i = 0; i < this.gridOptions.columnCount; i++) {
+        var column = document.createElement("i");
+        this.grid.appendChild(column);
+        column.style.cssText = "\n                height: auto;\n                flex-grow: 1;\n                background-color: ".concat(this.gridOptions.columnBgColor, ";\n                border-left: 1px solid ").concat(this.gridOptions.gridColor, ";\n            ");
+
+        if (this.gridOptions.gutterWidth > 0) {
+          column.style.borderRight = "1px solid ".concat(this.gridOptions.gridColor);
+        } else {
+          this.grid.style.borderRight = "1px solid ".concat(this.gridOptions.gridColor);
+        }
+
+        if (this.gridOptions.gutterFixed === true) {
+          column.style.marginRight = "".concat(this.gridOptions.gutterWidth, "px");
+        } else {
+          column.style.marginRight = this.gutterWidthPercentage;
+          column.style.width = this.columnWidthPercentage;
+        }
+      }
+
+      this.grid.lastChild.style.marginRight = 0;
+    }
+    /**
+     *
+     */
+
+  }, {
+    key: "keyboardShortcut",
+    value: function keyboardShortcut() {
+      var _this = this;
+
+      document.addEventListener("keyup", function (ev) {
+        if (ev.keyCode === 71 && ev.altKey) {
+          if (_this.grid.style.display === "none") {
+            _this.grid.style.display = "flex";
+          } else {
+            _this.grid.style.display = "none";
+          }
+        }
+      });
+    }
+  }]);
+
+  return GridHelper;
+}();
+
+exports.default = GridHelper;
+
+},{}],8:[function(require,module,exports){
+"use strict";
+
+var _GridHelper = _interopRequireDefault(require("./helpers/GridHelper"));
+
+var _DarkModeHelper = _interopRequireDefault(require("./helpers/DarkModeHelper"));
+
+var _NavigationController = _interopRequireDefault(require("./components/NavigationController"));
+
+var _TimelineSlider = _interopRequireDefault(require("./components/TimelineSlider"));
+
+var _VideoScrub = _interopRequireDefault(require("./components/VideoScrub"));
+
+var _ScrollProgress = _interopRequireDefault(require("./components/ScrollProgress"));
+
+var _Dummy = _interopRequireDefault(require("./components/Dummy"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var ready = function ready(callbackFunc) {
+  if (document.readyState !== "loading") {
+    /**
+     * Document is already ready, call the callback directly
+     */
+    callbackFunc();
+  } else if (document.addEventListener) {
+    /**
+     * All modern browsers to register DOMContentLoaded
+     */
+    document.addEventListener("DOMContentLoaded", callbackFunc);
+  } else {
+    /**
+     * Old IE browsers
+     */
+    document.attachEvent("onreadystatechange", function () {
+      if (document.readyState === "complete") {
+        callbackFunc();
+      }
+    });
+  }
+};
+/**
+ * Document ready callback
+ */
+
+
+ready(function () {
+  var credits = ["background-color: #000000", "color: white", "display: block", "line-height: 24px", "text-align: center", "border: 1px solid #ffffff", "font-weight: bold"].join(";");
+  console.info("dev by: %c Bornfight ", credits);
+  var gridHelper = new _GridHelper.default();
+  gridHelper.init();
+  var darkModeHelper = new _DarkModeHelper.default();
+  darkModeHelper.init();
+  var dummy = new _Dummy.default();
+  dummy.init();
+  var navigation = new _NavigationController.default();
+  navigation.init();
+
+  if (document.getElementById("timeline-slider") !== null) {
+    var timelineSlider = new _TimelineSlider.default();
+  }
+
+  if (document.getElementById("video-scrub") !== null) {
+    var videoScrub = new _VideoScrub.default();
+    videoScrub.init();
+  }
+
+  if (document.getElementById("scroll-progress") !== null) {
+    var scrollProgress = new _ScrollProgress.default();
+    scrollProgress.init();
+  }
+});
+
+},{"./components/Dummy":1,"./components/NavigationController":2,"./components/ScrollProgress":3,"./components/TimelineSlider":4,"./components/VideoScrub":5,"./helpers/DarkModeHelper":6,"./helpers/GridHelper":7}]},{},[8])
+
+//# sourceMappingURL=bundle.js.map

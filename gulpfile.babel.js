@@ -203,7 +203,7 @@ export function reload(done) {
  */
 export function serve(done) {
     server.init({
-        proxy: "localhost/rimac-web-2020-prototypes",
+        proxy: "www.work.loc/rimac-web-2020-prototypes",
         port: 3000,
         host: "localhost",
     });

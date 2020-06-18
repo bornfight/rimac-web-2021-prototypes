@@ -206,7 +206,7 @@ export default class TimelineSlider {
             this.scene.add(this.helix);
 
             let theta = i * 0.5 + Math.PI;
-            let y = -(i * 48) + 600;
+            let y = -(i * 32) + 600;
 
             this.helix.position.setFromCylindricalCoords(640, theta, y);
 
