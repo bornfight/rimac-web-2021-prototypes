@@ -51,6 +51,8 @@
     position: relative;
     transform-style: preserve-3d;
     backface-visibility: hidden;
+    //opacity: 0.7;
+    //filter: grayscale(0.7);
 
     &:before {
         content: "";
@@ -89,6 +91,14 @@
         margin-top: -35px;
         padding: 20px 40px;
         transform: translateZ(10px);
+        opacity: 0;
+        transition: opacity 0.3s ease-out;
+    }
+
+    &.is-active {
+        .c-timeline-item__inner {
+            opacity: 1;
+        }
     }
 
     &:hover {

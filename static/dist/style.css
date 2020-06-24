@@ -602,6 +602,10 @@ a {
   -webkit-transform: translateY(-100%);
           transform: translateY(-100%); }
 
+.o-page--gradient {
+  position: relative;
+  z-index: 2; }
+
 .o-section-wrapper--video-scrub {
   position: relative;
   z-index: 2; }
@@ -893,7 +897,13 @@ a {
   margin-top: -35px;
   padding: 20px 40px;
   -webkit-transform: translateZ(10px);
-          transform: translateZ(10px); }
+          transform: translateZ(10px);
+  opacity: 0;
+  -webkit-transition: opacity 0.3s ease-out;
+  transition: opacity 0.3s ease-out; }
+
+.c-timeline-item.is-active .c-timeline-item__inner {
+  opacity: 1; }
 
 .c-timeline-item:hover .c-timeline-item__img {
   border: 1px solid rgba(255, 255, 255, 0.5);
@@ -930,6 +940,48 @@ a {
 .c-timeline-slider__slide.swiper-slide-active {
   text-shadow: 0 0 12px rgba(0, 255, 255, 0.5); }
 
+.c-page-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden; }
+
+.c-page-bg__gradient {
+  display: block;
+  position: absolute; }
+
+.c-page-bg__gradient--layer-1 {
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent radial-gradient(at calc(var(--mouse-x, 0) * 160%) calc(var(--mouse-y, 0) * 90%), rgba(255, 255, 255, 0), white) no-repeat 0 0; }
+
+.c-page-bg__gradient--layer-2 {
+  z-index: 2;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(15%, #00141d), to(transparent)), -webkit-gradient(linear, left bottom, right top, from(#091f28), to(transparent)), -webkit-gradient(linear, right bottom, left top, from(#12ccc4), to(transparent));
+  background: linear-gradient(#00141d 15%, transparent), linear-gradient(to top right, #091f28, transparent), linear-gradient(to top left, #12ccc4, transparent);
+  background-blend-mode: multiply; }
+
+.c-page-bg__bg {
+  z-index: 3;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  background-color: #ffffff; }
+
 .c-footer .o-container {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -961,6 +1013,10 @@ a {
   padding: 20px 30px;
   min-width: 85px;
   border: 1px solid rgba(255, 255, 255, 0.2); }
+
+.c-dummy--dark {
+  color: #000000;
+  border: 1px solid rgba(0, 0, 0, 0.2); }
 
 /**
  * Pages

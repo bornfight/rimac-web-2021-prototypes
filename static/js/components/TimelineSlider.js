@@ -23,6 +23,7 @@ export default class TimelineSlider {
         };
 
         this.timeline = document.querySelector(this.DOM.timeline);
+        this.timelineSlider = document.querySelector(this.DOM.timelineSlider);
 
         this.timelineItemsImagePath = "static/images/";
         this.timelineItems = [
@@ -121,8 +122,12 @@ export default class TimelineSlider {
 
         this.timelineSlider = document.querySelector(this.DOM.timelineSlider);
 
-        this.timelineSliderPrev = document.querySelector(this.DOM.timelineSliderPrev);
-        this.timelineSliderNext = document.querySelector(this.DOM.timelineSliderNext);
+        this.timelineSliderPrev = document.querySelector(
+            this.DOM.timelineSliderPrev,
+        );
+        this.timelineSliderNext = document.querySelector(
+            this.DOM.timelineSliderNext,
+        );
 
         this.camera = null;
         this.scene = null;
@@ -130,10 +135,15 @@ export default class TimelineSlider {
 
         this.helixItems = [];
 
-        this.helix = null;
+        this.helixItem = null;
+
+        this.slideCounter = 0;
 
         this.init();
-        this.initSwiper();
+
+        if (this.timelineSlider) {
+            this.initSwiper();
+        }
     }
 
     init() {
@@ -149,7 +159,7 @@ export default class TimelineSlider {
                 posX: -180,
                 posY: 100,
                 posZ: 1080,
-            }
+            },
         };
 
         this.camera = new THREE.PerspectiveCamera(
@@ -165,10 +175,9 @@ export default class TimelineSlider {
         this.camera.position.y = 275;
         this.camera.position.z = 1020;
 
-
         this.cameraWrapper = new THREE.Object3D();
         this.cameraWrapper.position.set(0, 275, 0);
-        this.cameraWrapper.rotation.y = 3.150;
+        this.cameraWrapper.rotation.y = 3.15;
         this.cameraWrapper.name = "camera wrapper";
         this.cameraWrapper.add(this.camera);
         this.scene.add(this.cameraWrapper);
@@ -200,21 +209,21 @@ export default class TimelineSlider {
             title.textContent = this.timelineItems[i].title;
             timelineItemInner.appendChild(title);
 
-            this.helix = new CSS3DObject(timelineItem);
-            this.helix.name = `${this.timelineItems[i].title}, index: ${i}`;
+            this.helixItem = new CSS3DObject(timelineItem);
+            this.helixItem.name = `${this.timelineItems[i].title}, index: ${i}`;
 
-            this.scene.add(this.helix);
+            this.scene.add(this.helixItem);
 
-            let theta = i * 0.5 + Math.PI;
-            let y = -(i * 32) + 600;
+            let theta = i * 0.85 + Math.PI;
+            let y = -(i * 200) + 600;
 
-            this.helix.position.setFromCylindricalCoords(640, theta, y);
+            this.helixItem.position.setFromCylindricalCoords(640, theta, y);
 
-            vector.x = this.helix.position.x * 2;
-            vector.y = this.helix.position.y;
-            vector.z = this.helix.position.z * 2;
+            vector.x = this.helixItem.position.x * 2;
+            vector.y = this.helixItem.position.y;
+            vector.z = this.helixItem.position.z * 2;
 
-            this.helix.lookAt(vector);
+            this.helixItem.lookAt(vector);
 
             this.helixItems.push(this.helix);
         }
@@ -251,47 +260,96 @@ export default class TimelineSlider {
         // TODO: tu ces trebati jos i y poziciju i lookAt mjenjati ovisno o pozici planea (ako sam dobro skuzio to imas na 212 liniji)
         // TODO: rotaciju ces dobiti (Math.PI * 2) / broj poligona u punom krugu - iako realno moze ostati zahartkodirano
 
+        document
+            .querySelectorAll(".c-timeline-item")[0]
+            .classList.add("is-active");
+
         this.timelineSliderPrev.addEventListener("click", () => {
             console.log("click Prev");
-            gsap.to(this.cameraWrapper.rotation, {
-                duration: 1,
-                y: "-=0.5",
-                onStart: () => {
-                    document.documentElement.classList.add("is-rotating-right");
-                },
-                onComplete: () => {
-                    document.documentElement.classList.remove("is-rotating-right");
-                }
-            });
-            gsap.to(this.cameraWrapper.position, {
-                duration: 1,
-                y: "+=50",
-            });
+
+            if (this.slideCounter > 0) {
+                gsap.to(this.cameraWrapper.rotation, {
+                    duration: 0.6,
+                    y: "-=0.85",
+                    onStart: () => {
+                        this.slideCounter -= 1;
+                        document.documentElement.classList.add(
+                            "is-rotating-right",
+                        );
+
+                        for (
+                            let i = 0, l = this.timelineItems.length;
+                            i < l;
+                            i++
+                        ) {
+                            console.log(
+                                document.querySelectorAll(".c-timeline-item"),
+                            );
+                            document
+                                .querySelectorAll(".c-timeline-item")
+                                [i].classList.remove("is-active");
+                        }
+                    },
+                    onComplete: () => {
+                        document.documentElement.classList.remove(
+                            "is-rotating-right",
+                        );
+
+                        document
+                            .querySelectorAll(".c-timeline-item")
+                            [this.slideCounter].classList.add("is-active");
+                    },
+                });
+                gsap.to(this.cameraWrapper.position, {
+                    duration: 0.6,
+                    y: "+=200",
+                });
+            }
         });
 
         this.timelineSliderNext.addEventListener("click", () => {
             console.log("click Next");
 
-            gsap.to(this.cameraWrapper.rotation, {
-                duration: 1,
-                y: "+=0.5",
-                onStart: () => {
-                    document.documentElement.classList.add("is-rotating-left");
-                },
-                onComplete: () => {
-                    document.documentElement.classList.remove("is-rotating-left");
-                }
-            });
+            if (this.slideCounter < this.timelineItems.length - 1) {
+                gsap.to(this.cameraWrapper.rotation, {
+                    duration: 0.6,
+                    y: "+=0.85",
+                    onStart: () => {
+                        this.slideCounter += 1;
+                        document.documentElement.classList.add(
+                            "is-rotating-left",
+                        );
 
-            gsap.to(this.cameraWrapper.position, {
-                duration: 1,
-                y: "-=50",
-            });
+                        for (
+                            let i = 0, l = this.timelineItems.length;
+                            i < l;
+                            i++
+                        ) {
+                            document
+                                .querySelectorAll(".c-timeline-item")
+                                [i].classList.remove("is-active");
+                        }
+                    },
+                    onComplete: () => {
+                        document.documentElement.classList.remove(
+                            "is-rotating-left",
+                        );
+
+                        document
+                            .querySelectorAll(".c-timeline-item")
+                            [this.slideCounter].classList.add("is-active");
+                    },
+                });
+
+                gsap.to(this.cameraWrapper.position, {
+                    duration: 0.6,
+                    y: "-=200",
+                });
+            }
         });
     }
 
     initSwiper() {
-
         let timelineSlider = new Swiper(this.DOM.timelineSlider, {
             init: false,
             slidesPerView: 13,
@@ -302,16 +360,11 @@ export default class TimelineSlider {
             },
         });
 
-        timelineSlider.on("init", () => {
-        });
+        timelineSlider.on("init", () => {});
 
-        timelineSlider.on("slideNextTransitionStart", () => {
+        timelineSlider.on("slideNextTransitionStart", () => {});
 
-        });
-
-        timelineSlider.on("slidePrevTransitionStart", () => {
-
-        });
+        timelineSlider.on("slidePrevTransitionStart", () => {});
 
         timelineSlider.init();
     }

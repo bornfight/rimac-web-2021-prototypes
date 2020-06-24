@@ -37,6 +37,120 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
+var _gsap = require("gsap");
+
+var _ScrollTrigger = require("gsap/ScrollTrigger");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+_gsap.gsap.registerPlugin(_ScrollTrigger.ScrollTrigger);
+
+var GradientBg = /*#__PURE__*/function () {
+  function GradientBg() {
+    _classCallCheck(this, GradientBg);
+
+    this.DOM = {
+      bgContainer: ".js-page-bg",
+      bg: ".js-page-bg-bg",
+      bgGradientMouseFollow: ".js-page-bg-gradient-mousefollow",
+      bgGradientMouseMove: ".js-page-bg-gradient-mousemove",
+      bgChangeTrigger: ".js-page-bg-change-trigger",
+      states: {}
+    };
+    this.body = document.getElementsByTagName(this.DOM.body)[0];
+    this.bgContainer = document.querySelector(this.DOM.bgContainer);
+    this.bg = document.querySelector(this.DOM.bg);
+    this.bgChangeTrigger = document.querySelectorAll(this.DOM.bgChangeTrigger);
+    this.bgGradientMouseFollow = document.querySelector(this.DOM.bgGradientMouseFollow);
+    this.bgGradientMouseMove = document.querySelector(this.DOM.bgGradientMouseMove);
+  }
+
+  _createClass(GradientBg, [{
+    key: "init",
+    value: function init() {
+      console.log("GradientBg init()");
+      this.bgColorChange();
+      this.onMouseMove();
+    }
+  }, {
+    key: "bgColorChange",
+    value: function bgColorChange() {
+      var _this = this;
+
+      var _loop = function _loop(i, l) {
+        var bgChange = _gsap.gsap.to(_this.bg, {
+          duration: 1,
+          opacity: _this.bgChangeTrigger[i].getAttribute("data-bg-opacity"),
+          ease: "none",
+          onUpdate: function onUpdate() {
+            console.log("changing to: ", _this.bgChangeTrigger[i].getAttribute("data-bg-opacity"));
+          }
+        });
+
+        _ScrollTrigger.ScrollTrigger.create({
+          trigger: _this.bgChangeTrigger[i],
+          // markers: true,
+          end: "+=300",
+          animation: bgChange,
+          scrub: true
+        });
+      };
+
+      for (var i = 0, l = this.bgChangeTrigger.length; i < l; i++) {
+        _loop(i, l);
+      }
+    }
+  }, {
+    key: "onMouseMove",
+    value: function onMouseMove() {
+      var _this2 = this;
+
+      document.addEventListener("mousemove", function (evt) {
+        var x = evt.clientX / innerWidth;
+        var y = evt.clientY / innerHeight;
+        var decimalX = evt.clientX / window.innerWidth - 0.5;
+        var decimalY = evt.clientY / window.innerHeight - 0.5;
+
+        _gsap.gsap.to("html", 1, {
+          "--mouse-x": x,
+          ease: "power3.easIn"
+        });
+
+        _gsap.gsap.to("html", 1, {
+          "--mouse-y": y,
+          ease: "power3.easIn"
+        });
+
+        _gsap.gsap.to(_this2.bgGradientMouseMove, 1, {
+          rotationY: 1.5 * decimalY,
+          x: 20 * decimalX,
+          rotationX: 2.5 * decimalX,
+          y: 5 * decimalY,
+          ease: "quad.easOut",
+          transformPerspective: 900,
+          transformOrigin: "center"
+        });
+      });
+    }
+  }]);
+
+  return GradientBg;
+}();
+
+exports.default = GradientBg;
+
+},{"gsap":"gsap","gsap/ScrollTrigger":"gsap/ScrollTrigger"}],3:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -209,7 +323,7 @@ var NavigationController = /*#__PURE__*/function () {
 
 exports.default = NavigationController;
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -277,7 +391,7 @@ var ScrollProgress = /*#__PURE__*/function () {
 
 exports.default = ScrollProgress;
 
-},{"gsap":"gsap","gsap/ScrollTrigger":"gsap/ScrollTrigger"}],4:[function(require,module,exports){
+},{"gsap":"gsap","gsap/ScrollTrigger":"gsap/ScrollTrigger"}],5:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -322,6 +436,7 @@ var TimelineSlider = /*#__PURE__*/function () {
       transitionSpeed: 1000
     };
     this.timeline = document.querySelector(this.DOM.timeline);
+    this.timelineSlider = document.querySelector(this.DOM.timelineSlider);
     this.timelineItemsImagePath = "static/images/";
     this.timelineItems = [{
       image: "timeline-01.jpg",
@@ -396,9 +511,13 @@ var TimelineSlider = /*#__PURE__*/function () {
     this.scene = null;
     this.renderer = null;
     this.helixItems = [];
-    this.helix = null;
+    this.helixItem = null;
+    this.slideCounter = 0;
     this.init();
-    this.initSwiper();
+
+    if (this.timelineSlider) {
+      this.initSwiper();
+    }
   }
 
   _createClass(TimelineSlider, [{
@@ -425,7 +544,7 @@ var TimelineSlider = /*#__PURE__*/function () {
       this.camera.position.z = 1020;
       this.cameraWrapper = new THREE.Object3D();
       this.cameraWrapper.position.set(0, 275, 0);
-      this.cameraWrapper.rotation.y = 3.150;
+      this.cameraWrapper.rotation.y = 3.15;
       this.cameraWrapper.name = "camera wrapper";
       this.cameraWrapper.add(this.camera);
       this.scene.add(this.cameraWrapper);
@@ -449,16 +568,16 @@ var TimelineSlider = /*#__PURE__*/function () {
         title.className = "c-timeline-item__title";
         title.textContent = this.timelineItems[i].title;
         timelineItemInner.appendChild(title);
-        this.helix = new _CSS3DRenderer.CSS3DObject(timelineItem);
-        this.helix.name = "".concat(this.timelineItems[i].title, ", index: ").concat(i);
-        this.scene.add(this.helix);
-        var theta = i * 0.5 + Math.PI;
-        var y = -(i * 32) + 600;
-        this.helix.position.setFromCylindricalCoords(640, theta, y);
-        vector.x = this.helix.position.x * 2;
-        vector.y = this.helix.position.y;
-        vector.z = this.helix.position.z * 2;
-        this.helix.lookAt(vector);
+        this.helixItem = new _CSS3DRenderer.CSS3DObject(timelineItem);
+        this.helixItem.name = "".concat(this.timelineItems[i].title, ", index: ").concat(i);
+        this.scene.add(this.helixItem);
+        var theta = i * 0.85 + Math.PI;
+        var y = -(i * 200) + 600;
+        this.helixItem.position.setFromCylindricalCoords(640, theta, y);
+        vector.x = this.helixItem.position.x * 2;
+        vector.y = this.helixItem.position.y;
+        vector.z = this.helixItem.position.z * 2;
+        this.helixItem.lookAt(vector);
         this.helixItems.push(this.helix);
       }
 
@@ -495,43 +614,63 @@ var TimelineSlider = /*#__PURE__*/function () {
 
       // TODO: tu ces trebati jos i y poziciju i lookAt mjenjati ovisno o pozici planea (ako sam dobro skuzio to imas na 212 liniji)
       // TODO: rotaciju ces dobiti (Math.PI * 2) / broj poligona u punom krugu - iako realno moze ostati zahartkodirano
+      document.querySelectorAll(".c-timeline-item")[0].classList.add("is-active");
       this.timelineSliderPrev.addEventListener("click", function () {
         console.log("click Prev");
 
-        _gsap.gsap.to(_this3.cameraWrapper.rotation, {
-          duration: 1,
-          y: "-=0.5",
-          onStart: function onStart() {
-            document.documentElement.classList.add("is-rotating-right");
-          },
-          onComplete: function onComplete() {
-            document.documentElement.classList.remove("is-rotating-right");
-          }
-        });
+        if (_this3.slideCounter > 0) {
+          _gsap.gsap.to(_this3.cameraWrapper.rotation, {
+            duration: 0.6,
+            y: "-=0.85",
+            onStart: function onStart() {
+              _this3.slideCounter -= 1;
+              document.documentElement.classList.add("is-rotating-right");
 
-        _gsap.gsap.to(_this3.cameraWrapper.position, {
-          duration: 1,
-          y: "+=50"
-        });
+              for (var i = 0, l = _this3.timelineItems.length; i < l; i++) {
+                console.log(document.querySelectorAll(".c-timeline-item"));
+                document.querySelectorAll(".c-timeline-item")[i].classList.remove("is-active");
+              }
+            },
+            onComplete: function onComplete() {
+              document.documentElement.classList.remove("is-rotating-right");
+
+              document.querySelectorAll(".c-timeline-item")[_this3.slideCounter].classList.add("is-active");
+            }
+          });
+
+          _gsap.gsap.to(_this3.cameraWrapper.position, {
+            duration: 0.6,
+            y: "+=200"
+          });
+        }
       });
       this.timelineSliderNext.addEventListener("click", function () {
         console.log("click Next");
 
-        _gsap.gsap.to(_this3.cameraWrapper.rotation, {
-          duration: 1,
-          y: "+=0.5",
-          onStart: function onStart() {
-            document.documentElement.classList.add("is-rotating-left");
-          },
-          onComplete: function onComplete() {
-            document.documentElement.classList.remove("is-rotating-left");
-          }
-        });
+        if (_this3.slideCounter < _this3.timelineItems.length - 1) {
+          _gsap.gsap.to(_this3.cameraWrapper.rotation, {
+            duration: 0.6,
+            y: "+=0.85",
+            onStart: function onStart() {
+              _this3.slideCounter += 1;
+              document.documentElement.classList.add("is-rotating-left");
 
-        _gsap.gsap.to(_this3.cameraWrapper.position, {
-          duration: 1,
-          y: "-=50"
-        });
+              for (var i = 0, l = _this3.timelineItems.length; i < l; i++) {
+                document.querySelectorAll(".c-timeline-item")[i].classList.remove("is-active");
+              }
+            },
+            onComplete: function onComplete() {
+              document.documentElement.classList.remove("is-rotating-left");
+
+              document.querySelectorAll(".c-timeline-item")[_this3.slideCounter].classList.add("is-active");
+            }
+          });
+
+          _gsap.gsap.to(_this3.cameraWrapper.position, {
+            duration: 0.6,
+            y: "-=200"
+          });
+        }
       });
     }
   }, {
@@ -558,7 +697,7 @@ var TimelineSlider = /*#__PURE__*/function () {
 
 exports.default = TimelineSlider;
 
-},{"gsap":"gsap","swiper":"swiper","three":"three","three/examples/jsm/renderers/CSS3DRenderer.js":"three/examples/jsm/renderers/CSS3DRenderer.js"}],5:[function(require,module,exports){
+},{"gsap":"gsap","swiper":"swiper","three":"three","three/examples/jsm/renderers/CSS3DRenderer.js":"three/examples/jsm/renderers/CSS3DRenderer.js"}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -633,7 +772,7 @@ var VideoScrub = /*#__PURE__*/function () {
 
 exports.default = VideoScrub;
 
-},{"gsap":"gsap","gsap/ScrollTrigger":"gsap/ScrollTrigger"}],6:[function(require,module,exports){
+},{"gsap":"gsap","gsap/ScrollTrigger":"gsap/ScrollTrigger"}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -693,7 +832,7 @@ var DarkModeHelper = /*#__PURE__*/function () {
 
 exports.default = DarkModeHelper;
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -807,7 +946,7 @@ var GridHelper = /*#__PURE__*/function () {
 
 exports.default = GridHelper;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 var _GridHelper = _interopRequireDefault(require("./helpers/GridHelper"));
@@ -823,6 +962,8 @@ var _VideoScrub = _interopRequireDefault(require("./components/VideoScrub"));
 var _ScrollProgress = _interopRequireDefault(require("./components/ScrollProgress"));
 
 var _Dummy = _interopRequireDefault(require("./components/Dummy"));
+
+var _GradientBg = _interopRequireDefault(require("./components/GradientBg"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -878,8 +1019,13 @@ ready(function () {
     var scrollProgress = new _ScrollProgress.default();
     scrollProgress.init();
   }
+
+  if (document.getElementById("gradient") !== null) {
+    var gradientBg = new _GradientBg.default();
+    gradientBg.init();
+  }
 });
 
-},{"./components/Dummy":1,"./components/NavigationController":2,"./components/ScrollProgress":3,"./components/TimelineSlider":4,"./components/VideoScrub":5,"./helpers/DarkModeHelper":6,"./helpers/GridHelper":7}]},{},[8])
+},{"./components/Dummy":1,"./components/GradientBg":2,"./components/NavigationController":3,"./components/ScrollProgress":4,"./components/TimelineSlider":5,"./components/VideoScrub":6,"./helpers/DarkModeHelper":7,"./helpers/GridHelper":8}]},{},[9])
 
 //# sourceMappingURL=bundle.js.map

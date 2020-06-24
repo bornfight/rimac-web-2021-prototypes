@@ -5,6 +5,7 @@ import TimelineSlider from "./components/TimelineSlider";
 import VideoScrub from "./components/VideoScrub";
 import ScrollProgress from "./components/ScrollProgress";
 import Dummy from "./components/Dummy";
+import GradientBg from "./components/GradientBg";
 
 const ready = (callbackFunc) => {
     if (document.readyState !== "loading") {
@@ -69,5 +70,10 @@ ready(() => {
     if (document.getElementById("scroll-progress") !== null) {
         const scrollProgress = new ScrollProgress();
         scrollProgress.init();
+    }
+
+    if (document.getElementById("gradient") !== null) {
+        const gradientBg = new GradientBg();
+        gradientBg.init();
     }
 });

@@ -1,0 +1,60 @@
+.c-page-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+	overflow: hidden;
+
+    &__gradient {
+	    display: block;
+        position: absolute;
+
+        &--layer-1 {
+            z-index: 1;
+	        top: 0;
+	        left: 0;
+	        width: 100%;
+	        height: 100%;
+            background: transparent
+                radial-gradient(
+                    at calc(var(--mouse-x, 0) * 160%)
+                        calc(var(--mouse-y, 0) * 90%),
+                    rgba(255, 255, 255, 0),
+                    rgba(255, 255, 255, 1)
+                )
+                no-repeat 0 0;
+
+            // #00141d — dark
+            // #18343f — medium
+            // #2e4a55 — light
+        }
+
+        &--layer-2 {
+            z-index: 2;
+	        top: -10%;
+	        left: -10%;
+	        width: 120%;
+	        height: 120%;
+            //background-color: red;
+            //mix-blend-mode: screen;
+            background: linear-gradient(#00141d 15%, transparent),
+                linear-gradient(to top right, #091f28, transparent),
+                linear-gradient(to top left, #12ccc4, transparent);
+            background-blend-mode: multiply;
+        }
+    }
+
+    &__bg {
+        z-index: 3;
+	    display: block;
+	    position: absolute;
+	    top: 0;
+	    left: 0;
+	    width: 100%;
+	    height: 100%;
+	    opacity: 0;
+	    background-color: $white;
+    }
+}

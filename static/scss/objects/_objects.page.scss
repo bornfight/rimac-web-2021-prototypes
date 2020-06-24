@@ -8,4 +8,9 @@
 
     &--video-scrub {
     }
+
+    &--gradient {
+        position: relative;
+        z-index: 2;
+    }
 }
