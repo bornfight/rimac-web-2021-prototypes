@@ -951,15 +951,18 @@ a {
 
 .c-page-bg__gradient {
   display: block;
-  position: absolute; }
+  position: absolute;
+  -webkit-backface-visibility: hidden;
+          backface-visibility: hidden; }
 
 .c-page-bg__gradient--layer-1 {
   z-index: 1;
   top: 0;
   left: 0;
   width: 100%;
+  opacity: 0.5;
   height: 100%;
-  background: transparent radial-gradient(at calc(var(--mouse-x, 0) * 160%) calc(var(--mouse-y, 0) * 90%), rgba(255, 255, 255, 0), white) no-repeat 0 0; }
+  background: transparent radial-gradient(at calc(var(--mouse-x, 0) * 100%) calc(var(--mouse-y, 0) * 100%), rgba(255, 255, 255, 0), white) no-repeat 0 0; }
 
 .c-page-bg__gradient--layer-2 {
   z-index: 2;

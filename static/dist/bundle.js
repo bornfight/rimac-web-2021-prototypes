@@ -108,23 +108,23 @@ var GradientBg = /*#__PURE__*/function () {
         var decimalX = evt.clientX / window.innerWidth - 0.5;
         var decimalY = evt.clientY / window.innerHeight - 0.5;
 
-        _gsap.gsap.to("html", 1, {
+        _gsap.gsap.to("html", 1.4, {
           "--mouse-x": x,
           ease: "power3.easIn"
         });
 
-        _gsap.gsap.to("html", 1, {
+        _gsap.gsap.to("html", 1.4, {
           "--mouse-y": y,
           ease: "power3.easIn"
         });
 
-        _gsap.gsap.to(_this.bgGradientMouseMove, 1, {
-          rotationY: 1.5 * decimalY,
-          x: 20 * decimalX,
+        _gsap.gsap.to(_this.bgGradientMouseMove, 1.4, {
+          rotationY: 5 * decimalY,
+          x: 50 * decimalX,
           rotationX: 2.5 * decimalX,
-          y: 5 * decimalY,
+          y: -120 * decimalY,
           ease: "quad.easOut",
-          transformPerspective: 900,
+          transformPerspective: 700,
           transformOrigin: "center"
         });
       });
