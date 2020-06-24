@@ -646,6 +646,21 @@ a {
   position: relative; }
 
 .o-section--dummy {
+  position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  width: 100%;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  text-align: center; }
+
+.o-section--dummy-footer {
+  background-color: #00141d;
+  padding-top: 140px;
+  padding-bottom: 140px;
+  position: relative;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;

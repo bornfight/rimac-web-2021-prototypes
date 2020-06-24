@@ -54,6 +54,18 @@
     }
 
     &--dummy {
+        position: relative;
+        display: flex;
+        width: 100%;
+        align-items: center;
+        text-align: center;
+    }
+
+    &--dummy-footer {
+        background-color: #00141d;
+        padding-top: 140px;
+        padding-bottom: 140px;
+        position: relative;
         display: flex;
         width: 100%;
         align-items: center;
