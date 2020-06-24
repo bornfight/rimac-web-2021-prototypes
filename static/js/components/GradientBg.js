@@ -41,14 +41,14 @@ export default class GradientBg {
                 opacity: this.bgChangeTrigger[i].getAttribute("data-bg-opacity"),
                 ease: "none",
                 onUpdate: () => {
-                    console.log("changing to: ", this.bgChangeTrigger[i].getAttribute("data-bg-opacity"));
+                    // console.log("changing to: ", this.bgChangeTrigger[i].getAttribute("data-bg-opacity"));
                 },
             });
 
             ScrollTrigger.create({
                 trigger: this.bgChangeTrigger[i],
                 // markers: true,
-                end: "+=300",
+                end: "+200",
                 animation: bgChange,
                 scrub: true,
             });

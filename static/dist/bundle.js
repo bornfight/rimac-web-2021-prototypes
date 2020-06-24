@@ -79,35 +79,28 @@ var GradientBg = /*#__PURE__*/function () {
   }, {
     key: "bgColorChange",
     value: function bgColorChange() {
-      var _this = this;
-
-      var _loop = function _loop(i, l) {
-        var bgChange = _gsap.gsap.to(_this.bg, {
+      for (var i = 0, l = this.bgChangeTrigger.length; i < l; i++) {
+        var bgChange = _gsap.gsap.to(this.bg, {
           duration: 1,
-          opacity: _this.bgChangeTrigger[i].getAttribute("data-bg-opacity"),
+          opacity: this.bgChangeTrigger[i].getAttribute("data-bg-opacity"),
           ease: "none",
-          onUpdate: function onUpdate() {
-            console.log("changing to: ", _this.bgChangeTrigger[i].getAttribute("data-bg-opacity"));
+          onUpdate: function onUpdate() {// console.log("changing to: ", this.bgChangeTrigger[i].getAttribute("data-bg-opacity"));
           }
         });
 
         _ScrollTrigger.ScrollTrigger.create({
-          trigger: _this.bgChangeTrigger[i],
+          trigger: this.bgChangeTrigger[i],
           // markers: true,
-          end: "+=300",
+          end: "+200",
           animation: bgChange,
           scrub: true
         });
-      };
-
-      for (var i = 0, l = this.bgChangeTrigger.length; i < l; i++) {
-        _loop(i, l);
       }
     }
   }, {
     key: "onMouseMove",
     value: function onMouseMove() {
-      var _this2 = this;
+      var _this = this;
 
       document.addEventListener("mousemove", function (evt) {
         var x = evt.clientX / innerWidth;
@@ -125,7 +118,7 @@ var GradientBg = /*#__PURE__*/function () {
           ease: "power3.easIn"
         });
 
-        _gsap.gsap.to(_this2.bgGradientMouseMove, 1, {
+        _gsap.gsap.to(_this.bgGradientMouseMove, 1, {
           rotationY: 1.5 * decimalY,
           x: 20 * decimalX,
           rotationX: 2.5 * decimalX,
