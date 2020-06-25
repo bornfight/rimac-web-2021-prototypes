@@ -7,7 +7,7 @@ export default class DarkModeHelper {
             body: "body",
             states: {
                 isLight: "is-light",
-            }
+            },
         };
 
         const consoleLogStyle = [
@@ -23,7 +23,6 @@ export default class DarkModeHelper {
         this.body = document.getElementsByTagName(this.DOM.body)[0];
 
         console.info("toggle dark mode: %c Alt/Option + D ", consoleLogStyle);
-
     }
 
     init() {
@@ -33,12 +32,11 @@ export default class DarkModeHelper {
 
     toggleDarkMode() {
         document.addEventListener("keyup", (ev) => {
-
             if (ev.keyCode === 68 && ev.altKey) {
                 if (this.body.classList.contains(this.DOM.states.isLight)) {
-                    this.body.classList.remove(this.DOM.states.isLight)
+                    this.body.classList.remove(this.DOM.states.isLight);
                 } else {
-                    this.body.classList.add(this.DOM.states.isLight)
+                    this.body.classList.add(this.DOM.states.isLight);
                 }
             }
         });

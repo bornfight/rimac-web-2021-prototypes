@@ -16,7 +16,7 @@ export default class GradientBg {
         this.bg = document.querySelector(this.DOM.bg);
         this.bgChangeTrigger = document.querySelectorAll(
             this.DOM.bgChangeTrigger,
-        )
+        );
         this.bgGradientMouseMove = document.querySelector(
             this.DOM.bgGradientMouseMove,
         );
@@ -30,7 +30,6 @@ export default class GradientBg {
     }
 
     bgColorChange() {
-
         for (let i = 0, l = this.bgChangeTrigger.length; i < l; i++) {
             let bgChange = gsap.to(this.bg, {
                 duration: 0.8,
@@ -38,12 +37,8 @@ export default class GradientBg {
                     "data-bg-opacity",
                 ),
                 ease: "none",
-                onStart: () => {
-
-                },
-                onUpdate: () => {
-
-                },
+                onStart: () => {},
+                onUpdate: () => {},
             });
 
             ScrollTrigger.create({

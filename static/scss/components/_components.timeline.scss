@@ -2,7 +2,6 @@
     position: relative;
 
     &__canvas {
-
     }
 
     &__navigation {
@@ -82,7 +81,6 @@
         box-shadow: 0 0 12px rgba(0, 255, 255, 0.5);
         border: 1px solid rgba(127, 255, 255, 0.25);
         transition: getTransition();
-
     }
 
     &__inner {
@@ -102,7 +100,6 @@
     }
 
     &:hover {
-
         .c-timeline-item__img {
             border: 1px solid rgba(255, 255, 255, 0.5);
             transform: scale(1.05);
@@ -134,16 +131,13 @@
     }
 
     &__text {
-
     }
 }
 
 .c-timeline-slider-container {
-
 }
 
 .c-timeline-slider {
-
     &__slide {
         &.swiper-slide-active {
             text-shadow: 0 0 12px rgba(0, 255, 255, 0.5);

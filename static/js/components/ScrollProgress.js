@@ -15,8 +15,12 @@ export default class ScrollProgress {
         };
 
         this.scrollProgress = document.querySelector(this.DOM.scrollProgress);
-        this.scrollProgressItems = document.querySelectorAll(this.DOM.scrollProgressItem);
-        this.scrollProgressTriggers = document.querySelectorAll(this.DOM.scrollProgressTrigger);
+        this.scrollProgressItems = document.querySelectorAll(
+            this.DOM.scrollProgressItem,
+        );
+        this.scrollProgressTriggers = document.querySelectorAll(
+            this.DOM.scrollProgressTrigger,
+        );
     }
 
     init() {
