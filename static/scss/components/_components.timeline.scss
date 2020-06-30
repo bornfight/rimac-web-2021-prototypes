@@ -2,6 +2,15 @@
     position: relative;
 
     &__canvas {
+        position: relative;
+
+        canvas{
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
     }
 
     &__navigation {
@@ -50,23 +59,24 @@
     position: relative;
     transform-style: preserve-3d;
     backface-visibility: hidden;
+    z-index: 1;
     //opacity: 0.7;
     //filter: grayscale(0.7);
 
-    &:before {
-        content: "";
-        display: block;
-        background-color: rgb(0, 45, 44);
-        right: 0;
-        bottom: 0;
-        opacity: 0.75;
-        position: absolute;
-        top: 0;
-        left: 0;
-        transform: rotateY(180deg);
-        transform-style: preserve-3d;
-        backface-visibility: hidden;
-    }
+    //&:before {
+    //    content: "";
+    //    display: block;
+    //    background-color: rgb(0, 45, 44);
+    //    right: 0;
+    //    bottom: 0;
+    //    opacity: 0.75;
+    //    position: absolute;
+    //    top: 0;
+    //    left: 0;
+    //    transform: rotateY(180deg);
+    //    transform-style: preserve-3d;
+    //    backface-visibility: hidden;
+    //}
 
     &__img {
         display: block;

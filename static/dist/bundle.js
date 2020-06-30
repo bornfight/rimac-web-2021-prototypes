@@ -410,6 +410,12 @@ var THREE = _interopRequireWildcard(require("three"));
 
 var _CSS3DRenderer = require("three/examples/jsm/renderers/CSS3DRenderer.js");
 
+var _EffectComposer = require("three/examples/jsm/postprocessing/EffectComposer.js");
+
+var _RenderPass = require("three/examples/jsm/postprocessing/RenderPass.js");
+
+var _BokehPass = require("three/examples/jsm/postprocessing/BokehPass.js");
+
 var _gsap = require("gsap");
 
 var _swiper = _interopRequireDefault(require("swiper"));
@@ -515,8 +521,11 @@ var TimelineSlider = /*#__PURE__*/function () {
     this.camera = null;
     this.scene = null;
     this.renderer = null;
+    this.postprocessing = {};
     this.helixItems = [];
+    this.helixCanvasItems = [];
     this.helixItem = null;
+    this.helixCanvasItem = null;
     this.slideCounter = 0;
     this.init();
 
@@ -536,7 +545,7 @@ var TimelineSlider = /*#__PURE__*/function () {
         camera: {
           fov: 60,
           near: 10,
-          far: 3000,
+          far: 2000,
           posX: -180,
           posY: 100,
           posZ: 1080
@@ -555,43 +564,92 @@ var TimelineSlider = /*#__PURE__*/function () {
       this.scene.add(this.cameraWrapper);
       var vector = new THREE.Vector3();
 
-      for (var i = 0, l = this.timelineItems.length; i < l; i++) {
+      var _loop = function _loop(i, l) {
         var timelineItem = document.createElement("div");
         timelineItem.className = "c-timeline-item";
-        var timelineItemImage = document.createElement("i");
-        timelineItemImage.className = "c-timeline-item__img";
-        timelineItemImage.style.backgroundImage = "url(".concat(this.timelineItemsImagePath + this.timelineItems[i].image, ")");
-        timelineItem.appendChild(timelineItemImage);
         var timelineItemInner = document.createElement("div");
         timelineItemInner.className = "c-timeline-item__inner";
         timelineItem.appendChild(timelineItemInner);
         var year = document.createElement("div");
         year.className = "c-timeline-item__year";
-        year.textContent = this.timelineItems[i].year;
+        year.textContent = _this.timelineItems[i].year;
         timelineItemInner.appendChild(year);
         var title = document.createElement("div");
         title.className = "c-timeline-item__title";
-        title.textContent = this.timelineItems[i].title;
+        title.textContent = _this.timelineItems[i].title;
         timelineItemInner.appendChild(title);
-        this.helixItem = new _CSS3DRenderer.CSS3DObject(timelineItem);
-        this.helixItem.name = "".concat(this.timelineItems[i].title, ", index: ").concat(i);
-        this.scene.add(this.helixItem);
+        _this.helixItem = new _CSS3DRenderer.CSS3DObject(timelineItem);
+        _this.helixItem.name = "".concat(_this.timelineItems[i].title, ", index: ").concat(i);
+
+        _this.scene.add(_this.helixItem);
+
         var theta = i * 0.85 + Math.PI;
         var y = -(i * 200) + 600;
-        this.helixItem.position.setFromCylindricalCoords(640, theta, y);
-        vector.x = this.helixItem.position.x * 2;
-        vector.y = this.helixItem.position.y;
-        vector.z = this.helixItem.position.z * 2;
-        this.helixItem.lookAt(vector);
-        this.helixItems.push(this.helix);
-      }
 
+        _this.helixItem.position.setFromCylindricalCoords(640, theta, y);
+
+        vector.x = _this.helixItem.position.x * 2;
+        vector.y = _this.helixItem.position.y;
+        vector.z = _this.helixItem.position.z * 2;
+
+        _this.helixItem.lookAt(vector);
+
+        _this.helixItems.push(_this.helixItem); // canvas
+
+
+        var geometryAspectRatio = 16 / 9;
+        var texture = new THREE.TextureLoader().load(_this.timelineItemsImagePath + _this.timelineItems[i].image, function () {
+          // image position to cover the plane
+          var imageAspectRatio = texture.image.width / texture.image.height;
+          texture.wrapT = THREE.RepeatWrapping;
+          texture.repeat.x = geometryAspectRatio / imageAspectRatio;
+          texture.offset.x = 0.5 * (1 - texture.repeat.x);
+        });
+        var planeMaterial = new THREE.MeshBasicMaterial({
+          map: texture,
+          flatShading: true,
+          transparent: false
+        });
+        planeMaterial.side = THREE.DoubleSide;
+        var planeGeometry = new THREE.PlaneGeometry(330, 186, 1, 1);
+        _this.helixCanvasItem = new THREE.Mesh(planeGeometry, planeMaterial);
+        _this.helixCanvasItem.name = "canvas-plane-".concat(_this.timelineItems[i].title, ", index: ").concat(i);
+
+        _this.scene.add(_this.helixCanvasItem);
+
+        _this.helixCanvasItem.position.setFromCylindricalCoords(640, theta, y);
+
+        _this.helixCanvasItem.lookAt(vector);
+
+        _this.helixCanvasItems.push(_this.helixCanvasItem);
+      };
+
+      for (var i = 0, l = this.timelineItems.length; i < l; i++) {
+        _loop(i, l);
+      } // canvas renderer
+
+
+      this.canvasRenderer = new THREE.WebGLRenderer({
+        alpha: true
+      });
+      this.canvasRenderer.setPixelRatio(window.devicePixelRatio);
+      this.canvasRenderer.setSize(window.innerWidth, window.innerHeight);
+      this.timeline.appendChild(this.canvasRenderer.domElement);
       this.renderer = new _CSS3DRenderer.CSS3DRenderer();
       this.renderer.setSize(window.innerWidth, window.innerHeight);
       this.timeline.appendChild(this.renderer.domElement);
+      var ambientlight = new THREE.AmbientLight(0x404040);
+      var light = new THREE.DirectionalLight(0xffffff, 1);
+      light.position.set(0, 0, 1000);
+      this.scene.add(light);
+      this.scene.add(ambientlight);
       window.addEventListener("resize", function () {
         _this.onWindowResize;
       }, false);
+      this.dof();
+      this.postprocessing.bokeh.uniforms["focus"].value = 500;
+      this.postprocessing.bokeh.uniforms["aperture"].value = 0.000005;
+      this.postprocessing.bokeh.uniforms["maxblur"].value = 0.1;
       this.animate();
       this.helixNavigation();
     }
@@ -601,6 +659,8 @@ var TimelineSlider = /*#__PURE__*/function () {
       this.camera.aspect = window.innerWidth / window.innerHeight;
       this.camera.updateProjectionMatrix();
       this.renderer.setSize(window.innerWidth, window.innerHeight);
+      this.canvasRenderer.setSize(window.innerWidth, window.innerHeight);
+      this.postprocessing.composer.setSize(window.innerWidth, window.innerHeight);
     }
   }, {
     key: "animate",
@@ -610,7 +670,9 @@ var TimelineSlider = /*#__PURE__*/function () {
       requestAnimationFrame(function () {
         return _this2.animate();
       });
-      this.renderer.render(this.scene, this.camera);
+      this.renderer.render(this.scene, this.camera); // this.canvasRenderer.render(this.scene, this.camera);
+
+      this.postprocessing.composer.render(0.1);
     }
   }, {
     key: "helixNavigation",
@@ -632,7 +694,9 @@ var TimelineSlider = /*#__PURE__*/function () {
               document.documentElement.classList.add("is-rotating-right");
 
               for (var i = 0, l = _this3.timelineItems.length; i < l; i++) {
-                console.log(document.querySelectorAll(".c-timeline-item"));
+                // console.log(
+                //     document.querySelectorAll(".c-timeline-item"),
+                // );
                 document.querySelectorAll(".c-timeline-item")[i].classList.remove("is-active");
               }
             },
@@ -694,6 +758,24 @@ var TimelineSlider = /*#__PURE__*/function () {
       timelineSlider.on("slideNextTransitionStart", function () {});
       timelineSlider.on("slidePrevTransitionStart", function () {});
       timelineSlider.init();
+    } // DOF
+
+  }, {
+    key: "dof",
+    value: function dof() {
+      var renderPass = new _RenderPass.RenderPass(this.scene, this.camera);
+      var bokehPass = new _BokehPass.BokehPass(this.scene, this.camera, {
+        focus: 1.0,
+        aperture: 0.025,
+        maxblur: 0.01,
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+      var composer = new _EffectComposer.EffectComposer(this.canvasRenderer);
+      composer.addPass(renderPass);
+      composer.addPass(bokehPass);
+      this.postprocessing.composer = composer;
+      this.postprocessing.bokeh = bokehPass;
     }
   }]);
 
@@ -702,7 +784,7 @@ var TimelineSlider = /*#__PURE__*/function () {
 
 exports.default = TimelineSlider;
 
-},{"gsap":"gsap","swiper":"swiper","three":"three","three/examples/jsm/renderers/CSS3DRenderer.js":"three/examples/jsm/renderers/CSS3DRenderer.js"}],6:[function(require,module,exports){
+},{"gsap":"gsap","swiper":"swiper","three":"three","three/examples/jsm/postprocessing/BokehPass.js":"three/examples/jsm/postprocessing/BokehPass.js","three/examples/jsm/postprocessing/EffectComposer.js":"three/examples/jsm/postprocessing/EffectComposer.js","three/examples/jsm/postprocessing/RenderPass.js":"three/examples/jsm/postprocessing/RenderPass.js","three/examples/jsm/renderers/CSS3DRenderer.js":"three/examples/jsm/renderers/CSS3DRenderer.js"}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

@@ -3368,6 +3368,295 @@ function JSONLoader(){console.error('THREE.JSONLoader has been removed.');}//
 var SceneUtils={createMultiMaterialObject:function createMultiMaterialObject()/* geometry, materials */{console.error('THREE.SceneUtils has been moved to /examples/jsm/utils/SceneUtils.js');},detach:function detach()/* child, parent, scene */{console.error('THREE.SceneUtils has been moved to /examples/jsm/utils/SceneUtils.js');},attach:function attach()/* child, scene, parent */{console.error('THREE.SceneUtils has been moved to /examples/jsm/utils/SceneUtils.js');}};//
 exports.SceneUtils=SceneUtils;function LensFlare(){console.error('THREE.LensFlare has been moved to /examples/jsm/objects/Lensflare.js');}if(typeof __THREE_DEVTOOLS__!=='undefined'){/* eslint-disable no-undef */__THREE_DEVTOOLS__.dispatchEvent(new CustomEvent('register',{detail:{revision:REVISION}}));/* eslint-enable no-undef */}
 
+},{}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ClearMaskPass = exports.MaskPass = void 0;
+
+var _Pass = require("../postprocessing/Pass.js");
+
+/**
+ * @author alteredq / http://alteredqualia.com/
+ */
+var MaskPass = function MaskPass(scene, camera) {
+  _Pass.Pass.call(this);
+
+  this.scene = scene;
+  this.camera = camera;
+  this.clear = true;
+  this.needsSwap = false;
+  this.inverse = false;
+};
+
+exports.MaskPass = MaskPass;
+MaskPass.prototype = Object.assign(Object.create(_Pass.Pass.prototype), {
+  constructor: MaskPass,
+  render: function render(renderer, writeBuffer, readBuffer
+  /*, deltaTime, maskActive */
+  ) {
+    var context = renderer.getContext();
+    var state = renderer.state; // don't update color or depth
+
+    state.buffers.color.setMask(false);
+    state.buffers.depth.setMask(false); // lock buffers
+
+    state.buffers.color.setLocked(true);
+    state.buffers.depth.setLocked(true); // set up stencil
+
+    var writeValue, clearValue;
+
+    if (this.inverse) {
+      writeValue = 0;
+      clearValue = 1;
+    } else {
+      writeValue = 1;
+      clearValue = 0;
+    }
+
+    state.buffers.stencil.setTest(true);
+    state.buffers.stencil.setOp(context.REPLACE, context.REPLACE, context.REPLACE);
+    state.buffers.stencil.setFunc(context.ALWAYS, writeValue, 0xffffffff);
+    state.buffers.stencil.setClear(clearValue);
+    state.buffers.stencil.setLocked(true); // draw into the stencil buffer
+
+    renderer.setRenderTarget(readBuffer);
+    if (this.clear) renderer.clear();
+    renderer.render(this.scene, this.camera);
+    renderer.setRenderTarget(writeBuffer);
+    if (this.clear) renderer.clear();
+    renderer.render(this.scene, this.camera); // unlock color and depth buffer for subsequent rendering
+
+    state.buffers.color.setLocked(false);
+    state.buffers.depth.setLocked(false); // only render where stencil is set to 1
+
+    state.buffers.stencil.setLocked(false);
+    state.buffers.stencil.setFunc(context.EQUAL, 1, 0xffffffff); // draw if == 1
+
+    state.buffers.stencil.setOp(context.KEEP, context.KEEP, context.KEEP);
+    state.buffers.stencil.setLocked(true);
+  }
+});
+
+var ClearMaskPass = function ClearMaskPass() {
+  _Pass.Pass.call(this);
+
+  this.needsSwap = false;
+};
+
+exports.ClearMaskPass = ClearMaskPass;
+ClearMaskPass.prototype = Object.create(_Pass.Pass.prototype);
+Object.assign(ClearMaskPass.prototype, {
+  render: function render(renderer
+  /*, writeBuffer, readBuffer, deltaTime, maskActive */
+  ) {
+    renderer.state.buffers.stencil.setLocked(false);
+    renderer.state.buffers.stencil.setTest(false);
+  }
+});
+
+},{"../postprocessing/Pass.js":3}],3:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Pass = Pass;
+
+var _threeModule = require("../../../build/three.module.js");
+
+function Pass() {
+  // if set to true, the pass is processed by the composer
+  this.enabled = true; // if set to true, the pass indicates to swap read and write buffer after rendering
+
+  this.needsSwap = true; // if set to true, the pass clears its buffer before rendering
+
+  this.clear = false; // if set to true, the result of the pass is rendered to screen. This is set automatically by EffectComposer.
+
+  this.renderToScreen = false;
+}
+
+Object.assign(Pass.prototype, {
+  setSize: function setSize()
+  /* width, height */
+  {},
+  render: function render()
+  /* renderer, writeBuffer, readBuffer, deltaTime, maskActive */
+  {
+    console.error('THREE.Pass: .render() must be implemented in derived pass.');
+  }
+}); // Helper for passes that need to fill the viewport with a single quad.
+
+Pass.FullScreenQuad = function () {
+  var camera = new _threeModule.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  var geometry = new _threeModule.PlaneBufferGeometry(2, 2);
+
+  var FullScreenQuad = function FullScreenQuad(material) {
+    this._mesh = new _threeModule.Mesh(geometry, material);
+  };
+
+  Object.defineProperty(FullScreenQuad.prototype, 'material', {
+    get: function get() {
+      return this._mesh.material;
+    },
+    set: function set(value) {
+      this._mesh.material = value;
+    }
+  });
+  Object.assign(FullScreenQuad.prototype, {
+    dispose: function dispose() {
+      this._mesh.geometry.dispose();
+    },
+    render: function render(renderer) {
+      renderer.render(this._mesh, camera);
+    }
+  });
+  return FullScreenQuad;
+}();
+
+},{"../../../build/three.module.js":1}],4:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ShaderPass = void 0;
+
+var _threeModule = require("../../../build/three.module.js");
+
+var _Pass = require("../postprocessing/Pass.js");
+
+/**
+ * @author alteredq / http://alteredqualia.com/
+ */
+var ShaderPass = function ShaderPass(shader, textureID) {
+  _Pass.Pass.call(this);
+
+  this.textureID = textureID !== undefined ? textureID : "tDiffuse";
+
+  if (shader instanceof _threeModule.ShaderMaterial) {
+    this.uniforms = shader.uniforms;
+    this.material = shader;
+  } else if (shader) {
+    this.uniforms = _threeModule.UniformsUtils.clone(shader.uniforms);
+    this.material = new _threeModule.ShaderMaterial({
+      defines: Object.assign({}, shader.defines),
+      uniforms: this.uniforms,
+      vertexShader: shader.vertexShader,
+      fragmentShader: shader.fragmentShader
+    });
+  }
+
+  this.fsQuad = new _Pass.Pass.FullScreenQuad(this.material);
+};
+
+exports.ShaderPass = ShaderPass;
+ShaderPass.prototype = Object.assign(Object.create(_Pass.Pass.prototype), {
+  constructor: ShaderPass,
+  render: function render(renderer, writeBuffer, readBuffer
+  /*, deltaTime, maskActive */
+  ) {
+    if (this.uniforms[this.textureID]) {
+      this.uniforms[this.textureID].value = readBuffer.texture;
+    }
+
+    this.fsQuad.material = this.material;
+
+    if (this.renderToScreen) {
+      renderer.setRenderTarget(null);
+      this.fsQuad.render(renderer);
+    } else {
+      renderer.setRenderTarget(writeBuffer); // TODO: Avoid using autoClear properties, see https://github.com/mrdoob/three.js/pull/15571#issuecomment-465669600
+
+      if (this.clear) renderer.clear(renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil);
+      this.fsQuad.render(renderer);
+    }
+  }
+});
+
+},{"../../../build/three.module.js":1,"../postprocessing/Pass.js":3}],5:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.BokehShader = void 0;
+
+/**
+ * @author alteredq / http://alteredqualia.com/
+ *
+ * Depth-of-field shader with bokeh
+ * ported from GLSL shader by Martins Upitis
+ * http://artmartinsh.blogspot.com/2010/02/glsl-lens-blur-filter-with-bokeh.html
+ */
+var BokehShader = {
+  defines: {
+    "DEPTH_PACKING": 1,
+    "PERSPECTIVE_CAMERA": 1
+  },
+  uniforms: {
+    "tColor": {
+      value: null
+    },
+    "tDepth": {
+      value: null
+    },
+    "focus": {
+      value: 1.0
+    },
+    "aspect": {
+      value: 1.0
+    },
+    "aperture": {
+      value: 0.025
+    },
+    "maxblur": {
+      value: 0.01
+    },
+    "nearClip": {
+      value: 1.0
+    },
+    "farClip": {
+      value: 1000.0
+    }
+  },
+  vertexShader: ["varying vec2 vUv;", "void main() {", "	vUv = uv;", "	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );", "}"].join("\n"),
+  fragmentShader: ["#include <common>", "varying vec2 vUv;", "uniform sampler2D tColor;", "uniform sampler2D tDepth;", "uniform float maxblur;", // max blur amount
+  "uniform float aperture;", // aperture - bigger values for shallower depth of field
+  "uniform float nearClip;", "uniform float farClip;", "uniform float focus;", "uniform float aspect;", "#include <packing>", "float getDepth( const in vec2 screenPosition ) {", "	#if DEPTH_PACKING == 1", "	return unpackRGBAToDepth( texture2D( tDepth, screenPosition ) );", "	#else", "	return texture2D( tDepth, screenPosition ).x;", "	#endif", "}", "float getViewZ( const in float depth ) {", "	#if PERSPECTIVE_CAMERA == 1", "	return perspectiveDepthToViewZ( depth, nearClip, farClip );", "	#else", "	return orthographicDepthToViewZ( depth, nearClip, farClip );", "	#endif", "}", "void main() {", "	vec2 aspectcorrect = vec2( 1.0, aspect );", "	float viewZ = getViewZ( getDepth( vUv ) );", "	float factor = ( focus + viewZ );", // viewZ is <= 0, so this is a difference equation
+  "	vec2 dofblur = vec2 ( clamp( factor * aperture, -maxblur, maxblur ) );", "	vec2 dofblur9 = dofblur * 0.9;", "	vec2 dofblur7 = dofblur * 0.7;", "	vec2 dofblur4 = dofblur * 0.4;", "	vec4 col = vec4( 0.0 );", "	col += texture2D( tColor, vUv.xy );", "	col += texture2D( tColor, vUv.xy + ( vec2(  0.0,   0.4  ) * aspectcorrect ) * dofblur );", "	col += texture2D( tColor, vUv.xy + ( vec2(  0.15,  0.37 ) * aspectcorrect ) * dofblur );", "	col += texture2D( tColor, vUv.xy + ( vec2(  0.29,  0.29 ) * aspectcorrect ) * dofblur );", "	col += texture2D( tColor, vUv.xy + ( vec2( -0.37,  0.15 ) * aspectcorrect ) * dofblur );", "	col += texture2D( tColor, vUv.xy + ( vec2(  0.40,  0.0  ) * aspectcorrect ) * dofblur );", "	col += texture2D( tColor, vUv.xy + ( vec2(  0.37, -0.15 ) * aspectcorrect ) * dofblur );", "	col += texture2D( tColor, vUv.xy + ( vec2(  0.29, -0.29 ) * aspectcorrect ) * dofblur );", "	col += texture2D( tColor, vUv.xy + ( vec2( -0.15, -0.37 ) * aspectcorrect ) * dofblur );", "	col += texture2D( tColor, vUv.xy + ( vec2(  0.0,  -0.4  ) * aspectcorrect ) * dofblur );", "	col += texture2D( tColor, vUv.xy + ( vec2( -0.15,  0.37 ) * aspectcorrect ) * dofblur );", "	col += texture2D( tColor, vUv.xy + ( vec2( -0.29,  0.29 ) * aspectcorrect ) * dofblur );", "	col += texture2D( tColor, vUv.xy + ( vec2(  0.37,  0.15 ) * aspectcorrect ) * dofblur );", "	col += texture2D( tColor, vUv.xy + ( vec2( -0.4,   0.0  ) * aspectcorrect ) * dofblur );", "	col += texture2D( tColor, vUv.xy + ( vec2( -0.37, -0.15 ) * aspectcorrect ) * dofblur );", "	col += texture2D( tColor, vUv.xy + ( vec2( -0.29, -0.29 ) * aspectcorrect ) * dofblur );", "	col += texture2D( tColor, vUv.xy + ( vec2(  0.15, -0.37 ) * aspectcorrect ) * dofblur );", "	col += texture2D( tColor, vUv.xy + ( vec2(  0.15,  0.37 ) * aspectcorrect ) * dofblur9 );", "	col += texture2D( tColor, vUv.xy + ( vec2( -0.37,  0.15 ) * aspectcorrect ) * dofblur9 );", "	col += texture2D( tColor, vUv.xy + ( vec2(  0.37, -0.15 ) * aspectcorrect ) * dofblur9 );", "	col += texture2D( tColor, vUv.xy + ( vec2( -0.15, -0.37 ) * aspectcorrect ) * dofblur9 );", "	col += texture2D( tColor, vUv.xy + ( vec2( -0.15,  0.37 ) * aspectcorrect ) * dofblur9 );", "	col += texture2D( tColor, vUv.xy + ( vec2(  0.37,  0.15 ) * aspectcorrect ) * dofblur9 );", "	col += texture2D( tColor, vUv.xy + ( vec2( -0.37, -0.15 ) * aspectcorrect ) * dofblur9 );", "	col += texture2D( tColor, vUv.xy + ( vec2(  0.15, -0.37 ) * aspectcorrect ) * dofblur9 );", "	col += texture2D( tColor, vUv.xy + ( vec2(  0.29,  0.29 ) * aspectcorrect ) * dofblur7 );", "	col += texture2D( tColor, vUv.xy + ( vec2(  0.40,  0.0  ) * aspectcorrect ) * dofblur7 );", "	col += texture2D( tColor, vUv.xy + ( vec2(  0.29, -0.29 ) * aspectcorrect ) * dofblur7 );", "	col += texture2D( tColor, vUv.xy + ( vec2(  0.0,  -0.4  ) * aspectcorrect ) * dofblur7 );", "	col += texture2D( tColor, vUv.xy + ( vec2( -0.29,  0.29 ) * aspectcorrect ) * dofblur7 );", "	col += texture2D( tColor, vUv.xy + ( vec2( -0.4,   0.0  ) * aspectcorrect ) * dofblur7 );", "	col += texture2D( tColor, vUv.xy + ( vec2( -0.29, -0.29 ) * aspectcorrect ) * dofblur7 );", "	col += texture2D( tColor, vUv.xy + ( vec2(  0.0,   0.4  ) * aspectcorrect ) * dofblur7 );", "	col += texture2D( tColor, vUv.xy + ( vec2(  0.29,  0.29 ) * aspectcorrect ) * dofblur4 );", "	col += texture2D( tColor, vUv.xy + ( vec2(  0.4,   0.0  ) * aspectcorrect ) * dofblur4 );", "	col += texture2D( tColor, vUv.xy + ( vec2(  0.29, -0.29 ) * aspectcorrect ) * dofblur4 );", "	col += texture2D( tColor, vUv.xy + ( vec2(  0.0,  -0.4  ) * aspectcorrect ) * dofblur4 );", "	col += texture2D( tColor, vUv.xy + ( vec2( -0.29,  0.29 ) * aspectcorrect ) * dofblur4 );", "	col += texture2D( tColor, vUv.xy + ( vec2( -0.4,   0.0  ) * aspectcorrect ) * dofblur4 );", "	col += texture2D( tColor, vUv.xy + ( vec2( -0.29, -0.29 ) * aspectcorrect ) * dofblur4 );", "	col += texture2D( tColor, vUv.xy + ( vec2(  0.0,   0.4  ) * aspectcorrect ) * dofblur4 );", "	gl_FragColor = col / 41.0;", "	gl_FragColor.a = 1.0;", "}"].join("\n")
+};
+exports.BokehShader = BokehShader;
+
+},{}],6:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.CopyShader = void 0;
+
+/**
+ * @author alteredq / http://alteredqualia.com/
+ *
+ * Full-screen textured quad shader
+ */
+var CopyShader = {
+  uniforms: {
+    "tDiffuse": {
+      value: null
+    },
+    "opacity": {
+      value: 1.0
+    }
+  },
+  vertexShader: ["varying vec2 vUv;", "void main() {", "	vUv = uv;", "	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );", "}"].join("\n"),
+  fragmentShader: ["uniform float opacity;", "uniform sampler2D tDiffuse;", "varying vec2 vUv;", "void main() {", "	vec4 texel = texture2D( tDiffuse, vUv );", "	gl_FragColor = opacity * texel;", "}"].join("\n")
+};
+exports.CopyShader = CopyShader;
+
 },{}],"gsap/ScrollTrigger":[function(require,module,exports){
 "use strict";
 
@@ -20735,7 +21024,393 @@ exports.MapControls = MapControls;
 MapControls.prototype = Object.create(_threeModule.EventDispatcher.prototype);
 MapControls.prototype.constructor = MapControls;
 
-},{"../../../build/three.module.js":1}],"three/examples/jsm/renderers/CSS3DRenderer.js":[function(require,module,exports){
+},{"../../../build/three.module.js":1}],"three/examples/jsm/postprocessing/BokehPass.js":[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.BokehPass = void 0;
+
+var _threeModule = require("../../../build/three.module.js");
+
+var _Pass = require("../postprocessing/Pass.js");
+
+var _BokehShader = require("../shaders/BokehShader.js");
+
+/**
+ * Depth-of-field post-process with bokeh shader
+ */
+var BokehPass = function BokehPass(scene, camera, params) {
+  _Pass.Pass.call(this);
+
+  this.scene = scene;
+  this.camera = camera;
+  var focus = params.focus !== undefined ? params.focus : 1.0;
+  var aspect = params.aspect !== undefined ? params.aspect : camera.aspect;
+  var aperture = params.aperture !== undefined ? params.aperture : 0.025;
+  var maxblur = params.maxblur !== undefined ? params.maxblur : 1.0; // render targets
+
+  var width = params.width || window.innerWidth || 1;
+  var height = params.height || window.innerHeight || 1;
+  this.renderTargetDepth = new _threeModule.WebGLRenderTarget(width, height, {
+    minFilter: _threeModule.NearestFilter,
+    magFilter: _threeModule.NearestFilter,
+    stencilBuffer: false
+  });
+  this.renderTargetDepth.texture.name = "BokehPass.depth"; // depth material
+
+  this.materialDepth = new _threeModule.MeshDepthMaterial();
+  this.materialDepth.depthPacking = _threeModule.RGBADepthPacking;
+  this.materialDepth.blending = _threeModule.NoBlending; // bokeh material
+
+  if (_BokehShader.BokehShader === undefined) {
+    console.error("BokehPass relies on BokehShader");
+  }
+
+  var bokehShader = _BokehShader.BokehShader;
+
+  var bokehUniforms = _threeModule.UniformsUtils.clone(bokehShader.uniforms);
+
+  bokehUniforms["tDepth"].value = this.renderTargetDepth.texture;
+  bokehUniforms["focus"].value = focus;
+  bokehUniforms["aspect"].value = aspect;
+  bokehUniforms["aperture"].value = aperture;
+  bokehUniforms["maxblur"].value = maxblur;
+  bokehUniforms["nearClip"].value = camera.near;
+  bokehUniforms["farClip"].value = camera.far;
+  this.materialBokeh = new _threeModule.ShaderMaterial({
+    defines: Object.assign({}, bokehShader.defines),
+    uniforms: bokehUniforms,
+    vertexShader: bokehShader.vertexShader,
+    fragmentShader: bokehShader.fragmentShader
+  });
+  this.uniforms = bokehUniforms;
+  this.needsSwap = false;
+  this.fsQuad = new _Pass.Pass.FullScreenQuad(this.materialBokeh);
+  this.oldClearColor = new _threeModule.Color();
+};
+
+exports.BokehPass = BokehPass;
+BokehPass.prototype = Object.assign(Object.create(_Pass.Pass.prototype), {
+  constructor: BokehPass,
+  render: function render(renderer, writeBuffer, readBuffer
+  /*, deltaTime, maskActive*/
+  ) {
+    // Render depth into texture
+    this.scene.overrideMaterial = this.materialDepth;
+    this.oldClearColor.copy(renderer.getClearColor());
+    var oldClearAlpha = renderer.getClearAlpha();
+    var oldAutoClear = renderer.autoClear;
+    renderer.autoClear = false;
+    renderer.setClearColor(0xffffff);
+    renderer.setClearAlpha(1.0);
+    renderer.setRenderTarget(this.renderTargetDepth);
+    renderer.clear();
+    renderer.render(this.scene, this.camera); // Render bokeh composite
+
+    this.uniforms["tColor"].value = readBuffer.texture;
+    this.uniforms["nearClip"].value = this.camera.near;
+    this.uniforms["farClip"].value = this.camera.far;
+
+    if (this.renderToScreen) {
+      renderer.setRenderTarget(null);
+      this.fsQuad.render(renderer);
+    } else {
+      renderer.setRenderTarget(writeBuffer);
+      renderer.clear();
+      this.fsQuad.render(renderer);
+    }
+
+    this.scene.overrideMaterial = null;
+    renderer.setClearColor(this.oldClearColor);
+    renderer.setClearAlpha(oldClearAlpha);
+    renderer.autoClear = oldAutoClear;
+  }
+});
+
+},{"../../../build/three.module.js":1,"../postprocessing/Pass.js":3,"../shaders/BokehShader.js":5}],"three/examples/jsm/postprocessing/EffectComposer.js":[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Pass = exports.EffectComposer = void 0;
+
+var _threeModule = require("../../../build/three.module.js");
+
+var _CopyShader = require("../shaders/CopyShader.js");
+
+var _ShaderPass = require("../postprocessing/ShaderPass.js");
+
+var _MaskPass = require("../postprocessing/MaskPass.js");
+
+/**
+ * @author alteredq / http://alteredqualia.com/
+ */
+var EffectComposer = function EffectComposer(renderer, renderTarget) {
+  this.renderer = renderer;
+
+  if (renderTarget === undefined) {
+    var parameters = {
+      minFilter: _threeModule.LinearFilter,
+      magFilter: _threeModule.LinearFilter,
+      format: _threeModule.RGBAFormat,
+      stencilBuffer: false
+    };
+    var size = renderer.getSize(new _threeModule.Vector2());
+    this._pixelRatio = renderer.getPixelRatio();
+    this._width = size.width;
+    this._height = size.height;
+    renderTarget = new _threeModule.WebGLRenderTarget(this._width * this._pixelRatio, this._height * this._pixelRatio, parameters);
+    renderTarget.texture.name = 'EffectComposer.rt1';
+  } else {
+    this._pixelRatio = 1;
+    this._width = renderTarget.width;
+    this._height = renderTarget.height;
+  }
+
+  this.renderTarget1 = renderTarget;
+  this.renderTarget2 = renderTarget.clone();
+  this.renderTarget2.texture.name = 'EffectComposer.rt2';
+  this.writeBuffer = this.renderTarget1;
+  this.readBuffer = this.renderTarget2;
+  this.renderToScreen = true;
+  this.passes = []; // dependencies
+
+  if (_CopyShader.CopyShader === undefined) {
+    console.error('THREE.EffectComposer relies on CopyShader');
+  }
+
+  if (_ShaderPass.ShaderPass === undefined) {
+    console.error('THREE.EffectComposer relies on ShaderPass');
+  }
+
+  this.copyPass = new _ShaderPass.ShaderPass(_CopyShader.CopyShader);
+  this.clock = new _threeModule.Clock();
+};
+
+exports.EffectComposer = EffectComposer;
+Object.assign(EffectComposer.prototype, {
+  swapBuffers: function swapBuffers() {
+    var tmp = this.readBuffer;
+    this.readBuffer = this.writeBuffer;
+    this.writeBuffer = tmp;
+  },
+  addPass: function addPass(pass) {
+    this.passes.push(pass);
+    pass.setSize(this._width * this._pixelRatio, this._height * this._pixelRatio);
+  },
+  insertPass: function insertPass(pass, index) {
+    this.passes.splice(index, 0, pass);
+    pass.setSize(this._width * this._pixelRatio, this._height * this._pixelRatio);
+  },
+  isLastEnabledPass: function isLastEnabledPass(passIndex) {
+    for (var i = passIndex + 1; i < this.passes.length; i++) {
+      if (this.passes[i].enabled) {
+        return false;
+      }
+    }
+
+    return true;
+  },
+  render: function render(deltaTime) {
+    // deltaTime value is in seconds
+    if (deltaTime === undefined) {
+      deltaTime = this.clock.getDelta();
+    }
+
+    var currentRenderTarget = this.renderer.getRenderTarget();
+    var maskActive = false;
+    var pass,
+        i,
+        il = this.passes.length;
+
+    for (i = 0; i < il; i++) {
+      pass = this.passes[i];
+      if (pass.enabled === false) continue;
+      pass.renderToScreen = this.renderToScreen && this.isLastEnabledPass(i);
+      pass.render(this.renderer, this.writeBuffer, this.readBuffer, deltaTime, maskActive);
+
+      if (pass.needsSwap) {
+        if (maskActive) {
+          var context = this.renderer.getContext();
+          var stencil = this.renderer.state.buffers.stencil; //context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff );
+
+          stencil.setFunc(context.NOTEQUAL, 1, 0xffffffff);
+          this.copyPass.render(this.renderer, this.writeBuffer, this.readBuffer, deltaTime); //context.stencilFunc( context.EQUAL, 1, 0xffffffff );
+
+          stencil.setFunc(context.EQUAL, 1, 0xffffffff);
+        }
+
+        this.swapBuffers();
+      }
+
+      if (_MaskPass.MaskPass !== undefined) {
+        if (pass instanceof _MaskPass.MaskPass) {
+          maskActive = true;
+        } else if (pass instanceof _MaskPass.ClearMaskPass) {
+          maskActive = false;
+        }
+      }
+    }
+
+    this.renderer.setRenderTarget(currentRenderTarget);
+  },
+  reset: function reset(renderTarget) {
+    if (renderTarget === undefined) {
+      var size = this.renderer.getSize(new _threeModule.Vector2());
+      this._pixelRatio = this.renderer.getPixelRatio();
+      this._width = size.width;
+      this._height = size.height;
+      renderTarget = this.renderTarget1.clone();
+      renderTarget.setSize(this._width * this._pixelRatio, this._height * this._pixelRatio);
+    }
+
+    this.renderTarget1.dispose();
+    this.renderTarget2.dispose();
+    this.renderTarget1 = renderTarget;
+    this.renderTarget2 = renderTarget.clone();
+    this.writeBuffer = this.renderTarget1;
+    this.readBuffer = this.renderTarget2;
+  },
+  setSize: function setSize(width, height) {
+    this._width = width;
+    this._height = height;
+    var effectiveWidth = this._width * this._pixelRatio;
+    var effectiveHeight = this._height * this._pixelRatio;
+    this.renderTarget1.setSize(effectiveWidth, effectiveHeight);
+    this.renderTarget2.setSize(effectiveWidth, effectiveHeight);
+
+    for (var i = 0; i < this.passes.length; i++) {
+      this.passes[i].setSize(effectiveWidth, effectiveHeight);
+    }
+  },
+  setPixelRatio: function setPixelRatio(pixelRatio) {
+    this._pixelRatio = pixelRatio;
+    this.setSize(this._width, this._height);
+  }
+});
+
+var Pass = function Pass() {
+  // if set to true, the pass is processed by the composer
+  this.enabled = true; // if set to true, the pass indicates to swap read and write buffer after rendering
+
+  this.needsSwap = true; // if set to true, the pass clears its buffer before rendering
+
+  this.clear = false; // if set to true, the result of the pass is rendered to screen. This is set automatically by EffectComposer.
+
+  this.renderToScreen = false;
+};
+
+exports.Pass = Pass;
+Object.assign(Pass.prototype, {
+  setSize: function setSize()
+  /* width, height */
+  {},
+  render: function render()
+  /* renderer, writeBuffer, readBuffer, deltaTime, maskActive */
+  {
+    console.error('THREE.Pass: .render() must be implemented in derived pass.');
+  }
+}); // Helper for passes that need to fill the viewport with a single quad.
+
+Pass.FullScreenQuad = function () {
+  var camera = new _threeModule.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  var geometry = new _threeModule.PlaneBufferGeometry(2, 2);
+
+  var FullScreenQuad = function FullScreenQuad(material) {
+    this._mesh = new _threeModule.Mesh(geometry, material);
+  };
+
+  Object.defineProperty(FullScreenQuad.prototype, 'material', {
+    get: function get() {
+      return this._mesh.material;
+    },
+    set: function set(value) {
+      this._mesh.material = value;
+    }
+  });
+  Object.assign(FullScreenQuad.prototype, {
+    dispose: function dispose() {
+      this._mesh.geometry.dispose();
+    },
+    render: function render(renderer) {
+      renderer.render(this._mesh, camera);
+    }
+  });
+  return FullScreenQuad;
+}();
+
+},{"../../../build/three.module.js":1,"../postprocessing/MaskPass.js":2,"../postprocessing/ShaderPass.js":4,"../shaders/CopyShader.js":6}],"three/examples/jsm/postprocessing/RenderPass.js":[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.RenderPass = void 0;
+
+var _Pass = require("../postprocessing/Pass.js");
+
+/**
+ * @author alteredq / http://alteredqualia.com/
+ */
+var RenderPass = function RenderPass(scene, camera, overrideMaterial, clearColor, clearAlpha) {
+  _Pass.Pass.call(this);
+
+  this.scene = scene;
+  this.camera = camera;
+  this.overrideMaterial = overrideMaterial;
+  this.clearColor = clearColor;
+  this.clearAlpha = clearAlpha !== undefined ? clearAlpha : 0;
+  this.clear = true;
+  this.clearDepth = false;
+  this.needsSwap = false;
+};
+
+exports.RenderPass = RenderPass;
+RenderPass.prototype = Object.assign(Object.create(_Pass.Pass.prototype), {
+  constructor: RenderPass,
+  render: function render(renderer, writeBuffer, readBuffer
+  /*, deltaTime, maskActive */
+  ) {
+    var oldAutoClear = renderer.autoClear;
+    renderer.autoClear = false;
+    var oldClearColor, oldClearAlpha, oldOverrideMaterial;
+
+    if (this.overrideMaterial !== undefined) {
+      oldOverrideMaterial = this.scene.overrideMaterial;
+      this.scene.overrideMaterial = this.overrideMaterial;
+    }
+
+    if (this.clearColor) {
+      oldClearColor = renderer.getClearColor().getHex();
+      oldClearAlpha = renderer.getClearAlpha();
+      renderer.setClearColor(this.clearColor, this.clearAlpha);
+    }
+
+    if (this.clearDepth) {
+      renderer.clearDepth();
+    }
+
+    renderer.setRenderTarget(this.renderToScreen ? null : readBuffer); // TODO: Avoid using autoClear properties, see https://github.com/mrdoob/three.js/pull/15571#issuecomment-465669600
+
+    if (this.clear) renderer.clear(renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil);
+    renderer.render(this.scene, this.camera);
+
+    if (this.clearColor) {
+      renderer.setClearColor(oldClearColor, oldClearAlpha);
+    }
+
+    if (this.overrideMaterial !== undefined) {
+      this.scene.overrideMaterial = oldOverrideMaterial;
+    }
+
+    renderer.autoClear = oldAutoClear;
+  }
+});
+
+},{"../postprocessing/Pass.js":3}],"three/examples/jsm/renderers/CSS3DRenderer.js":[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
