@@ -647,7 +647,7 @@ var TimelineSlider = /*#__PURE__*/function () {
         _this.onWindowResize;
       }, false);
       this.dof();
-      this.postprocessing.bokeh.uniforms["focus"].value = 500;
+      this.postprocessing.bokeh.uniforms["focus"].value = 200;
       this.postprocessing.bokeh.uniforms["aperture"].value = 0.000005;
       this.postprocessing.bokeh.uniforms["maxblur"].value = 0.1;
       this.animate();
@@ -765,9 +765,9 @@ var TimelineSlider = /*#__PURE__*/function () {
     value: function dof() {
       var renderPass = new _RenderPass.RenderPass(this.scene, this.camera);
       var bokehPass = new _BokehPass.BokehPass(this.scene, this.camera, {
-        focus: 1.0,
-        aperture: 0.025,
-        maxblur: 0.01,
+        // focus: 3.0,
+        // aperture: 0.05,
+        // maxblur: 0.5,
         width: window.innerWidth,
         height: window.innerHeight
       });
