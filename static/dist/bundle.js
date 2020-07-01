@@ -416,6 +416,8 @@ var _RenderPass = require("three/examples/jsm/postprocessing/RenderPass");
 
 var _BokehPass = require("three/examples/jsm/postprocessing/BokehPass");
 
+var _datGuiModule = require("three/examples/jsm/libs/dat.gui.module.js");
+
 var _gsap = require("gsap");
 
 var _swiper = _interopRequireDefault(require("swiper"));
@@ -646,10 +648,27 @@ var TimelineSlider = /*#__PURE__*/function () {
       window.addEventListener("resize", function () {
         _this.onWindowResize;
       }, false);
-      this.dof();
-      this.postprocessing.bokeh.uniforms["focus"].value = 200;
-      this.postprocessing.bokeh.uniforms["aperture"].value = 0.000005;
-      this.postprocessing.bokeh.uniforms["maxblur"].value = 0.1;
+      this.dof(); // DAT gui controls
+
+      var effectController = {
+        focus: 360,
+        aperture: 4.7,
+        maxblur: 0.007
+      };
+
+      var matChanger = function matChanger() {
+        _this.postprocessing.bokeh.uniforms["focus"].value = effectController.focus;
+        _this.postprocessing.bokeh.uniforms["aperture"].value = effectController.aperture * 0.00001;
+        _this.postprocessing.bokeh.uniforms["maxblur"].value = effectController.maxblur;
+      };
+
+      var gui = new _datGuiModule.GUI();
+      gui.add(effectController, "focus", 10.0, 3000.0, 10).onChange(matChanger);
+      gui.add(effectController, "aperture", 0, 10, 0.1).onChange(matChanger);
+      gui.add(effectController, "maxblur", 0.0, 0.01, 0.001).onChange(matChanger);
+      gui.close();
+      matChanger(); // end DAT gui controls
+
       this.animate();
       this.helixNavigation(); // background
 
@@ -803,7 +822,7 @@ var TimelineSlider = /*#__PURE__*/function () {
 
 exports.default = TimelineSlider;
 
-},{"gsap":"gsap","swiper":"swiper","three":"three","three/examples/jsm/postprocessing/BokehPass":"three/examples/jsm/postprocessing/BokehPass","three/examples/jsm/postprocessing/EffectComposer":"three/examples/jsm/postprocessing/EffectComposer","three/examples/jsm/postprocessing/RenderPass":"three/examples/jsm/postprocessing/RenderPass","three/examples/jsm/renderers/CSS3DRenderer":"three/examples/jsm/renderers/CSS3DRenderer"}],6:[function(require,module,exports){
+},{"gsap":"gsap","swiper":"swiper","three":"three","three/examples/jsm/libs/dat.gui.module.js":"three/examples/jsm/libs/dat.gui.module.js","three/examples/jsm/postprocessing/BokehPass":"three/examples/jsm/postprocessing/BokehPass","three/examples/jsm/postprocessing/EffectComposer":"three/examples/jsm/postprocessing/EffectComposer","three/examples/jsm/postprocessing/RenderPass":"three/examples/jsm/postprocessing/RenderPass","three/examples/jsm/renderers/CSS3DRenderer":"three/examples/jsm/renderers/CSS3DRenderer"}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

@@ -7,6 +7,7 @@ import {
 import {EffectComposer} from "three/examples/jsm/postprocessing/EffectComposer";
 import {RenderPass} from "three/examples/jsm/postprocessing/RenderPass";
 import {BokehPass} from "three/examples/jsm/postprocessing/BokehPass";
+import {GUI} from "three/examples/jsm/libs/dat.gui.module.js";
 
 import {gsap} from "gsap";
 import Swiper from "swiper";
@@ -292,9 +293,28 @@ export default class TimelineSlider {
         );
 
         this.dof();
-        this.postprocessing.bokeh.uniforms["focus"].value = 200;
-        this.postprocessing.bokeh.uniforms["aperture"].value = 0.000005;
-        this.postprocessing.bokeh.uniforms["maxblur"].value = 0.1;
+
+        // DAT gui controls
+        const effectController = {
+            focus: 360,
+            aperture: 4.7,
+            maxblur: 0.007,
+        };
+
+        var matChanger = () => {
+            this.postprocessing.bokeh.uniforms["focus"].value = effectController.focus;
+            this.postprocessing.bokeh.uniforms["aperture"].value = effectController.aperture * 0.00001;
+            this.postprocessing.bokeh.uniforms["maxblur"].value = effectController.maxblur;
+        };
+
+        const gui = new GUI();
+        gui.add(effectController, "focus", 10.0, 3000.0, 10).onChange(matChanger);
+        gui.add(effectController, "aperture", 0, 10, 0.1).onChange(matChanger);
+        gui.add(effectController, "maxblur", 0.0, 0.01, 0.001).onChange(matChanger);
+        gui.close();
+
+        matChanger();
+        // end DAT gui controls
 
         this.animate();
         this.helixNavigation();
