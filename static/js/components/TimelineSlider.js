@@ -27,6 +27,14 @@ export default class TimelineSlider {
             transitionSpeed: 1000,
         };
 
+        this.mouse = {
+            x: 0,
+            y: 0,
+        };
+
+        this.winWidth = window.innerWidth;
+        this.winHeight = window.innerHeight;
+
         this.timeline = document.querySelector(this.DOM.timeline);
         this.timelineSlider = document.querySelector(this.DOM.timelineSlider);
 
@@ -172,7 +180,7 @@ export default class TimelineSlider {
 
         this.camera = new THREE.PerspectiveCamera(
             options.camera.fov,
-            window.innerWidth / window.innerHeight,
+            this.winWidth / this.winHeight,
             options.camera.near,
             options.camera.far,
         );
@@ -180,11 +188,11 @@ export default class TimelineSlider {
         this.camera.lookAt(0, 0, 0);
 
         this.camera.position.x = 0;
-        this.camera.position.y = 275;
+        this.camera.position.y = 0;
         this.camera.position.z = 1020;
 
         this.cameraWrapper = new THREE.Object3D();
-        this.cameraWrapper.position.set(0, 275, 0);
+        this.cameraWrapper.position.set(0, 550, 0);
         this.cameraWrapper.rotation.y = 3.15;
         this.cameraWrapper.name = "camera wrapper";
         this.cameraWrapper.add(this.camera);
@@ -271,11 +279,11 @@ export default class TimelineSlider {
             alpha: true,
         });
         this.canvasRenderer.setPixelRatio(window.devicePixelRatio);
-        this.canvasRenderer.setSize(window.innerWidth, window.innerHeight);
+        this.canvasRenderer.setSize(this.winWidth, this.winHeight);
         this.timeline.appendChild(this.canvasRenderer.domElement);
 
         this.renderer = new CSS3DRenderer();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setSize(this.winWidth, this.winHeight);
         this.timeline.appendChild(this.renderer.domElement);
 
         const ambientlight = new THREE.AmbientLight(0x404040);
@@ -318,6 +326,7 @@ export default class TimelineSlider {
 
         this.animate();
         this.helixNavigation();
+        this.mouseMove();
 
         // background
         const bgGeometryAspectRatio = 16 / 9;
@@ -348,12 +357,12 @@ export default class TimelineSlider {
     }
 
     onWindowResize() {
-        this.camera.aspect = window.innerWidth / window.innerHeight;
+        this.camera.aspect = this.winWidth / this.winHeight;
         this.camera.updateProjectionMatrix();
 
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.canvasRenderer.setSize(window.innerWidth, window.innerHeight);
-        this.postprocessing.composer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setSize(this.winWidth, this.winHeight);
+        this.canvasRenderer.setSize(this.winWidth, this.winHeight);
+        this.postprocessing.composer.setSize(this.winWidth, this.winHeight);
     }
 
     animate() {
@@ -488,8 +497,8 @@ export default class TimelineSlider {
             // aperture: 0.05,
             // maxblur: 0.5,
 
-            width: window.innerWidth,
-            height: window.innerHeight,
+            width: this.winWidth,
+            height: this.winHeight,
         });
 
         const composer = new EffectComposer(this.canvasRenderer);
@@ -499,5 +508,21 @@ export default class TimelineSlider {
 
         this.postprocessing.composer = composer;
         this.postprocessing.bokeh = bokehPass;
+    }
+
+    mouseMove() {
+        window.addEventListener("mousemove", (ev) => {
+            this.mouse.x =
+                (15 / (this.winWidth / 2)) * (ev.clientX - this.winWidth / 2);
+            this.mouse.y =
+                (15 / (this.winHeight / 2)) * (ev.clientY - this.winHeight / 2);
+
+            gsap.to(this.camera.position, {
+                x: this.mouse.x,
+                y: this.mouse.y,
+                duration: 0.3,
+                ease: "power3.out",
+            });
+        });
     }
 }

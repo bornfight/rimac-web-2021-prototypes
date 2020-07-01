@@ -448,6 +448,12 @@ var TimelineSlider = /*#__PURE__*/function () {
     this.options = {
       transitionSpeed: 1000
     };
+    this.mouse = {
+      x: 0,
+      y: 0
+    };
+    this.winWidth = window.innerWidth;
+    this.winHeight = window.innerHeight;
     this.timeline = document.querySelector(this.DOM.timeline);
     this.timelineSlider = document.querySelector(this.DOM.timelineSlider);
     this.timelineItemsImagePath = "static/images/";
@@ -553,13 +559,13 @@ var TimelineSlider = /*#__PURE__*/function () {
           posZ: 1080
         }
       };
-      this.camera = new THREE.PerspectiveCamera(options.camera.fov, window.innerWidth / window.innerHeight, options.camera.near, options.camera.far);
+      this.camera = new THREE.PerspectiveCamera(options.camera.fov, this.winWidth / this.winHeight, options.camera.near, options.camera.far);
       this.camera.lookAt(0, 0, 0);
       this.camera.position.x = 0;
-      this.camera.position.y = 275;
+      this.camera.position.y = 0;
       this.camera.position.z = 1020;
       this.cameraWrapper = new THREE.Object3D();
-      this.cameraWrapper.position.set(0, 275, 0);
+      this.cameraWrapper.position.set(0, 550, 0);
       this.cameraWrapper.rotation.y = 3.15;
       this.cameraWrapper.name = "camera wrapper";
       this.cameraWrapper.add(this.camera);
@@ -635,10 +641,10 @@ var TimelineSlider = /*#__PURE__*/function () {
         alpha: true
       });
       this.canvasRenderer.setPixelRatio(window.devicePixelRatio);
-      this.canvasRenderer.setSize(window.innerWidth, window.innerHeight);
+      this.canvasRenderer.setSize(this.winWidth, this.winHeight);
       this.timeline.appendChild(this.canvasRenderer.domElement);
       this.renderer = new _CSS3DRenderer.CSS3DRenderer();
-      this.renderer.setSize(window.innerWidth, window.innerHeight);
+      this.renderer.setSize(this.winWidth, this.winHeight);
       this.timeline.appendChild(this.renderer.domElement);
       var ambientlight = new THREE.AmbientLight(0x404040);
       var light = new THREE.DirectionalLight(0xffffff, 1);
@@ -670,7 +676,8 @@ var TimelineSlider = /*#__PURE__*/function () {
       matChanger(); // end DAT gui controls
 
       this.animate();
-      this.helixNavigation(); // background
+      this.helixNavigation();
+      this.mouseMove(); // background
 
       var bgGeometryAspectRatio = 16 / 9;
       var texture = new THREE.TextureLoader().load(this.timelineItemsImagePath + "timeline-background.png", function () {
@@ -694,11 +701,11 @@ var TimelineSlider = /*#__PURE__*/function () {
   }, {
     key: "onWindowResize",
     value: function onWindowResize() {
-      this.camera.aspect = window.innerWidth / window.innerHeight;
+      this.camera.aspect = this.winWidth / this.winHeight;
       this.camera.updateProjectionMatrix();
-      this.renderer.setSize(window.innerWidth, window.innerHeight);
-      this.canvasRenderer.setSize(window.innerWidth, window.innerHeight);
-      this.postprocessing.composer.setSize(window.innerWidth, window.innerHeight);
+      this.renderer.setSize(this.winWidth, this.winHeight);
+      this.canvasRenderer.setSize(this.winWidth, this.winHeight);
+      this.postprocessing.composer.setSize(this.winWidth, this.winHeight);
     }
   }, {
     key: "animate",
@@ -806,14 +813,31 @@ var TimelineSlider = /*#__PURE__*/function () {
         // focus: 3.0,
         // aperture: 0.05,
         // maxblur: 0.5,
-        width: window.innerWidth,
-        height: window.innerHeight
+        width: this.winWidth,
+        height: this.winHeight
       });
       var composer = new _EffectComposer.EffectComposer(this.canvasRenderer);
       composer.addPass(renderPass);
       composer.addPass(bokehPass);
       this.postprocessing.composer = composer;
       this.postprocessing.bokeh = bokehPass;
+    }
+  }, {
+    key: "mouseMove",
+    value: function mouseMove() {
+      var _this4 = this;
+
+      window.addEventListener("mousemove", function (ev) {
+        _this4.mouse.x = 15 / (_this4.winWidth / 2) * (ev.clientX - _this4.winWidth / 2);
+        _this4.mouse.y = 15 / (_this4.winHeight / 2) * (ev.clientY - _this4.winHeight / 2);
+
+        _gsap.gsap.to(_this4.camera.position, {
+          x: _this4.mouse.x,
+          y: _this4.mouse.y,
+          duration: 0.3,
+          ease: "power3.out"
+        });
+      });
     }
   }]);
 
