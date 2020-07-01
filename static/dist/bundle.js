@@ -408,13 +408,13 @@ exports.default = void 0;
 
 var THREE = _interopRequireWildcard(require("three"));
 
-var _CSS3DRenderer = require("three/examples/jsm/renderers/CSS3DRenderer.js");
+var _CSS3DRenderer = require("three/examples/jsm/renderers/CSS3DRenderer");
 
-var _EffectComposer = require("three/examples/jsm/postprocessing/EffectComposer.js");
+var _EffectComposer = require("three/examples/jsm/postprocessing/EffectComposer");
 
-var _RenderPass = require("three/examples/jsm/postprocessing/RenderPass.js");
+var _RenderPass = require("three/examples/jsm/postprocessing/RenderPass");
 
-var _BokehPass = require("three/examples/jsm/postprocessing/BokehPass.js");
+var _BokehPass = require("three/examples/jsm/postprocessing/BokehPass");
 
 var _gsap = require("gsap");
 
@@ -545,7 +545,7 @@ var TimelineSlider = /*#__PURE__*/function () {
         camera: {
           fov: 60,
           near: 10,
-          far: 2000,
+          far: 3000,
           posX: -180,
           posY: 100,
           posZ: 1080
@@ -651,7 +651,26 @@ var TimelineSlider = /*#__PURE__*/function () {
       this.postprocessing.bokeh.uniforms["aperture"].value = 0.000005;
       this.postprocessing.bokeh.uniforms["maxblur"].value = 0.1;
       this.animate();
-      this.helixNavigation();
+      this.helixNavigation(); // background
+
+      var bgGeometryAspectRatio = 16 / 9;
+      var texture = new THREE.TextureLoader().load(this.timelineItemsImagePath + "timeline-background.png", function () {
+        // image position to cover the plane
+        var imageAspectRatio = texture.image.width / texture.image.height;
+        texture.wrapT = THREE.RepeatWrapping;
+        texture.repeat.x = bgGeometryAspectRatio / imageAspectRatio;
+        texture.offset.x = 0.5 * (1 - texture.repeat.x);
+      });
+      var planeMaterial = new THREE.MeshBasicMaterial({
+        map: texture,
+        flatShading: true,
+        transparent: false
+      });
+      planeMaterial.side = THREE.DoubleSide;
+      var planeGeometry = new THREE.PlaneGeometry(6400, 3600, 1, 1);
+      var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+      plane.position.set(0, 200, -1000);
+      this.cameraWrapper.add(plane);
     }
   }, {
     key: "onWindowResize",
@@ -784,7 +803,7 @@ var TimelineSlider = /*#__PURE__*/function () {
 
 exports.default = TimelineSlider;
 
-},{"gsap":"gsap","swiper":"swiper","three":"three","three/examples/jsm/postprocessing/BokehPass.js":"three/examples/jsm/postprocessing/BokehPass.js","three/examples/jsm/postprocessing/EffectComposer.js":"three/examples/jsm/postprocessing/EffectComposer.js","three/examples/jsm/postprocessing/RenderPass.js":"three/examples/jsm/postprocessing/RenderPass.js","three/examples/jsm/renderers/CSS3DRenderer.js":"three/examples/jsm/renderers/CSS3DRenderer.js"}],6:[function(require,module,exports){
+},{"gsap":"gsap","swiper":"swiper","three":"three","three/examples/jsm/postprocessing/BokehPass":"three/examples/jsm/postprocessing/BokehPass","three/examples/jsm/postprocessing/EffectComposer":"three/examples/jsm/postprocessing/EffectComposer","three/examples/jsm/postprocessing/RenderPass":"three/examples/jsm/postprocessing/RenderPass","three/examples/jsm/renderers/CSS3DRenderer":"three/examples/jsm/renderers/CSS3DRenderer"}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

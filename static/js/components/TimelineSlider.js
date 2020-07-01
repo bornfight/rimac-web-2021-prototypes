@@ -2,11 +2,11 @@ import * as THREE from "three";
 import {
     CSS3DObject,
     CSS3DRenderer,
-} from "three/examples/jsm/renderers/CSS3DRenderer.js";
+} from "three/examples/jsm/renderers/CSS3DRenderer";
 
-import {EffectComposer} from "three/examples/jsm/postprocessing/EffectComposer.js";
-import {RenderPass} from "three/examples/jsm/postprocessing/RenderPass.js";
-import {BokehPass} from "three/examples/jsm/postprocessing/BokehPass.js";
+import {EffectComposer} from "three/examples/jsm/postprocessing/EffectComposer";
+import {RenderPass} from "three/examples/jsm/postprocessing/RenderPass";
+import {BokehPass} from "three/examples/jsm/postprocessing/BokehPass";
 
 import {gsap} from "gsap";
 import Swiper from "swiper";
@@ -162,7 +162,7 @@ export default class TimelineSlider {
             camera: {
                 fov: 60,
                 near: 10,
-                far: 2000,
+                far: 3000,
                 posX: -180,
                 posY: 100,
                 posZ: 1080,
@@ -298,6 +298,33 @@ export default class TimelineSlider {
 
         this.animate();
         this.helixNavigation();
+
+        // background
+        const bgGeometryAspectRatio = 16 / 9;
+        let texture = new THREE.TextureLoader().load(
+            this.timelineItemsImagePath + "timeline-background.png",
+            () => {
+                // image position to cover the plane
+                const imageAspectRatio =
+                    texture.image.width / texture.image.height;
+                texture.wrapT = THREE.RepeatWrapping;
+                texture.repeat.x = bgGeometryAspectRatio / imageAspectRatio;
+                texture.offset.x = 0.5 * (1 - texture.repeat.x);
+            },
+        );
+
+        let planeMaterial = new THREE.MeshBasicMaterial({
+            map: texture,
+            flatShading: true,
+            transparent: false,
+        });
+
+        planeMaterial.side = THREE.DoubleSide;
+
+        const planeGeometry = new THREE.PlaneGeometry(6400, 3600, 1, 1);
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.position.set(0, 200, -1000);
+        this.cameraWrapper.add(plane);
     }
 
     onWindowResize() {

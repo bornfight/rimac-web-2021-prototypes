@@ -20230,7 +20230,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
   return Swiper;
 });
 
-},{}],"three/examples/jsm/controls/OrbitControls.js":[function(require,module,exports){
+},{}],"three/examples/jsm/controls/OrbitControls":[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -21024,7 +21024,7 @@ exports.MapControls = MapControls;
 MapControls.prototype = Object.create(_threeModule.EventDispatcher.prototype);
 MapControls.prototype.constructor = MapControls;
 
-},{"../../../build/three.module.js":1}],"three/examples/jsm/postprocessing/BokehPass.js":[function(require,module,exports){
+},{"../../../build/three.module.js":1}],"three/examples/jsm/postprocessing/BokehPass":[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -21129,7 +21129,7 @@ BokehPass.prototype = Object.assign(Object.create(_Pass.Pass.prototype), {
   }
 });
 
-},{"../../../build/three.module.js":1,"../postprocessing/Pass.js":3,"../shaders/BokehShader.js":5}],"three/examples/jsm/postprocessing/EffectComposer.js":[function(require,module,exports){
+},{"../../../build/three.module.js":1,"../postprocessing/Pass.js":3,"../shaders/BokehShader.js":5}],"three/examples/jsm/postprocessing/EffectComposer":[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -21342,7 +21342,7 @@ Pass.FullScreenQuad = function () {
   return FullScreenQuad;
 }();
 
-},{"../../../build/three.module.js":1,"../postprocessing/MaskPass.js":2,"../postprocessing/ShaderPass.js":4,"../shaders/CopyShader.js":6}],"three/examples/jsm/postprocessing/RenderPass.js":[function(require,module,exports){
+},{"../../../build/three.module.js":1,"../postprocessing/MaskPass.js":2,"../postprocessing/ShaderPass.js":4,"../shaders/CopyShader.js":6}],"three/examples/jsm/postprocessing/RenderPass":[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -21410,7 +21410,7 @@ RenderPass.prototype = Object.assign(Object.create(_Pass.Pass.prototype), {
   }
 });
 
-},{"../postprocessing/Pass.js":3}],"three/examples/jsm/renderers/CSS3DRenderer.js":[function(require,module,exports){
+},{"../postprocessing/Pass.js":3}],"three/examples/jsm/renderers/CSS3DRenderer":[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
