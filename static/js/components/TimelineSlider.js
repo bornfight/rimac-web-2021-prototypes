@@ -10,7 +10,6 @@ import {BokehPass} from "three/examples/jsm/postprocessing/BokehPass";
 import {GUI} from "three/examples/jsm/libs/dat.gui.module.js";
 
 import {gsap} from "gsap";
-import Swiper from "swiper";
 
 export default class TimelineSlider {
     constructor() {
@@ -153,10 +152,6 @@ export default class TimelineSlider {
         this.slideCounter = 0;
 
         this.init();
-
-        // if (this.timelineSlider) {
-            // this.initSwiper();
-        // }
     }
 
     init() {
@@ -373,29 +368,6 @@ export default class TimelineSlider {
         });
     }
 
-    // initSwiper() {
-    //     let timelineSlider = new Swiper(this.DOM.timelineSlider, {
-    //         init: false,
-    //         slidesPerView: 13,
-    //         speed: this.options.transitionSpeed,
-    //         navigation: {
-    //             nextEl: this.DOM.timelineSliderNext,
-    //             prevEl: this.DOM.timelineSliderPrev,
-    //         },
-    //     });
-    //
-    //     timelineSlider.on("init", () => {
-    //     });
-    //
-    //     timelineSlider.on("slideNextTransitionStart", () => {
-    //     });
-    //
-    //     timelineSlider.on("slidePrevTransitionStart", () => {
-    //     });
-    //
-    //     timelineSlider.init();
-    // }
-
     cretateItem(i, timelineLoopItem, planeGeometryBack, planeBackMaterial, planeGeometry) {
         let timelineItem = document.createElement("div");
         timelineItem.className = "c-timeline-item";
@@ -465,8 +437,7 @@ export default class TimelineSlider {
         planeGroup.lookAt(this.vector);
         this.helixCanvasItems.push(helixCanvasItem);
     }
-
-    // DOF
+    
     dof() {
         var renderPass = new RenderPass(this.scene, this.camera);
 
