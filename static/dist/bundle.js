@@ -571,6 +571,9 @@ var TimelineSlider = /*#__PURE__*/function () {
       this.cameraWrapper.add(this.camera);
       this.scene.add(this.cameraWrapper);
       var vector = new THREE.Vector3();
+      var planeBackMaterial = new THREE.MeshBasicMaterial({
+        color: 0x333333
+      });
 
       var _loop = function _loop(i, l) {
         var timelineItem = document.createElement("div");
@@ -602,8 +605,9 @@ var TimelineSlider = /*#__PURE__*/function () {
 
         _this.helixItem.lookAt(vector);
 
-        _this.helixItems.push(_this.helixItem); // canvas
+        _this.helixItems.push(_this.helixItem);
 
+        var planeGroup = new THREE.Object3D(); // canvas
 
         var geometryAspectRatio = 16 / 9;
         var texture = new THREE.TextureLoader().load(_this.timelineItemsImagePath + _this.timelineItems[i].image, function () {
@@ -617,17 +621,21 @@ var TimelineSlider = /*#__PURE__*/function () {
           map: texture,
           flatShading: true,
           transparent: false
-        });
-        planeMaterial.side = THREE.DoubleSide;
+        }); // planeMaterial.side = THREE.DoubleSide;
+
         var planeGeometry = new THREE.PlaneGeometry(330, 186, 1, 1);
+        var planeGeometryBack = planeGeometry.clone();
+        planeGeometryBack.applyMatrix(new THREE.Matrix4().makeRotationY(Math.PI));
+        var planeBack = new THREE.Mesh(planeGeometryBack, planeBackMaterial);
         _this.helixCanvasItem = new THREE.Mesh(planeGeometry, planeMaterial);
-        _this.helixCanvasItem.name = "canvas-plane-".concat(_this.timelineItems[i].title, ", index: ").concat(i);
+        planeGroup.name = "canvas-plane-".concat(_this.timelineItems[i].title, ", index: ").concat(i);
+        planeGroup.add(_this.helixCanvasItem);
+        planeGroup.add(planeBack);
 
-        _this.scene.add(_this.helixCanvasItem);
+        _this.scene.add(planeGroup);
 
-        _this.helixCanvasItem.position.setFromCylindricalCoords(640, theta, y);
-
-        _this.helixCanvasItem.lookAt(vector);
+        planeGroup.position.setFromCylindricalCoords(640, theta, y);
+        planeGroup.lookAt(vector);
 
         _this.helixCanvasItems.push(_this.helixCanvasItem);
       };
@@ -828,13 +836,13 @@ var TimelineSlider = /*#__PURE__*/function () {
       var _this4 = this;
 
       window.addEventListener("mousemove", function (ev) {
-        _this4.mouse.x = 15 / (_this4.winWidth / 2) * (ev.clientX - _this4.winWidth / 2);
-        _this4.mouse.y = 15 / (_this4.winHeight / 2) * (ev.clientY - _this4.winHeight / 2);
+        _this4.mouse.x = 0.06 / _this4.winWidth * (ev.clientX - _this4.winWidth / 2);
+        _this4.mouse.y = 0.06 / _this4.winHeight * (ev.clientY - _this4.winHeight / 2);
 
-        _gsap.gsap.to(_this4.camera.position, {
-          x: _this4.mouse.x,
-          y: _this4.mouse.y,
-          duration: 0.3,
+        _gsap.gsap.to(_this4.camera.rotation, {
+          x: _this4.mouse.y,
+          y: _this4.mouse.x,
+          duration: 2,
           ease: "power3.out"
         });
       });

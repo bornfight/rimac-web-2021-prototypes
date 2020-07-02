@@ -200,6 +200,10 @@ export default class TimelineSlider {
 
         const vector = new THREE.Vector3();
 
+        const planeBackMaterial = new THREE.MeshBasicMaterial({
+            color: 0x333333,
+        });
+
         for (let i = 0, l = this.timelineItems.length; i < l; i++) {
             let timelineItem = document.createElement("div");
             timelineItem.className = "c-timeline-item";
@@ -236,6 +240,7 @@ export default class TimelineSlider {
 
             this.helixItems.push(this.helixItem);
 
+            const planeGroup = new THREE.Object3D();
             // canvas
             const geometryAspectRatio = 16 / 9;
             let texture = new THREE.TextureLoader().load(
@@ -256,21 +261,26 @@ export default class TimelineSlider {
                 transparent: false,
             });
 
-            planeMaterial.side = THREE.DoubleSide;
+            // planeMaterial.side = THREE.DoubleSide;
 
             let planeGeometry = new THREE.PlaneGeometry(330, 186, 1, 1);
+            let planeGeometryBack = planeGeometry.clone();
+            planeGeometryBack.applyMatrix(new THREE.Matrix4().makeRotationY(Math.PI));
+            const planeBack = new THREE.Mesh(planeGeometryBack, planeBackMaterial);
             this.helixCanvasItem = new THREE.Mesh(planeGeometry, planeMaterial);
-            this.helixCanvasItem.name = `canvas-plane-${this.timelineItems[i].title}, index: ${i}`;
+            planeGroup.name = `canvas-plane-${this.timelineItems[i].title}, index: ${i}`;
 
-            this.scene.add(this.helixCanvasItem);
+            planeGroup.add(this.helixCanvasItem);
+            planeGroup.add(planeBack);
+            this.scene.add(planeGroup);
 
-            this.helixCanvasItem.position.setFromCylindricalCoords(
+            planeGroup.position.setFromCylindricalCoords(
                 640,
                 theta,
                 y,
             );
 
-            this.helixCanvasItem.lookAt(vector);
+            planeGroup.lookAt(vector);
             this.helixCanvasItems.push(this.helixCanvasItem);
         }
 
@@ -513,14 +523,14 @@ export default class TimelineSlider {
     mouseMove() {
         window.addEventListener("mousemove", (ev) => {
             this.mouse.x =
-                (15 / (this.winWidth / 2)) * (ev.clientX - this.winWidth / 2);
+                (0.06 / this.winWidth) * (ev.clientX - this.winWidth / 2);
             this.mouse.y =
-                (15 / (this.winHeight / 2)) * (ev.clientY - this.winHeight / 2);
+                (0.06 / this.winHeight) * (ev.clientY - this.winHeight / 2);
 
-            gsap.to(this.camera.position, {
-                x: this.mouse.x,
-                y: this.mouse.y,
-                duration: 0.3,
+            gsap.to(this.camera.rotation, {
+                x: this.mouse.y,
+                y: this.mouse.x,
+                duration: 2,
                 ease: "power3.out",
             });
         });
