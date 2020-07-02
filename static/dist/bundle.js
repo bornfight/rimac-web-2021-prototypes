@@ -692,12 +692,14 @@ var TimelineSlider = /*#__PURE__*/function () {
       var swiper = new _swiper.default(this.slider, {
         loop: false,
         slidesPerView: 1,
+        // direction: "vertical",
         centeredSlides: true,
         speed: 800,
         grabCursor: true,
         watchSlidesProgress: true,
         mousewheelControl: true,
         mousewheel: true,
+        freeMode: true,
         // effect: "fade",
         // fadeEffect: {
         //     crossFade: true,

@@ -343,12 +343,14 @@ export default class TimelineSlider {
         const swiper = new Swiper(this.slider, {
             loop: false,
             slidesPerView: 1,
+            // direction: "vertical",
             centeredSlides: true,
             speed: 800,
             grabCursor: true,
             watchSlidesProgress: true,
             mousewheelControl: true,
             mousewheel: true,
+            freeMode: true,
             // effect: "fade",
             // fadeEffect: {
             //     crossFade: true,
