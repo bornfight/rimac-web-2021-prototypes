@@ -1,6 +1,8 @@
 export const plugins = [
     "gsap",
     "gsap/ScrollTrigger",
+    "gsap/InertiaPlugin",
+    "gsap/Draggable",
     "three",
     "three/examples/jsm/controls/OrbitControls",
     "three/examples/jsm/renderers/CSS3DRenderer",

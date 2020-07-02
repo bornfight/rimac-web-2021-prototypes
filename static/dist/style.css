@@ -827,10 +827,12 @@ a {
   padding-bottom: 60px; }
 
 .c-timeline {
-  position: relative; }
+  position: relative;
+  height: 100vh; }
 
 .c-timeline__canvas {
-  position: relative; }
+  position: relative;
+  z-index: 0 !important; }
 
 .c-timeline__canvas canvas {
   position: absolute;
@@ -843,7 +845,8 @@ a {
   position: absolute;
   bottom: 80px;
   left: 0;
-  width: 100%; }
+  width: 100%;
+  z-index: 1; }
 
 .c-timeline__buttons {
   width: 100%;
@@ -871,9 +874,16 @@ a {
 .c-timeline__button.c-link {
   color: #ffffff; }
 
+.c-timeline .swiper-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh; }
+
 .c-timeline-item {
-  width: 304px;
-  min-height: 171px;
+  width: 100vw;
+  height: 100%;
   text-align: center;
   line-height: normal;
   cursor: pointer;
@@ -884,34 +894,19 @@ a {
           backface-visibility: hidden;
   z-index: 1; }
 
-.c-timeline-item__img {
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  background-color: #004c4a;
-  -webkit-box-shadow: 0 0 12px rgba(0, 255, 255, 0.5);
-          box-shadow: 0 0 12px rgba(0, 255, 255, 0.5);
-  border: 1px solid rgba(127, 255, 255, 0.25);
-  -webkit-transition: all 0.2s cubic-bezier(0.55, 0.085, 0.68, 0.53);
-  transition: all 0.2s cubic-bezier(0.55, 0.085, 0.68, 0.53); }
-
 .c-timeline-item__inner {
   position: absolute;
-  top: 100%;
-  margin-top: -35px;
+  top: 50%;
+  left: 50%;
   padding: 20px 40px;
-  -webkit-transform: translateZ(10px);
-          transform: translateZ(10px);
+  -webkit-transform: translate(50%, 50%);
+          transform: translate(50%, 50%);
   opacity: 0;
   -webkit-transition: opacity 0.3s ease-out;
-  transition: opacity 0.3s ease-out; }
+  transition: opacity 0.3s ease-out;
+  margin-top: 100px; }
 
-.c-timeline-item.is-active .c-timeline-item__inner {
+.c-timeline-item.swiper-slide-active .c-timeline-item__inner {
   opacity: 1; }
 
 .c-timeline-item:hover .c-timeline-item__img {

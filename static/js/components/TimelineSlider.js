@@ -1,8 +1,4 @@
 import * as THREE from "three";
-import {
-    CSS3DObject,
-    CSS3DRenderer,
-} from "three/examples/jsm/renderers/CSS3DRenderer";
 
 import {EffectComposer} from "three/examples/jsm/postprocessing/EffectComposer";
 import {RenderPass} from "three/examples/jsm/postprocessing/RenderPass";
@@ -11,12 +7,15 @@ import {GUI} from "three/examples/jsm/libs/dat.gui.module.js";
 
 import {gsap} from "gsap";
 
+import Swiper from "swiper";
+
 export default class TimelineSlider {
     constructor() {
         this.DOM = {
             timeline: ".js-timeline",
 
             timelineSlider: ".js-timeline-slider",
+            timelineSliderWrapper: ".js-timeline-slider-wrapper",
             timelineSliderNext: ".js-timeline-slider-next",
             timelineSliderPrev: ".js-timeline-slider-previous",
             states: {},
@@ -34,8 +33,11 @@ export default class TimelineSlider {
         this.winWidth = window.innerWidth;
         this.winHeight = window.innerHeight;
 
+        this.activeIndex = 0;
+
         this.timeline = document.querySelector(this.DOM.timeline);
-        this.timelineSlider = document.querySelector(this.DOM.timelineSlider);
+        this.slider = document.querySelector(this.DOM.timelineSlider);
+        this.sliderWrapper = document.querySelector(this.DOM.timelineSliderWrapper);
 
         this.timelineItemsImagePath = "static/images/";
         this.timelineItems = [
@@ -132,8 +134,6 @@ export default class TimelineSlider {
             },
         ];
 
-        this.timelineSlider = document.querySelector(this.DOM.timelineSlider);
-
         this.timelineSliderPrev = document.querySelector(
             this.DOM.timelineSliderPrev,
         );
@@ -177,15 +177,20 @@ export default class TimelineSlider {
             options.camera.far,
         );
 
+        this.itemRadiusOffset = 0.85;
+
         this.camera.lookAt(0, 0, 0);
 
         this.camera.position.x = 0;
         this.camera.position.y = 0;
         this.camera.position.z = 1020;
 
+        this.initialCameraWrapperPosition = 550;
+        this.initialCameraWrapperRotation = 3.15;
+
         this.cameraWrapper = new THREE.Object3D();
-        this.cameraWrapper.position.set(0, 550, 0);
-        this.cameraWrapper.rotation.y = 3.15;
+        this.cameraWrapper.position.set(0, this.initialCameraWrapperPosition, 0);
+        this.cameraWrapper.rotation.y = this.initialCameraWrapperRotation;
         this.cameraWrapper.name = "camera wrapper";
         this.cameraWrapper.add(this.camera);
         this.scene.add(this.cameraWrapper);
@@ -206,15 +211,16 @@ export default class TimelineSlider {
             this.cretateItem(i, this.timelineItems[i], planeGeometryBack, planeBackMaterial, planeGeometry)
         }
 
+        const topOfTheHelix = this.helixCanvasItems[0].position.y;
+        const bottomOfTheHelix = this.helixCanvasItems[this.helixCanvasItems.length - 1].position.y;
+        const helixHeight = Math.abs(bottomOfTheHelix) + Math.abs(topOfTheHelix);
+        this.helixOffsetByItem = helixHeight / (this.helixCanvasItems.length - 1);
+
         // canvas renderer
         this.canvasRenderer = new THREE.WebGLRenderer();
         this.canvasRenderer.setPixelRatio(window.devicePixelRatio);
         this.canvasRenderer.setSize(this.winWidth, this.winHeight);
         this.timeline.appendChild(this.canvasRenderer.domElement);
-
-        this.renderer = new CSS3DRenderer();
-        this.renderer.setSize(this.winWidth, this.winHeight);
-        this.timeline.appendChild(this.renderer.domElement);
 
         window.addEventListener(
             "resize",
@@ -249,128 +255,28 @@ export default class TimelineSlider {
         // end DAT gui controls
 
         this.animate();
-        this.helixNavigation();
         this.mouseMove();
 
         // background
         this.addBgImage();
+
+        this.swiperInit();
     }
 
     onWindowResize() {
         this.camera.aspect = this.winWidth / this.winHeight;
         this.camera.updateProjectionMatrix();
-
-        this.renderer.setSize(this.winWidth, this.winHeight);
-        this.canvasRenderer.setSize(this.winWidth, this.winHeight);
         this.postprocessing.composer.setSize(this.winWidth, this.winHeight);
     }
 
     animate() {
         requestAnimationFrame(() => this.animate());
-        this.renderer.render(this.scene, this.camera);
         this.postprocessing.composer.render(0.1);
-    }
-
-    helixNavigation() {
-        // TODO: tu ces trebati jos i y poziciju i lookAt mjenjati ovisno o pozici planea (ako sam dobro skuzio to imas na 212 liniji)
-        // TODO: rotaciju ces dobiti (Math.PI * 2) / broj poligona u punom krugu - iako realno moze ostati zahartkodirano
-
-        document
-            .querySelectorAll(".c-timeline-item")[0]
-            .classList.add("is-active");
-
-        this.timelineSliderPrev.addEventListener("click", () => {
-            console.log("click Prev");
-
-            if (this.slideCounter > 0) {
-                gsap.to(this.cameraWrapper.rotation, {
-                    duration: 1,
-                    y: "-=0.85",
-                    ease: "power2.inOut",
-                    onStart: () => {
-                        this.slideCounter -= 1;
-                        document.documentElement.classList.add(
-                            "is-rotating-right",
-                        );
-
-                        for (
-                            let i = 0, l = this.timelineItems.length;
-                            i < l;
-                            i++
-                        ) {
-                            // console.log(
-                            //     document.querySelectorAll(".c-timeline-item"),
-                            // );
-                            document
-                                .querySelectorAll(".c-timeline-item")
-                                [i].classList.remove("is-active");
-                        }
-                    },
-                    onComplete: () => {
-                        document.documentElement.classList.remove(
-                            "is-rotating-right",
-                        );
-
-                        document
-                            .querySelectorAll(".c-timeline-item")
-                            [this.slideCounter].classList.add("is-active");
-                    },
-                });
-                gsap.to(this.cameraWrapper.position, {
-                    duration: 0.9,
-                    ease: "power2.inOut",
-                    y: "+=200",
-                });
-            }
-        });
-
-        this.timelineSliderNext.addEventListener("click", () => {
-            console.log("click Next");
-
-            if (this.slideCounter < this.timelineItems.length - 1) {
-                gsap.to(this.cameraWrapper.rotation, {
-                    duration: 0.8,
-                    ease: "power2.inOut",
-                    y: "+=0.85",
-                    onStart: () => {
-                        this.slideCounter += 1;
-                        document.documentElement.classList.add(
-                            "is-rotating-left",
-                        );
-
-                        for (
-                            let i = 0, l = this.timelineItems.length;
-                            i < l;
-                            i++
-                        ) {
-                            document
-                                .querySelectorAll(".c-timeline-item")
-                                [i].classList.remove("is-active");
-                        }
-                    },
-                    onComplete: () => {
-                        document.documentElement.classList.remove(
-                            "is-rotating-left",
-                        );
-
-                        document
-                            .querySelectorAll(".c-timeline-item")
-                            [this.slideCounter].classList.add("is-active");
-                    },
-                });
-
-                gsap.to(this.cameraWrapper.position, {
-                    duration: 1,
-                    ease: "power2.inOut",
-                    y: "-=200",
-                });
-            }
-        });
     }
 
     cretateItem(i, timelineLoopItem, planeGeometryBack, planeBackMaterial, planeGeometry) {
         let timelineItem = document.createElement("div");
-        timelineItem.className = "c-timeline-item";
+        timelineItem.className = "c-timeline-item swiper-slide";
 
         let timelineItemInner = document.createElement("div");
         timelineItemInner.className = "c-timeline-item__inner";
@@ -386,23 +292,10 @@ export default class TimelineSlider {
         title.textContent = timelineLoopItem.title;
         timelineItemInner.appendChild(title);
 
-        let helixItem = new CSS3DObject(timelineItem);
-        helixItem.name = `${timelineLoopItem.title}, index: ${i}`;
+        this.sliderWrapper.appendChild(timelineItem);
 
-        this.scene.add(helixItem);
-
-        let theta = i * 0.85 + Math.PI;
+        let theta = i * this.itemRadiusOffset + Math.PI;
         let y = -(i * 200) + 600;
-
-        helixItem.position.setFromCylindricalCoords(640, theta, y);
-
-        this.vector.x = helixItem.position.x * 2;
-        this.vector.y = helixItem.position.y;
-        this.vector.z = helixItem.position.z * 2;
-
-        helixItem.lookAt(this.vector);
-
-        this.helixItems.push(helixItem);
 
         // canvas
         const planeGroup = new THREE.Object3D();
@@ -422,6 +315,12 @@ export default class TimelineSlider {
             map: texture,
         });
 
+        planeGroup.position.setFromCylindricalCoords(640, theta, y);
+
+        this.vector.x = planeGroup.position.x * 2;
+        this.vector.y = planeGroup.position.y;
+        this.vector.z = planeGroup.position.z * 2;
+
         const planeBack = new THREE.Mesh(planeGeometryBack, planeBackMaterial);
         planeBack.name = "item image back";
         const helixCanvasItem = new THREE.Mesh(planeGeometry, planeMaterial);
@@ -435,9 +334,58 @@ export default class TimelineSlider {
         planeGroup.position.setFromCylindricalCoords(640, theta, y);
 
         planeGroup.lookAt(this.vector);
-        this.helixCanvasItems.push(helixCanvasItem);
+        this.helixCanvasItems.push(planeGroup);
     }
-    
+
+    swiperInit() {
+        const self = this;
+
+        const swiper = new Swiper(this.slider, {
+            loop: false,
+            slidesPerView: 1,
+            centeredSlides: true,
+            speed: 800,
+            grabCursor: true,
+            watchSlidesProgress: true,
+            mousewheelControl: true,
+            mousewheel: true,
+            navigation: {
+                nextEl: this.timelineSliderNext,
+                prevEl: this.timelineSliderPrev,
+            },
+            on: {
+                progress: function () {
+                    let swiper = this;
+
+                    gsap.to(self.cameraWrapper.rotation, {
+                        duration: 0.8,
+                        ease: "power2.out",
+                        y: ((swiper.slides.length - 1) * self.itemRadiusOffset * swiper.progress) + self.initialCameraWrapperRotation,
+                    });
+
+                    gsap.to(self.cameraWrapper.position, {
+                        duration: 1,
+                        ease: "power2.out",
+                        y: self.initialCameraWrapperPosition - ((swiper.slides.length - 1) * self.helixOffsetByItem * swiper.progress),
+                    });
+                },
+                slideChange: () => {
+                    // gsap.to(this.cameraWrapper.rotation, {
+                    //     duration: 0.8,
+                    //     ease: "power2.inOut",
+                    //     y: (swiper.activeIndex * this.itemRadiusOffset) + this.initialCameraWrapperRotation,
+                    // });
+                    //
+                    // gsap.to(this.cameraWrapper.position, {
+                    //     duration: 1,
+                    //     ease: "power2.inOut",
+                    //     y: this.initialCameraWrapperPosition - (swiper.activeIndex * this.helixOffsetByItem),
+                    // });
+                },
+            },
+        });
+    }
+
     dof() {
         var renderPass = new RenderPass(this.scene, this.camera);
 
@@ -492,5 +440,43 @@ export default class TimelineSlider {
         const bg = new THREE.Mesh(bgGeometry, bgMaterial);
         bg.position.set(0, 200, -1000);
         this.cameraWrapper.add(bg);
+    }
+
+    draggableInit() {
+        const self = this;
+        let currentRotation = this.cameraWrapper.rotation.y;
+        let currentPosition = this.cameraWrapper.rotation.y;
+
+        Draggable.create(this.timeline, {
+            type: "x",
+            // inertia: true,
+            edgeResistance: 0.65,
+            throwProps: true,
+            onDragStart: () => {
+                currentRotation = this.cameraWrapper.rotation.y;
+                currentPosition = this.cameraWrapper.position.y;
+            },
+            onDrag: function () {
+                gsap.set(self.timeline, {
+                    x: 0,
+                });
+
+                const rotation = this.x / 2000;
+                const position = rotation * 240;
+
+                // console.log(this.x);
+
+                gsap.set(self.cameraWrapper.rotation, {
+                    y: currentRotation - parseFloat(rotation.toFixed(3)),
+                });
+
+                gsap.set(self.cameraWrapper.position, {
+                    y: currentPosition + parseFloat(position.toFixed(3)),
+                });
+            },
+            onThrowUpdate: function () {
+                console.log(this.x);
+            },
+        });
     }
 }

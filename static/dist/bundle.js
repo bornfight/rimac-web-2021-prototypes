@@ -408,8 +408,6 @@ exports.default = void 0;
 
 var THREE = _interopRequireWildcard(require("three"));
 
-var _CSS3DRenderer = require("three/examples/jsm/renderers/CSS3DRenderer");
-
 var _EffectComposer = require("three/examples/jsm/postprocessing/EffectComposer");
 
 var _RenderPass = require("three/examples/jsm/postprocessing/RenderPass");
@@ -441,6 +439,7 @@ var TimelineSlider = /*#__PURE__*/function () {
     this.DOM = {
       timeline: ".js-timeline",
       timelineSlider: ".js-timeline-slider",
+      timelineSliderWrapper: ".js-timeline-slider-wrapper",
       timelineSliderNext: ".js-timeline-slider-next",
       timelineSliderPrev: ".js-timeline-slider-previous",
       states: {}
@@ -454,8 +453,10 @@ var TimelineSlider = /*#__PURE__*/function () {
     };
     this.winWidth = window.innerWidth;
     this.winHeight = window.innerHeight;
+    this.activeIndex = 0;
     this.timeline = document.querySelector(this.DOM.timeline);
-    this.timelineSlider = document.querySelector(this.DOM.timelineSlider);
+    this.slider = document.querySelector(this.DOM.timelineSlider);
+    this.sliderWrapper = document.querySelector(this.DOM.timelineSliderWrapper);
     this.timelineItemsImagePath = "static/images/";
     this.timelineItems = [{
       image: "timeline-01.jpg",
@@ -523,7 +524,6 @@ var TimelineSlider = /*#__PURE__*/function () {
       title: "Lorem ipsum dolor sit.",
       text: "Makes example posts, pages, custom terms, helps to style and develop new and current themes."
     }];
-    this.timelineSlider = document.querySelector(this.DOM.timelineSlider);
     this.timelineSliderPrev = document.querySelector(this.DOM.timelineSliderPrev);
     this.timelineSliderNext = document.querySelector(this.DOM.timelineSliderNext);
     this.camera = null;
@@ -533,9 +533,7 @@ var TimelineSlider = /*#__PURE__*/function () {
     this.helixItems = [];
     this.helixCanvasItems = [];
     this.slideCounter = 0;
-    this.init(); // if (this.timelineSlider) {
-    // this.initSwiper();
-    // }
+    this.init();
   }
 
   _createClass(TimelineSlider, [{
@@ -556,13 +554,16 @@ var TimelineSlider = /*#__PURE__*/function () {
         }
       };
       this.camera = new THREE.PerspectiveCamera(options.camera.fov, this.winWidth / this.winHeight, options.camera.near, options.camera.far);
+      this.itemRadiusOffset = 0.85;
       this.camera.lookAt(0, 0, 0);
       this.camera.position.x = 0;
       this.camera.position.y = 0;
       this.camera.position.z = 1020;
+      this.initialCameraWrapperPosition = 550;
+      this.initialCameraWrapperRotation = 3.15;
       this.cameraWrapper = new THREE.Object3D();
-      this.cameraWrapper.position.set(0, 550, 0);
-      this.cameraWrapper.rotation.y = 3.15;
+      this.cameraWrapper.position.set(0, this.initialCameraWrapperPosition, 0);
+      this.cameraWrapper.rotation.y = this.initialCameraWrapperRotation;
       this.cameraWrapper.name = "camera wrapper";
       this.cameraWrapper.add(this.camera);
       this.scene.add(this.cameraWrapper);
@@ -577,16 +578,17 @@ var TimelineSlider = /*#__PURE__*/function () {
 
       for (var i = 0, l = this.timelineItems.length; i < l; i++) {
         this.cretateItem(i, this.timelineItems[i], planeGeometryBack, planeBackMaterial, planeGeometry);
-      } // canvas renderer
+      }
 
+      var topOfTheHelix = this.helixCanvasItems[0].position.y;
+      var bottomOfTheHelix = this.helixCanvasItems[this.helixCanvasItems.length - 1].position.y;
+      var helixHeight = Math.abs(bottomOfTheHelix) + Math.abs(topOfTheHelix);
+      this.helixOffsetByItem = helixHeight / (this.helixCanvasItems.length - 1); // canvas renderer
 
       this.canvasRenderer = new THREE.WebGLRenderer();
       this.canvasRenderer.setPixelRatio(window.devicePixelRatio);
       this.canvasRenderer.setSize(this.winWidth, this.winHeight);
       this.timeline.appendChild(this.canvasRenderer.domElement);
-      this.renderer = new _CSS3DRenderer.CSS3DRenderer();
-      this.renderer.setSize(this.winWidth, this.winHeight);
-      this.timeline.appendChild(this.renderer.domElement);
       window.addEventListener("resize", function () {
         _this.onWindowResize;
       }, false);
@@ -612,18 +614,16 @@ var TimelineSlider = /*#__PURE__*/function () {
       matChanger(); // end DAT gui controls
 
       this.animate();
-      this.helixNavigation();
       this.mouseMove(); // background
 
       this.addBgImage();
+      this.swiperInit();
     }
   }, {
     key: "onWindowResize",
     value: function onWindowResize() {
       this.camera.aspect = this.winWidth / this.winHeight;
       this.camera.updateProjectionMatrix();
-      this.renderer.setSize(this.winWidth, this.winHeight);
-      this.canvasRenderer.setSize(this.winWidth, this.winHeight);
       this.postprocessing.composer.setSize(this.winWidth, this.winHeight);
     }
   }, {
@@ -634,110 +634,15 @@ var TimelineSlider = /*#__PURE__*/function () {
       requestAnimationFrame(function () {
         return _this2.animate();
       });
-      this.renderer.render(this.scene, this.camera);
       this.postprocessing.composer.render(0.1);
     }
   }, {
-    key: "helixNavigation",
-    value: function helixNavigation() {
-      var _this3 = this;
-
-      // TODO: tu ces trebati jos i y poziciju i lookAt mjenjati ovisno o pozici planea (ako sam dobro skuzio to imas na 212 liniji)
-      // TODO: rotaciju ces dobiti (Math.PI * 2) / broj poligona u punom krugu - iako realno moze ostati zahartkodirano
-      document.querySelectorAll(".c-timeline-item")[0].classList.add("is-active");
-      this.timelineSliderPrev.addEventListener("click", function () {
-        console.log("click Prev");
-
-        if (_this3.slideCounter > 0) {
-          _gsap.gsap.to(_this3.cameraWrapper.rotation, {
-            duration: 1,
-            y: "-=0.85",
-            ease: "power2.inOut",
-            onStart: function onStart() {
-              _this3.slideCounter -= 1;
-              document.documentElement.classList.add("is-rotating-right");
-
-              for (var i = 0, l = _this3.timelineItems.length; i < l; i++) {
-                // console.log(
-                //     document.querySelectorAll(".c-timeline-item"),
-                // );
-                document.querySelectorAll(".c-timeline-item")[i].classList.remove("is-active");
-              }
-            },
-            onComplete: function onComplete() {
-              document.documentElement.classList.remove("is-rotating-right");
-
-              document.querySelectorAll(".c-timeline-item")[_this3.slideCounter].classList.add("is-active");
-            }
-          });
-
-          _gsap.gsap.to(_this3.cameraWrapper.position, {
-            duration: 0.9,
-            ease: "power2.inOut",
-            y: "+=200"
-          });
-        }
-      });
-      this.timelineSliderNext.addEventListener("click", function () {
-        console.log("click Next");
-
-        if (_this3.slideCounter < _this3.timelineItems.length - 1) {
-          _gsap.gsap.to(_this3.cameraWrapper.rotation, {
-            duration: 0.8,
-            ease: "power2.inOut",
-            y: "+=0.85",
-            onStart: function onStart() {
-              _this3.slideCounter += 1;
-              document.documentElement.classList.add("is-rotating-left");
-
-              for (var i = 0, l = _this3.timelineItems.length; i < l; i++) {
-                document.querySelectorAll(".c-timeline-item")[i].classList.remove("is-active");
-              }
-            },
-            onComplete: function onComplete() {
-              document.documentElement.classList.remove("is-rotating-left");
-
-              document.querySelectorAll(".c-timeline-item")[_this3.slideCounter].classList.add("is-active");
-            }
-          });
-
-          _gsap.gsap.to(_this3.cameraWrapper.position, {
-            duration: 1,
-            ease: "power2.inOut",
-            y: "-=200"
-          });
-        }
-      });
-    } // initSwiper() {
-    //     let timelineSlider = new Swiper(this.DOM.timelineSlider, {
-    //         init: false,
-    //         slidesPerView: 13,
-    //         speed: this.options.transitionSpeed,
-    //         navigation: {
-    //             nextEl: this.DOM.timelineSliderNext,
-    //             prevEl: this.DOM.timelineSliderPrev,
-    //         },
-    //     });
-    //
-    //     timelineSlider.on("init", () => {
-    //     });
-    //
-    //     timelineSlider.on("slideNextTransitionStart", () => {
-    //     });
-    //
-    //     timelineSlider.on("slidePrevTransitionStart", () => {
-    //     });
-    //
-    //     timelineSlider.init();
-    // }
-
-  }, {
     key: "cretateItem",
     value: function cretateItem(i, timelineLoopItem, planeGeometryBack, planeBackMaterial, planeGeometry) {
-      var _this4 = this;
+      var _this3 = this;
 
       var timelineItem = document.createElement("div");
-      timelineItem.className = "c-timeline-item";
+      timelineItem.className = "c-timeline-item swiper-slide";
       var timelineItemInner = document.createElement("div");
       timelineItemInner.className = "c-timeline-item__inner";
       timelineItem.appendChild(timelineItemInner);
@@ -749,29 +654,25 @@ var TimelineSlider = /*#__PURE__*/function () {
       title.className = "c-timeline-item__title";
       title.textContent = timelineLoopItem.title;
       timelineItemInner.appendChild(title);
-      var helixItem = new _CSS3DRenderer.CSS3DObject(timelineItem);
-      helixItem.name = "".concat(timelineLoopItem.title, ", index: ").concat(i);
-      this.scene.add(helixItem);
-      var theta = i * 0.85 + Math.PI;
-      var y = -(i * 200) + 600;
-      helixItem.position.setFromCylindricalCoords(640, theta, y);
-      this.vector.x = helixItem.position.x * 2;
-      this.vector.y = helixItem.position.y;
-      this.vector.z = helixItem.position.z * 2;
-      helixItem.lookAt(this.vector);
-      this.helixItems.push(helixItem); // canvas
+      this.sliderWrapper.appendChild(timelineItem);
+      var theta = i * this.itemRadiusOffset + Math.PI;
+      var y = -(i * 200) + 600; // canvas
 
       var planeGroup = new THREE.Object3D();
       var texture = new THREE.TextureLoader().load(this.timelineItemsImagePath + timelineLoopItem.image, function () {
         // image position to cover the plane
         var imageAspectRatio = texture.image.width / texture.image.height;
         texture.wrapT = THREE.RepeatWrapping;
-        texture.repeat.x = _this4.geometryAspectRatio / imageAspectRatio;
+        texture.repeat.x = _this3.geometryAspectRatio / imageAspectRatio;
         texture.offset.x = 0.5 * (1 - texture.repeat.x);
       });
       var planeMaterial = new THREE.MeshBasicMaterial({
         map: texture
       });
+      planeGroup.position.setFromCylindricalCoords(640, theta, y);
+      this.vector.x = planeGroup.position.x * 2;
+      this.vector.y = planeGroup.position.y;
+      this.vector.z = planeGroup.position.z * 2;
       var planeBack = new THREE.Mesh(planeGeometryBack, planeBackMaterial);
       planeBack.name = "item image back";
       var helixCanvasItem = new THREE.Mesh(planeGeometry, planeMaterial);
@@ -782,9 +683,56 @@ var TimelineSlider = /*#__PURE__*/function () {
       this.scene.add(planeGroup);
       planeGroup.position.setFromCylindricalCoords(640, theta, y);
       planeGroup.lookAt(this.vector);
-      this.helixCanvasItems.push(helixCanvasItem);
-    } // DOF
+      this.helixCanvasItems.push(planeGroup);
+    }
+  }, {
+    key: "swiperInit",
+    value: function swiperInit() {
+      var self = this;
+      var swiper = new _swiper.default(this.slider, {
+        loop: false,
+        slidesPerView: 1,
+        centeredSlides: true,
+        speed: 800,
+        grabCursor: true,
+        watchSlidesProgress: true,
+        mousewheelControl: true,
+        mousewheel: true,
+        navigation: {
+          nextEl: this.timelineSliderNext,
+          prevEl: this.timelineSliderPrev
+        },
+        on: {
+          progress: function progress() {
+            var swiper = this;
 
+            _gsap.gsap.to(self.cameraWrapper.rotation, {
+              duration: 0.8,
+              ease: "power2.out",
+              y: (swiper.slides.length - 1) * self.itemRadiusOffset * swiper.progress + self.initialCameraWrapperRotation
+            });
+
+            _gsap.gsap.to(self.cameraWrapper.position, {
+              duration: 1,
+              ease: "power2.out",
+              y: self.initialCameraWrapperPosition - (swiper.slides.length - 1) * self.helixOffsetByItem * swiper.progress
+            });
+          },
+          slideChange: function slideChange() {// gsap.to(this.cameraWrapper.rotation, {
+            //     duration: 0.8,
+            //     ease: "power2.inOut",
+            //     y: (swiper.activeIndex * this.itemRadiusOffset) + this.initialCameraWrapperRotation,
+            // });
+            //
+            // gsap.to(this.cameraWrapper.position, {
+            //     duration: 1,
+            //     ease: "power2.inOut",
+            //     y: this.initialCameraWrapperPosition - (swiper.activeIndex * this.helixOffsetByItem),
+            // });
+          }
+        }
+      });
+    }
   }, {
     key: "dof",
     value: function dof() {
@@ -802,15 +750,15 @@ var TimelineSlider = /*#__PURE__*/function () {
   }, {
     key: "mouseMove",
     value: function mouseMove() {
-      var _this5 = this;
+      var _this4 = this;
 
       window.addEventListener("mousemove", function (ev) {
-        _this5.mouse.x = 20 / _this5.winWidth * (ev.clientX - _this5.winWidth / 2);
-        _this5.mouse.y = 20 / _this5.winHeight * (ev.clientY - _this5.winHeight / 2);
+        _this4.mouse.x = 20 / _this4.winWidth * (ev.clientX - _this4.winWidth / 2);
+        _this4.mouse.y = 20 / _this4.winHeight * (ev.clientY - _this4.winHeight / 2);
 
-        _gsap.gsap.to(_this5.camera.position, {
-          x: _this5.mouse.x,
-          y: _this5.mouse.y,
+        _gsap.gsap.to(_this4.camera.position, {
+          x: _this4.mouse.x,
+          y: _this4.mouse.y,
           duration: 1.5,
           ease: "power3.out"
         });
@@ -819,13 +767,13 @@ var TimelineSlider = /*#__PURE__*/function () {
   }, {
     key: "addBgImage",
     value: function addBgImage() {
-      var _this6 = this;
+      var _this5 = this;
 
       var texture = new THREE.TextureLoader().load(this.timelineItemsImagePath + "timeline-background.png", function () {
         // image position to cover the plane
         var imageAspectRatio = texture.image.width / texture.image.height;
         texture.wrapT = THREE.RepeatWrapping;
-        texture.repeat.x = _this6.geometryAspectRatio / imageAspectRatio;
+        texture.repeat.x = _this5.geometryAspectRatio / imageAspectRatio;
         texture.offset.x = 0.5 * (1 - texture.repeat.x);
       });
       var bgMaterial = new THREE.MeshBasicMaterial({
@@ -836,6 +784,44 @@ var TimelineSlider = /*#__PURE__*/function () {
       bg.position.set(0, 200, -1000);
       this.cameraWrapper.add(bg);
     }
+  }, {
+    key: "draggableInit",
+    value: function draggableInit() {
+      var _this6 = this;
+
+      var self = this;
+      var currentRotation = this.cameraWrapper.rotation.y;
+      var currentPosition = this.cameraWrapper.rotation.y;
+      Draggable.create(this.timeline, {
+        type: "x",
+        // inertia: true,
+        edgeResistance: 0.65,
+        throwProps: true,
+        onDragStart: function onDragStart() {
+          currentRotation = _this6.cameraWrapper.rotation.y;
+          currentPosition = _this6.cameraWrapper.position.y;
+        },
+        onDrag: function onDrag() {
+          _gsap.gsap.set(self.timeline, {
+            x: 0
+          });
+
+          var rotation = this.x / 2000;
+          var position = rotation * 240; // console.log(this.x);
+
+          _gsap.gsap.set(self.cameraWrapper.rotation, {
+            y: currentRotation - parseFloat(rotation.toFixed(3))
+          });
+
+          _gsap.gsap.set(self.cameraWrapper.position, {
+            y: currentPosition + parseFloat(position.toFixed(3))
+          });
+        },
+        onThrowUpdate: function onThrowUpdate() {
+          console.log(this.x);
+        }
+      });
+    }
   }]);
 
   return TimelineSlider;
@@ -843,7 +829,7 @@ var TimelineSlider = /*#__PURE__*/function () {
 
 exports.default = TimelineSlider;
 
-},{"gsap":"gsap","swiper":"swiper","three":"three","three/examples/jsm/libs/dat.gui.module.js":"three/examples/jsm/libs/dat.gui.module.js","three/examples/jsm/postprocessing/BokehPass":"three/examples/jsm/postprocessing/BokehPass","three/examples/jsm/postprocessing/EffectComposer":"three/examples/jsm/postprocessing/EffectComposer","three/examples/jsm/postprocessing/RenderPass":"three/examples/jsm/postprocessing/RenderPass","three/examples/jsm/renderers/CSS3DRenderer":"three/examples/jsm/renderers/CSS3DRenderer"}],6:[function(require,module,exports){
+},{"gsap":"gsap","swiper":"swiper","three":"three","three/examples/jsm/libs/dat.gui.module.js":"three/examples/jsm/libs/dat.gui.module.js","three/examples/jsm/postprocessing/BokehPass":"three/examples/jsm/postprocessing/BokehPass","three/examples/jsm/postprocessing/EffectComposer":"three/examples/jsm/postprocessing/EffectComposer","three/examples/jsm/postprocessing/RenderPass":"three/examples/jsm/postprocessing/RenderPass"}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
