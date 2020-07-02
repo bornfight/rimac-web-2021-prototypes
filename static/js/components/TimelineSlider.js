@@ -351,6 +351,7 @@ export default class TimelineSlider {
             mousewheelControl: true,
             mousewheel: true,
             freeMode: true,
+            freeModeSticky: true,
             // effect: "fade",
             // fadeEffect: {
             //     crossFade: true,

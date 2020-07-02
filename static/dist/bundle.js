@@ -700,6 +700,7 @@ var TimelineSlider = /*#__PURE__*/function () {
         mousewheelControl: true,
         mousewheel: true,
         freeMode: true,
+        freeModeSticky: true,
         // effect: "fade",
         // fadeEffect: {
         //     crossFade: true,
