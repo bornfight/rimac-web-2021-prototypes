@@ -699,8 +699,15 @@ var TimelineSlider = /*#__PURE__*/function () {
         watchSlidesProgress: true,
         mousewheelControl: true,
         mousewheel: true,
+        // TODO: @Tomo — proucit malo kaj i kak rade ovi optioni za freeMode
         freeMode: true,
         freeModeSticky: true,
+        freeModeMomentum: true,
+        freeModeMomentumRatio: 1,
+        freeModeMomentumVelocityRatio: 1,
+        freeModeMomentumBounce: true,
+        freeModeMomentumBounceRatio: 1,
+        freeModeMinimumVelocity: 0.02,
         // effect: "fade",
         // fadeEffect: {
         //     crossFade: true,
