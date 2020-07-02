@@ -349,6 +349,10 @@ export default class TimelineSlider {
             watchSlidesProgress: true,
             mousewheelControl: true,
             mousewheel: true,
+            // effect: "fade",
+            // fadeEffect: {
+            //     crossFade: true,
+            // },
             navigation: {
                 nextEl: this.timelineSliderNext,
                 prevEl: this.timelineSliderPrev,

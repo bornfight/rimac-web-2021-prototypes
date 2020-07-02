@@ -698,6 +698,10 @@ var TimelineSlider = /*#__PURE__*/function () {
         watchSlidesProgress: true,
         mousewheelControl: true,
         mousewheel: true,
+        // effect: "fade",
+        // fadeEffect: {
+        //     crossFade: true,
+        // },
         navigation: {
           nextEl: this.timelineSliderNext,
           prevEl: this.timelineSliderPrev
