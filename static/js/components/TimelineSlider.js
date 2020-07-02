@@ -150,16 +150,13 @@ export default class TimelineSlider {
         this.helixItems = [];
         this.helixCanvasItems = [];
 
-        this.helixItem = null;
-        this.helixCanvasItem = null;
-
         this.slideCounter = 0;
 
         this.init();
 
-        if (this.timelineSlider) {
-            this.initSwiper();
-        }
+        // if (this.timelineSlider) {
+            // this.initSwiper();
+        // }
     }
 
     init() {
@@ -198,96 +195,24 @@ export default class TimelineSlider {
         this.cameraWrapper.add(this.camera);
         this.scene.add(this.cameraWrapper);
 
-        const vector = new THREE.Vector3();
+        this.vector = new THREE.Vector3();
 
         const planeBackMaterial = new THREE.MeshBasicMaterial({
             color: 0x333333,
         });
 
+        this.geometryAspectRatio = 16 / 9;
+        const planeGeometry = new THREE.PlaneGeometry(330, 186, 1, 1);
+        let planeGeometryBack = planeGeometry.clone();
+        planeGeometryBack.applyMatrix(new THREE.Matrix4().makeRotationY(Math.PI));
+
+        // create items
         for (let i = 0, l = this.timelineItems.length; i < l; i++) {
-            let timelineItem = document.createElement("div");
-            timelineItem.className = "c-timeline-item";
-
-            let timelineItemInner = document.createElement("div");
-            timelineItemInner.className = "c-timeline-item__inner";
-            timelineItem.appendChild(timelineItemInner);
-
-            let year = document.createElement("div");
-            year.className = "c-timeline-item__year";
-            year.textContent = this.timelineItems[i].year;
-            timelineItemInner.appendChild(year);
-
-            let title = document.createElement("div");
-            title.className = "c-timeline-item__title";
-            title.textContent = this.timelineItems[i].title;
-            timelineItemInner.appendChild(title);
-
-            this.helixItem = new CSS3DObject(timelineItem);
-            this.helixItem.name = `${this.timelineItems[i].title}, index: ${i}`;
-
-            this.scene.add(this.helixItem);
-
-            let theta = i * 0.85 + Math.PI;
-            let y = -(i * 200) + 600;
-
-            this.helixItem.position.setFromCylindricalCoords(640, theta, y);
-
-            vector.x = this.helixItem.position.x * 2;
-            vector.y = this.helixItem.position.y;
-            vector.z = this.helixItem.position.z * 2;
-
-            this.helixItem.lookAt(vector);
-
-            this.helixItems.push(this.helixItem);
-
-            const planeGroup = new THREE.Object3D();
-            // canvas
-            const geometryAspectRatio = 16 / 9;
-            let texture = new THREE.TextureLoader().load(
-                this.timelineItemsImagePath + this.timelineItems[i].image,
-                () => {
-                    // image position to cover the plane
-                    const imageAspectRatio =
-                        texture.image.width / texture.image.height;
-                    texture.wrapT = THREE.RepeatWrapping;
-                    texture.repeat.x = geometryAspectRatio / imageAspectRatio;
-                    texture.offset.x = 0.5 * (1 - texture.repeat.x);
-                },
-            );
-
-            let planeMaterial = new THREE.MeshBasicMaterial({
-                map: texture,
-                flatShading: true,
-                transparent: false,
-            });
-
-            // planeMaterial.side = THREE.DoubleSide;
-
-            let planeGeometry = new THREE.PlaneGeometry(330, 186, 1, 1);
-            let planeGeometryBack = planeGeometry.clone();
-            planeGeometryBack.applyMatrix(new THREE.Matrix4().makeRotationY(Math.PI));
-            const planeBack = new THREE.Mesh(planeGeometryBack, planeBackMaterial);
-            this.helixCanvasItem = new THREE.Mesh(planeGeometry, planeMaterial);
-            planeGroup.name = `canvas-plane-${this.timelineItems[i].title}, index: ${i}`;
-
-            planeGroup.add(this.helixCanvasItem);
-            planeGroup.add(planeBack);
-            this.scene.add(planeGroup);
-
-            planeGroup.position.setFromCylindricalCoords(
-                640,
-                theta,
-                y,
-            );
-
-            planeGroup.lookAt(vector);
-            this.helixCanvasItems.push(this.helixCanvasItem);
+            this.cretateItem(i, this.timelineItems[i], planeGeometryBack, planeBackMaterial, planeGeometry)
         }
 
         // canvas renderer
-        this.canvasRenderer = new THREE.WebGLRenderer({
-            alpha: true,
-        });
+        this.canvasRenderer = new THREE.WebGLRenderer();
         this.canvasRenderer.setPixelRatio(window.devicePixelRatio);
         this.canvasRenderer.setSize(this.winWidth, this.winHeight);
         this.timeline.appendChild(this.canvasRenderer.domElement);
@@ -295,12 +220,6 @@ export default class TimelineSlider {
         this.renderer = new CSS3DRenderer();
         this.renderer.setSize(this.winWidth, this.winHeight);
         this.timeline.appendChild(this.renderer.domElement);
-
-        const ambientlight = new THREE.AmbientLight(0x404040);
-        const light = new THREE.DirectionalLight(0xffffff, 1);
-        light.position.set(0, 0, 1000);
-        this.scene.add(light);
-        this.scene.add(ambientlight);
 
         window.addEventListener(
             "resize",
@@ -339,31 +258,7 @@ export default class TimelineSlider {
         this.mouseMove();
 
         // background
-        const bgGeometryAspectRatio = 16 / 9;
-        let texture = new THREE.TextureLoader().load(
-            this.timelineItemsImagePath + "timeline-background.png",
-            () => {
-                // image position to cover the plane
-                const imageAspectRatio =
-                    texture.image.width / texture.image.height;
-                texture.wrapT = THREE.RepeatWrapping;
-                texture.repeat.x = bgGeometryAspectRatio / imageAspectRatio;
-                texture.offset.x = 0.5 * (1 - texture.repeat.x);
-            },
-        );
-
-        let planeMaterial = new THREE.MeshBasicMaterial({
-            map: texture,
-            flatShading: true,
-            transparent: false,
-        });
-
-        planeMaterial.side = THREE.DoubleSide;
-
-        const planeGeometry = new THREE.PlaneGeometry(6400, 3600, 1, 1);
-        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-        plane.position.set(0, 200, -1000);
-        this.cameraWrapper.add(plane);
+        this.addBgImage();
     }
 
     onWindowResize() {
@@ -378,7 +273,6 @@ export default class TimelineSlider {
     animate() {
         requestAnimationFrame(() => this.animate());
         this.renderer.render(this.scene, this.camera);
-        // this.canvasRenderer.render(this.scene, this.camera);
         this.postprocessing.composer.render(0.1);
     }
 
@@ -395,8 +289,9 @@ export default class TimelineSlider {
 
             if (this.slideCounter > 0) {
                 gsap.to(this.cameraWrapper.rotation, {
-                    duration: 0.6,
+                    duration: 1,
                     y: "-=0.85",
+                    ease: "power2.inOut",
                     onStart: () => {
                         this.slideCounter -= 1;
                         document.documentElement.classList.add(
@@ -427,7 +322,8 @@ export default class TimelineSlider {
                     },
                 });
                 gsap.to(this.cameraWrapper.position, {
-                    duration: 0.6,
+                    duration: 0.9,
+                    ease: "power2.inOut",
                     y: "+=200",
                 });
             }
@@ -438,7 +334,8 @@ export default class TimelineSlider {
 
             if (this.slideCounter < this.timelineItems.length - 1) {
                 gsap.to(this.cameraWrapper.rotation, {
-                    duration: 0.6,
+                    duration: 0.8,
+                    ease: "power2.inOut",
                     y: "+=0.85",
                     onStart: () => {
                         this.slideCounter += 1;
@@ -468,34 +365,105 @@ export default class TimelineSlider {
                 });
 
                 gsap.to(this.cameraWrapper.position, {
-                    duration: 0.6,
+                    duration: 1,
+                    ease: "power2.inOut",
                     y: "-=200",
                 });
             }
         });
     }
 
-    initSwiper() {
-        let timelineSlider = new Swiper(this.DOM.timelineSlider, {
-            init: false,
-            slidesPerView: 13,
-            speed: this.options.transitionSpeed,
-            navigation: {
-                nextEl: this.DOM.timelineSliderNext,
-                prevEl: this.DOM.timelineSliderPrev,
+    // initSwiper() {
+    //     let timelineSlider = new Swiper(this.DOM.timelineSlider, {
+    //         init: false,
+    //         slidesPerView: 13,
+    //         speed: this.options.transitionSpeed,
+    //         navigation: {
+    //             nextEl: this.DOM.timelineSliderNext,
+    //             prevEl: this.DOM.timelineSliderPrev,
+    //         },
+    //     });
+    //
+    //     timelineSlider.on("init", () => {
+    //     });
+    //
+    //     timelineSlider.on("slideNextTransitionStart", () => {
+    //     });
+    //
+    //     timelineSlider.on("slidePrevTransitionStart", () => {
+    //     });
+    //
+    //     timelineSlider.init();
+    // }
+
+    cretateItem(i, timelineLoopItem, planeGeometryBack, planeBackMaterial, planeGeometry) {
+        let timelineItem = document.createElement("div");
+        timelineItem.className = "c-timeline-item";
+
+        let timelineItemInner = document.createElement("div");
+        timelineItemInner.className = "c-timeline-item__inner";
+        timelineItem.appendChild(timelineItemInner);
+
+        let year = document.createElement("div");
+        year.className = "c-timeline-item__year";
+        year.textContent = timelineLoopItem.year;
+        timelineItemInner.appendChild(year);
+
+        let title = document.createElement("div");
+        title.className = "c-timeline-item__title";
+        title.textContent = timelineLoopItem.title;
+        timelineItemInner.appendChild(title);
+
+        let helixItem = new CSS3DObject(timelineItem);
+        helixItem.name = `${timelineLoopItem.title}, index: ${i}`;
+
+        this.scene.add(helixItem);
+
+        let theta = i * 0.85 + Math.PI;
+        let y = -(i * 200) + 600;
+
+        helixItem.position.setFromCylindricalCoords(640, theta, y);
+
+        this.vector.x = helixItem.position.x * 2;
+        this.vector.y = helixItem.position.y;
+        this.vector.z = helixItem.position.z * 2;
+
+        helixItem.lookAt(this.vector);
+
+        this.helixItems.push(helixItem);
+
+        // canvas
+        const planeGroup = new THREE.Object3D();
+        const texture = new THREE.TextureLoader().load(
+            this.timelineItemsImagePath + timelineLoopItem.image,
+            () => {
+                // image position to cover the plane
+                const imageAspectRatio =
+                    texture.image.width / texture.image.height;
+                texture.wrapT = THREE.RepeatWrapping;
+                texture.repeat.x = this.geometryAspectRatio / imageAspectRatio;
+                texture.offset.x = 0.5 * (1 - texture.repeat.x);
             },
+        );
+
+        const planeMaterial = new THREE.MeshBasicMaterial({
+            map: texture,
         });
 
-        timelineSlider.on("init", () => {
-        });
+        const planeBack = new THREE.Mesh(planeGeometryBack, planeBackMaterial);
+        planeBack.name = "item image back";
+        const helixCanvasItem = new THREE.Mesh(planeGeometry, planeMaterial);
+        helixCanvasItem.name = "item image";
+        planeGroup.name = `canvas-plane-${timelineLoopItem.title}, index: ${i}`;
 
-        timelineSlider.on("slideNextTransitionStart", () => {
-        });
+        planeGroup.add(helixCanvasItem);
+        planeGroup.add(planeBack);
+        this.scene.add(planeGroup);
 
-        timelineSlider.on("slidePrevTransitionStart", () => {
-        });
+        planeGroup.position.setFromCylindricalCoords(640, theta, y);
 
-        timelineSlider.init();
+        planeGroup.lookAt(this.vector);
+        this.helixCanvasItems.push(helixCanvasItem);
     }
 
     // DOF
@@ -503,10 +471,6 @@ export default class TimelineSlider {
         var renderPass = new RenderPass(this.scene, this.camera);
 
         var bokehPass = new BokehPass(this.scene, this.camera, {
-            // focus: 3.0,
-            // aperture: 0.05,
-            // maxblur: 0.5,
-
             width: this.winWidth,
             height: this.winHeight,
         });
@@ -523,16 +487,39 @@ export default class TimelineSlider {
     mouseMove() {
         window.addEventListener("mousemove", (ev) => {
             this.mouse.x =
-                (0.06 / this.winWidth) * (ev.clientX - this.winWidth / 2);
+                (20 / this.winWidth) * (ev.clientX - this.winWidth / 2);
             this.mouse.y =
-                (0.06 / this.winHeight) * (ev.clientY - this.winHeight / 2);
+                (20 / this.winHeight) * (ev.clientY - this.winHeight / 2);
 
-            gsap.to(this.camera.rotation, {
-                x: this.mouse.y,
-                y: this.mouse.x,
-                duration: 2,
+            gsap.to(this.camera.position, {
+                x: this.mouse.x,
+                y: this.mouse.y,
+                duration: 1.5,
                 ease: "power3.out",
             });
         });
+    }
+
+    addBgImage() {
+        let texture = new THREE.TextureLoader().load(
+            this.timelineItemsImagePath + "timeline-background.png",
+            () => {
+                // image position to cover the plane
+                const imageAspectRatio =
+                    texture.image.width / texture.image.height;
+                texture.wrapT = THREE.RepeatWrapping;
+                texture.repeat.x = this.geometryAspectRatio / imageAspectRatio;
+                texture.offset.x = 0.5 * (1 - texture.repeat.x);
+            },
+        );
+
+        let bgMaterial = new THREE.MeshBasicMaterial({
+            map: texture,
+        });
+
+        const bgGeometry = new THREE.PlaneGeometry(6400, 3600, 1, 1);
+        const bg = new THREE.Mesh(bgGeometry, bgMaterial);
+        bg.position.set(0, 200, -1000);
+        this.cameraWrapper.add(bg);
     }
 }

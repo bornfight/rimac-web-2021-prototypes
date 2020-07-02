@@ -532,14 +532,10 @@ var TimelineSlider = /*#__PURE__*/function () {
     this.postprocessing = {};
     this.helixItems = [];
     this.helixCanvasItems = [];
-    this.helixItem = null;
-    this.helixCanvasItem = null;
     this.slideCounter = 0;
-    this.init();
-
-    if (this.timelineSlider) {
-      this.initSwiper();
-    }
+    this.init(); // if (this.timelineSlider) {
+    // this.initSwiper();
+    // }
   }
 
   _createClass(TimelineSlider, [{
@@ -570,95 +566,27 @@ var TimelineSlider = /*#__PURE__*/function () {
       this.cameraWrapper.name = "camera wrapper";
       this.cameraWrapper.add(this.camera);
       this.scene.add(this.cameraWrapper);
-      var vector = new THREE.Vector3();
+      this.vector = new THREE.Vector3();
       var planeBackMaterial = new THREE.MeshBasicMaterial({
         color: 0x333333
       });
-
-      var _loop = function _loop(i, l) {
-        var timelineItem = document.createElement("div");
-        timelineItem.className = "c-timeline-item";
-        var timelineItemInner = document.createElement("div");
-        timelineItemInner.className = "c-timeline-item__inner";
-        timelineItem.appendChild(timelineItemInner);
-        var year = document.createElement("div");
-        year.className = "c-timeline-item__year";
-        year.textContent = _this.timelineItems[i].year;
-        timelineItemInner.appendChild(year);
-        var title = document.createElement("div");
-        title.className = "c-timeline-item__title";
-        title.textContent = _this.timelineItems[i].title;
-        timelineItemInner.appendChild(title);
-        _this.helixItem = new _CSS3DRenderer.CSS3DObject(timelineItem);
-        _this.helixItem.name = "".concat(_this.timelineItems[i].title, ", index: ").concat(i);
-
-        _this.scene.add(_this.helixItem);
-
-        var theta = i * 0.85 + Math.PI;
-        var y = -(i * 200) + 600;
-
-        _this.helixItem.position.setFromCylindricalCoords(640, theta, y);
-
-        vector.x = _this.helixItem.position.x * 2;
-        vector.y = _this.helixItem.position.y;
-        vector.z = _this.helixItem.position.z * 2;
-
-        _this.helixItem.lookAt(vector);
-
-        _this.helixItems.push(_this.helixItem);
-
-        var planeGroup = new THREE.Object3D(); // canvas
-
-        var geometryAspectRatio = 16 / 9;
-        var texture = new THREE.TextureLoader().load(_this.timelineItemsImagePath + _this.timelineItems[i].image, function () {
-          // image position to cover the plane
-          var imageAspectRatio = texture.image.width / texture.image.height;
-          texture.wrapT = THREE.RepeatWrapping;
-          texture.repeat.x = geometryAspectRatio / imageAspectRatio;
-          texture.offset.x = 0.5 * (1 - texture.repeat.x);
-        });
-        var planeMaterial = new THREE.MeshBasicMaterial({
-          map: texture,
-          flatShading: true,
-          transparent: false
-        }); // planeMaterial.side = THREE.DoubleSide;
-
-        var planeGeometry = new THREE.PlaneGeometry(330, 186, 1, 1);
-        var planeGeometryBack = planeGeometry.clone();
-        planeGeometryBack.applyMatrix(new THREE.Matrix4().makeRotationY(Math.PI));
-        var planeBack = new THREE.Mesh(planeGeometryBack, planeBackMaterial);
-        _this.helixCanvasItem = new THREE.Mesh(planeGeometry, planeMaterial);
-        planeGroup.name = "canvas-plane-".concat(_this.timelineItems[i].title, ", index: ").concat(i);
-        planeGroup.add(_this.helixCanvasItem);
-        planeGroup.add(planeBack);
-
-        _this.scene.add(planeGroup);
-
-        planeGroup.position.setFromCylindricalCoords(640, theta, y);
-        planeGroup.lookAt(vector);
-
-        _this.helixCanvasItems.push(_this.helixCanvasItem);
-      };
+      this.geometryAspectRatio = 16 / 9;
+      var planeGeometry = new THREE.PlaneGeometry(330, 186, 1, 1);
+      var planeGeometryBack = planeGeometry.clone();
+      planeGeometryBack.applyMatrix(new THREE.Matrix4().makeRotationY(Math.PI)); // create items
 
       for (var i = 0, l = this.timelineItems.length; i < l; i++) {
-        _loop(i, l);
+        this.cretateItem(i, this.timelineItems[i], planeGeometryBack, planeBackMaterial, planeGeometry);
       } // canvas renderer
 
 
-      this.canvasRenderer = new THREE.WebGLRenderer({
-        alpha: true
-      });
+      this.canvasRenderer = new THREE.WebGLRenderer();
       this.canvasRenderer.setPixelRatio(window.devicePixelRatio);
       this.canvasRenderer.setSize(this.winWidth, this.winHeight);
       this.timeline.appendChild(this.canvasRenderer.domElement);
       this.renderer = new _CSS3DRenderer.CSS3DRenderer();
       this.renderer.setSize(this.winWidth, this.winHeight);
       this.timeline.appendChild(this.renderer.domElement);
-      var ambientlight = new THREE.AmbientLight(0x404040);
-      var light = new THREE.DirectionalLight(0xffffff, 1);
-      light.position.set(0, 0, 1000);
-      this.scene.add(light);
-      this.scene.add(ambientlight);
       window.addEventListener("resize", function () {
         _this.onWindowResize;
       }, false);
@@ -687,24 +615,7 @@ var TimelineSlider = /*#__PURE__*/function () {
       this.helixNavigation();
       this.mouseMove(); // background
 
-      var bgGeometryAspectRatio = 16 / 9;
-      var texture = new THREE.TextureLoader().load(this.timelineItemsImagePath + "timeline-background.png", function () {
-        // image position to cover the plane
-        var imageAspectRatio = texture.image.width / texture.image.height;
-        texture.wrapT = THREE.RepeatWrapping;
-        texture.repeat.x = bgGeometryAspectRatio / imageAspectRatio;
-        texture.offset.x = 0.5 * (1 - texture.repeat.x);
-      });
-      var planeMaterial = new THREE.MeshBasicMaterial({
-        map: texture,
-        flatShading: true,
-        transparent: false
-      });
-      planeMaterial.side = THREE.DoubleSide;
-      var planeGeometry = new THREE.PlaneGeometry(6400, 3600, 1, 1);
-      var plane = new THREE.Mesh(planeGeometry, planeMaterial);
-      plane.position.set(0, 200, -1000);
-      this.cameraWrapper.add(plane);
+      this.addBgImage();
     }
   }, {
     key: "onWindowResize",
@@ -723,8 +634,7 @@ var TimelineSlider = /*#__PURE__*/function () {
       requestAnimationFrame(function () {
         return _this2.animate();
       });
-      this.renderer.render(this.scene, this.camera); // this.canvasRenderer.render(this.scene, this.camera);
-
+      this.renderer.render(this.scene, this.camera);
       this.postprocessing.composer.render(0.1);
     }
   }, {
@@ -740,8 +650,9 @@ var TimelineSlider = /*#__PURE__*/function () {
 
         if (_this3.slideCounter > 0) {
           _gsap.gsap.to(_this3.cameraWrapper.rotation, {
-            duration: 0.6,
+            duration: 1,
             y: "-=0.85",
+            ease: "power2.inOut",
             onStart: function onStart() {
               _this3.slideCounter -= 1;
               document.documentElement.classList.add("is-rotating-right");
@@ -761,7 +672,8 @@ var TimelineSlider = /*#__PURE__*/function () {
           });
 
           _gsap.gsap.to(_this3.cameraWrapper.position, {
-            duration: 0.6,
+            duration: 0.9,
+            ease: "power2.inOut",
             y: "+=200"
           });
         }
@@ -771,7 +683,8 @@ var TimelineSlider = /*#__PURE__*/function () {
 
         if (_this3.slideCounter < _this3.timelineItems.length - 1) {
           _gsap.gsap.to(_this3.cameraWrapper.rotation, {
-            duration: 0.6,
+            duration: 0.8,
+            ease: "power2.inOut",
             y: "+=0.85",
             onStart: function onStart() {
               _this3.slideCounter += 1;
@@ -789,28 +702,87 @@ var TimelineSlider = /*#__PURE__*/function () {
           });
 
           _gsap.gsap.to(_this3.cameraWrapper.position, {
-            duration: 0.6,
+            duration: 1,
+            ease: "power2.inOut",
             y: "-=200"
           });
         }
       });
-    }
+    } // initSwiper() {
+    //     let timelineSlider = new Swiper(this.DOM.timelineSlider, {
+    //         init: false,
+    //         slidesPerView: 13,
+    //         speed: this.options.transitionSpeed,
+    //         navigation: {
+    //             nextEl: this.DOM.timelineSliderNext,
+    //             prevEl: this.DOM.timelineSliderPrev,
+    //         },
+    //     });
+    //
+    //     timelineSlider.on("init", () => {
+    //     });
+    //
+    //     timelineSlider.on("slideNextTransitionStart", () => {
+    //     });
+    //
+    //     timelineSlider.on("slidePrevTransitionStart", () => {
+    //     });
+    //
+    //     timelineSlider.init();
+    // }
+
   }, {
-    key: "initSwiper",
-    value: function initSwiper() {
-      var timelineSlider = new _swiper.default(this.DOM.timelineSlider, {
-        init: false,
-        slidesPerView: 13,
-        speed: this.options.transitionSpeed,
-        navigation: {
-          nextEl: this.DOM.timelineSliderNext,
-          prevEl: this.DOM.timelineSliderPrev
-        }
+    key: "cretateItem",
+    value: function cretateItem(i, timelineLoopItem, planeGeometryBack, planeBackMaterial, planeGeometry) {
+      var _this4 = this;
+
+      var timelineItem = document.createElement("div");
+      timelineItem.className = "c-timeline-item";
+      var timelineItemInner = document.createElement("div");
+      timelineItemInner.className = "c-timeline-item__inner";
+      timelineItem.appendChild(timelineItemInner);
+      var year = document.createElement("div");
+      year.className = "c-timeline-item__year";
+      year.textContent = timelineLoopItem.year;
+      timelineItemInner.appendChild(year);
+      var title = document.createElement("div");
+      title.className = "c-timeline-item__title";
+      title.textContent = timelineLoopItem.title;
+      timelineItemInner.appendChild(title);
+      var helixItem = new _CSS3DRenderer.CSS3DObject(timelineItem);
+      helixItem.name = "".concat(timelineLoopItem.title, ", index: ").concat(i);
+      this.scene.add(helixItem);
+      var theta = i * 0.85 + Math.PI;
+      var y = -(i * 200) + 600;
+      helixItem.position.setFromCylindricalCoords(640, theta, y);
+      this.vector.x = helixItem.position.x * 2;
+      this.vector.y = helixItem.position.y;
+      this.vector.z = helixItem.position.z * 2;
+      helixItem.lookAt(this.vector);
+      this.helixItems.push(helixItem); // canvas
+
+      var planeGroup = new THREE.Object3D();
+      var texture = new THREE.TextureLoader().load(this.timelineItemsImagePath + timelineLoopItem.image, function () {
+        // image position to cover the plane
+        var imageAspectRatio = texture.image.width / texture.image.height;
+        texture.wrapT = THREE.RepeatWrapping;
+        texture.repeat.x = _this4.geometryAspectRatio / imageAspectRatio;
+        texture.offset.x = 0.5 * (1 - texture.repeat.x);
       });
-      timelineSlider.on("init", function () {});
-      timelineSlider.on("slideNextTransitionStart", function () {});
-      timelineSlider.on("slidePrevTransitionStart", function () {});
-      timelineSlider.init();
+      var planeMaterial = new THREE.MeshBasicMaterial({
+        map: texture
+      });
+      var planeBack = new THREE.Mesh(planeGeometryBack, planeBackMaterial);
+      planeBack.name = "item image back";
+      var helixCanvasItem = new THREE.Mesh(planeGeometry, planeMaterial);
+      helixCanvasItem.name = "item image";
+      planeGroup.name = "canvas-plane-".concat(timelineLoopItem.title, ", index: ").concat(i);
+      planeGroup.add(helixCanvasItem);
+      planeGroup.add(planeBack);
+      this.scene.add(planeGroup);
+      planeGroup.position.setFromCylindricalCoords(640, theta, y);
+      planeGroup.lookAt(this.vector);
+      this.helixCanvasItems.push(helixCanvasItem);
     } // DOF
 
   }, {
@@ -818,9 +790,6 @@ var TimelineSlider = /*#__PURE__*/function () {
     value: function dof() {
       var renderPass = new _RenderPass.RenderPass(this.scene, this.camera);
       var bokehPass = new _BokehPass.BokehPass(this.scene, this.camera, {
-        // focus: 3.0,
-        // aperture: 0.05,
-        // maxblur: 0.5,
         width: this.winWidth,
         height: this.winHeight
       });
@@ -833,19 +802,39 @@ var TimelineSlider = /*#__PURE__*/function () {
   }, {
     key: "mouseMove",
     value: function mouseMove() {
-      var _this4 = this;
+      var _this5 = this;
 
       window.addEventListener("mousemove", function (ev) {
-        _this4.mouse.x = 0.06 / _this4.winWidth * (ev.clientX - _this4.winWidth / 2);
-        _this4.mouse.y = 0.06 / _this4.winHeight * (ev.clientY - _this4.winHeight / 2);
+        _this5.mouse.x = 20 / _this5.winWidth * (ev.clientX - _this5.winWidth / 2);
+        _this5.mouse.y = 20 / _this5.winHeight * (ev.clientY - _this5.winHeight / 2);
 
-        _gsap.gsap.to(_this4.camera.rotation, {
-          x: _this4.mouse.y,
-          y: _this4.mouse.x,
-          duration: 2,
+        _gsap.gsap.to(_this5.camera.position, {
+          x: _this5.mouse.x,
+          y: _this5.mouse.y,
+          duration: 1.5,
           ease: "power3.out"
         });
       });
+    }
+  }, {
+    key: "addBgImage",
+    value: function addBgImage() {
+      var _this6 = this;
+
+      var texture = new THREE.TextureLoader().load(this.timelineItemsImagePath + "timeline-background.png", function () {
+        // image position to cover the plane
+        var imageAspectRatio = texture.image.width / texture.image.height;
+        texture.wrapT = THREE.RepeatWrapping;
+        texture.repeat.x = _this6.geometryAspectRatio / imageAspectRatio;
+        texture.offset.x = 0.5 * (1 - texture.repeat.x);
+      });
+      var bgMaterial = new THREE.MeshBasicMaterial({
+        map: texture
+      });
+      var bgGeometry = new THREE.PlaneGeometry(6400, 3600, 1, 1);
+      var bg = new THREE.Mesh(bgGeometry, bgMaterial);
+      bg.position.set(0, 200, -1000);
+      this.cameraWrapper.add(bg);
     }
   }]);
 
