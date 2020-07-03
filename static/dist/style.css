@@ -970,21 +970,6 @@ a {
 .c-timeline-item.swiper-slide-active .c-timeline-item__inner {
   opacity: 1; }
 
-.c-timeline-item:hover .c-timeline-item__img {
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  -webkit-transform: scale(1.05);
-          transform: scale(1.05); }
-
-.c-timeline-item:hover .c-timeline-item__year {
-  -webkit-transform: translateY(-20px);
-          transform: translateY(-20px); }
-
-.c-timeline-item:hover .c-timeline-item__title {
-  -webkit-transform: translateY(-25px);
-          transform: translateY(-25px);
-  -webkit-transition-delay: 0.05s;
-          transition-delay: 0.05s; }
-
 .c-timeline-item__year {
   position: absolute;
   top: 0;
