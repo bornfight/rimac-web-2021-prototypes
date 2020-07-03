@@ -52,8 +52,65 @@
         }
     }
 
+    &__pagination {
+        position: relative;
+        margin-bottom: 30px;
+        display: inline-block;
+        width: auto;
+
+        // overrides
+        .swiper-pagination-bullets {
+            margin-left: -15px;
+        }
+    }
+
+    &__pagination-bullet.swiper-pagination-bullet {
+        display: inline-block;
+        margin: 0 15px;
+        padding: 10px 0;
+        height: auto;
+        width: auto;
+        border-radius: 0;
+        background-color: transparent;
+        transition: opacity 0.5s;
+
+        @include hover {
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        &.swiper-pagination-bullet-active {
+            pointer-events: none;
+        }
+
+        &:last-child {
+            position: absolute;
+            top: 0;
+            left: 100%;
+        }
+    }
+
+    &__progress-line {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: -15px;
+        height: 1px;
+        background-color: $white-20;
+    }
+
+    &__progress-line-dot {
+        position: absolute;
+        top: -2px;
+        left: 0;
+        width: 5px;
+        height: 5px;
+        background-color: $white;
+        border-radius: 50%;
+    }
+
     // overrides
-    .swiper-container{
+    .swiper-container {
         position: absolute;
         top: 0;
         left: 0;

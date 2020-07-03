@@ -442,6 +442,8 @@ var TimelineSlider = /*#__PURE__*/function () {
       timelineSliderWrapper: ".js-timeline-slider-wrapper",
       timelineSliderNext: ".js-timeline-slider-next",
       timelineSliderPrev: ".js-timeline-slider-previous",
+      timelineProgressDot: ".js-timeline-pagination-progress-dot",
+      timelineProgressWrapper: ".js-timeline-pagination-progress-wrapper",
       states: {}
     };
     this.options = {
@@ -456,6 +458,8 @@ var TimelineSlider = /*#__PURE__*/function () {
     this.activeIndex = 0;
     this.timeline = document.querySelector(this.DOM.timeline);
     this.slider = document.querySelector(this.DOM.timelineSlider);
+    this.progressDot = document.querySelector(this.DOM.timelineProgressDot);
+    this.progressWrapper = document.querySelector(this.DOM.timelineProgressWrapper);
     this.sliderWrapper = document.querySelector(this.DOM.timelineSliderWrapper);
     this.timelineItemsImagePath = "static/images/";
     this.timelineItems = [{
@@ -530,9 +534,7 @@ var TimelineSlider = /*#__PURE__*/function () {
     this.scene = null;
     this.renderer = null;
     this.postprocessing = {};
-    this.helixItems = [];
     this.helixCanvasItems = [];
-    this.slideCounter = 0;
     this.init();
   }
 
@@ -688,7 +690,10 @@ var TimelineSlider = /*#__PURE__*/function () {
   }, {
     key: "swiperInit",
     value: function swiperInit() {
+      var _this4 = this;
+
       var self = this;
+      var progressWidth = this.progressWrapper.clientWidth;
       var swiper = new _swiper.default(this.slider, {
         loop: false,
         slidesPerView: 1,
@@ -716,9 +721,20 @@ var TimelineSlider = /*#__PURE__*/function () {
           nextEl: this.timelineSliderNext,
           prevEl: this.timelineSliderPrev
         },
+        pagination: {
+          el: '.js-timeline-pagination',
+          clickable: true,
+          renderBullet: function renderBullet(index, className) {
+            return "<span class=\"c-timeline__pagination-bullet ".concat(className, "\">").concat(_this4.timelineItems[index].year, "</span>");
+          }
+        },
         on: {
           progress: function progress() {
             var swiper = this;
+
+            _gsap.gsap.to(self.progressDot, {
+              x: swiper.progress * progressWidth
+            });
 
             _gsap.gsap.to(self.cameraWrapper.rotation, {
               duration: 0.8,
@@ -732,17 +748,11 @@ var TimelineSlider = /*#__PURE__*/function () {
               y: self.initialCameraWrapperPosition - (swiper.slides.length - 1) * self.helixOffsetByItem * swiper.progress
             });
           },
-          slideChange: function slideChange() {// gsap.to(this.cameraWrapper.rotation, {
-            //     duration: 0.8,
-            //     ease: "power2.inOut",
-            //     y: (swiper.activeIndex * this.itemRadiusOffset) + this.initialCameraWrapperRotation,
-            // });
-            //
-            // gsap.to(this.cameraWrapper.position, {
-            //     duration: 1,
-            //     ease: "power2.inOut",
-            //     y: this.initialCameraWrapperPosition - (swiper.activeIndex * this.helixOffsetByItem),
-            // });
+          init: function init() {
+            // trebamo timeout zbog doma (dok se ne stvor i paginacia)
+            setTimeout(function () {
+              progressWidth = _this4.progressWrapper.clientWidth;
+            }, 300);
           }
         }
       });
@@ -764,16 +774,23 @@ var TimelineSlider = /*#__PURE__*/function () {
   }, {
     key: "mouseMove",
     value: function mouseMove() {
-      var _this4 = this;
+      var _this5 = this;
 
       window.addEventListener("mousemove", function (ev) {
-        _this4.mouse.x = 20 / _this4.winWidth * (ev.clientX - _this4.winWidth / 2);
-        _this4.mouse.y = 20 / _this4.winHeight * (ev.clientY - _this4.winHeight / 2);
+        _this5.mouse.x = 20 / _this5.winWidth * (ev.clientX - _this5.winWidth / 2);
+        _this5.mouse.y = 20 / _this5.winHeight * (ev.clientY - _this5.winHeight / 2);
 
-        _gsap.gsap.to(_this4.camera.position, {
-          x: _this4.mouse.x,
-          y: _this4.mouse.y,
+        _gsap.gsap.to(_this5.camera.position, {
+          x: _this5.mouse.x,
+          y: _this5.mouse.y,
           duration: 1.5,
+          ease: "power3.out"
+        });
+
+        _gsap.gsap.to(_this5.slider, {
+          x: -_this5.mouse.x * 3,
+          y: _this5.mouse.y * 3,
+          duration: 1,
           ease: "power3.out"
         });
       });
@@ -781,13 +798,13 @@ var TimelineSlider = /*#__PURE__*/function () {
   }, {
     key: "addBgImage",
     value: function addBgImage() {
-      var _this5 = this;
+      var _this6 = this;
 
       var texture = new THREE.TextureLoader().load(this.timelineItemsImagePath + "timeline-background.png", function () {
         // image position to cover the plane
         var imageAspectRatio = texture.image.width / texture.image.height;
         texture.wrapT = THREE.RepeatWrapping;
-        texture.repeat.x = _this5.geometryAspectRatio / imageAspectRatio;
+        texture.repeat.x = _this6.geometryAspectRatio / imageAspectRatio;
         texture.offset.x = 0.5 * (1 - texture.repeat.x);
       });
       var bgMaterial = new THREE.MeshBasicMaterial({
@@ -797,44 +814,6 @@ var TimelineSlider = /*#__PURE__*/function () {
       var bg = new THREE.Mesh(bgGeometry, bgMaterial);
       bg.position.set(0, 200, -1000);
       this.cameraWrapper.add(bg);
-    }
-  }, {
-    key: "draggableInit",
-    value: function draggableInit() {
-      var _this6 = this;
-
-      var self = this;
-      var currentRotation = this.cameraWrapper.rotation.y;
-      var currentPosition = this.cameraWrapper.rotation.y;
-      Draggable.create(this.timeline, {
-        type: "x",
-        // inertia: true,
-        edgeResistance: 0.65,
-        throwProps: true,
-        onDragStart: function onDragStart() {
-          currentRotation = _this6.cameraWrapper.rotation.y;
-          currentPosition = _this6.cameraWrapper.position.y;
-        },
-        onDrag: function onDrag() {
-          _gsap.gsap.set(self.timeline, {
-            x: 0
-          });
-
-          var rotation = this.x / 2000;
-          var position = rotation * 240; // console.log(this.x);
-
-          _gsap.gsap.set(self.cameraWrapper.rotation, {
-            y: currentRotation - parseFloat(rotation.toFixed(3))
-          });
-
-          _gsap.gsap.set(self.cameraWrapper.position, {
-            y: currentPosition + parseFloat(position.toFixed(3))
-          });
-        },
-        onThrowUpdate: function onThrowUpdate() {
-          console.log(this.x);
-        }
-      });
     }
   }]);
 

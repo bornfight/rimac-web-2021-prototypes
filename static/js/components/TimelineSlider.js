@@ -18,6 +18,8 @@ export default class TimelineSlider {
             timelineSliderWrapper: ".js-timeline-slider-wrapper",
             timelineSliderNext: ".js-timeline-slider-next",
             timelineSliderPrev: ".js-timeline-slider-previous",
+            timelineProgressDot: ".js-timeline-pagination-progress-dot",
+            timelineProgressWrapper: ".js-timeline-pagination-progress-wrapper",
             states: {},
         };
 
@@ -37,7 +39,11 @@ export default class TimelineSlider {
 
         this.timeline = document.querySelector(this.DOM.timeline);
         this.slider = document.querySelector(this.DOM.timelineSlider);
-        this.sliderWrapper = document.querySelector(this.DOM.timelineSliderWrapper);
+        this.progressDot = document.querySelector(this.DOM.timelineProgressDot);
+        this.progressWrapper = document.querySelector(this.DOM.timelineProgressWrapper);
+        this.sliderWrapper = document.querySelector(
+            this.DOM.timelineSliderWrapper,
+        );
 
         this.timelineItemsImagePath = "static/images/";
         this.timelineItems = [
@@ -145,11 +151,7 @@ export default class TimelineSlider {
         this.scene = null;
         this.renderer = null;
         this.postprocessing = {};
-
-        this.helixItems = [];
         this.helixCanvasItems = [];
-
-        this.slideCounter = 0;
 
         this.init();
     }
@@ -189,7 +191,11 @@ export default class TimelineSlider {
         this.initialCameraWrapperRotation = 3.15;
 
         this.cameraWrapper = new THREE.Object3D();
-        this.cameraWrapper.position.set(0, this.initialCameraWrapperPosition, 0);
+        this.cameraWrapper.position.set(
+            0,
+            this.initialCameraWrapperPosition,
+            0,
+        );
         this.cameraWrapper.rotation.y = this.initialCameraWrapperRotation;
         this.cameraWrapper.name = "camera wrapper";
         this.cameraWrapper.add(this.camera);
@@ -204,17 +210,27 @@ export default class TimelineSlider {
         this.geometryAspectRatio = 16 / 9;
         const planeGeometry = new THREE.PlaneGeometry(330, 186, 1, 1);
         let planeGeometryBack = planeGeometry.clone();
-        planeGeometryBack.applyMatrix(new THREE.Matrix4().makeRotationY(Math.PI));
+        planeGeometryBack.applyMatrix(
+            new THREE.Matrix4().makeRotationY(Math.PI),
+        );
 
         // create items
         for (let i = 0, l = this.timelineItems.length; i < l; i++) {
-            this.cretateItem(i, this.timelineItems[i], planeGeometryBack, planeBackMaterial, planeGeometry)
+            this.cretateItem(
+                i,
+                this.timelineItems[i],
+                planeGeometryBack,
+                planeBackMaterial,
+                planeGeometry,
+            );
         }
 
         const topOfTheHelix = this.helixCanvasItems[0].position.y;
         const bottomOfTheHelix = this.helixCanvasItems[this.helixCanvasItems.length - 1].position.y;
-        const helixHeight = Math.abs(bottomOfTheHelix) + Math.abs(topOfTheHelix);
-        this.helixOffsetByItem = helixHeight / (this.helixCanvasItems.length - 1);
+        const helixHeight =
+            Math.abs(bottomOfTheHelix) + Math.abs(topOfTheHelix);
+        this.helixOffsetByItem =
+            helixHeight / (this.helixCanvasItems.length - 1);
 
         // canvas renderer
         this.canvasRenderer = new THREE.WebGLRenderer();
@@ -240,15 +256,22 @@ export default class TimelineSlider {
         };
 
         var matChanger = () => {
-            this.postprocessing.bokeh.uniforms["focus"].value = effectController.focus;
-            this.postprocessing.bokeh.uniforms["aperture"].value = effectController.aperture * 0.00001;
-            this.postprocessing.bokeh.uniforms["maxblur"].value = effectController.maxblur;
+            this.postprocessing.bokeh.uniforms["focus"].value =
+                effectController.focus;
+            this.postprocessing.bokeh.uniforms["aperture"].value =
+                effectController.aperture * 0.00001;
+            this.postprocessing.bokeh.uniforms["maxblur"].value =
+                effectController.maxblur;
         };
 
         const gui = new GUI();
-        gui.add(effectController, "focus", 10.0, 3000.0, 10).onChange(matChanger);
+        gui.add(effectController, "focus", 10.0, 3000.0, 10).onChange(
+            matChanger,
+        );
         gui.add(effectController, "aperture", 0, 10, 0.1).onChange(matChanger);
-        gui.add(effectController, "maxblur", 0.0, 0.01, 0.001).onChange(matChanger);
+        gui.add(effectController, "maxblur", 0.0, 0.01, 0.001).onChange(
+            matChanger,
+        );
         gui.close();
 
         matChanger();
@@ -274,7 +297,13 @@ export default class TimelineSlider {
         this.postprocessing.composer.render(0.1);
     }
 
-    cretateItem(i, timelineLoopItem, planeGeometryBack, planeBackMaterial, planeGeometry) {
+    cretateItem(
+        i,
+        timelineLoopItem,
+        planeGeometryBack,
+        planeBackMaterial,
+        planeGeometry,
+    ) {
         let timelineItem = document.createElement("div");
         timelineItem.className = "c-timeline-item swiper-slide";
 
@@ -339,6 +368,7 @@ export default class TimelineSlider {
 
     swiperInit() {
         const self = this;
+        let progressWidth = this.progressWrapper.clientWidth;
 
         const swiper = new Swiper(this.slider, {
             loop: false,
@@ -367,34 +397,46 @@ export default class TimelineSlider {
                 nextEl: this.timelineSliderNext,
                 prevEl: this.timelineSliderPrev,
             },
+            pagination: {
+                el: '.js-timeline-pagination',
+                clickable: true,
+                renderBullet: (index, className) => {
+                    return `<span class="c-timeline__pagination-bullet ${className}">${this.timelineItems[index].year}</span>`;
+                },
+            },
             on: {
                 progress: function () {
                     let swiper = this;
 
+                    gsap.to(self.progressDot, {
+                        x: swiper.progress * progressWidth,
+                    });
+
                     gsap.to(self.cameraWrapper.rotation, {
                         duration: 0.8,
                         ease: "power2.out",
-                        y: ((swiper.slides.length - 1) * self.itemRadiusOffset * swiper.progress) + self.initialCameraWrapperRotation,
+                        y:
+                            (swiper.slides.length - 1) *
+                            self.itemRadiusOffset *
+                            swiper.progress +
+                            self.initialCameraWrapperRotation,
                     });
 
                     gsap.to(self.cameraWrapper.position, {
                         duration: 1,
                         ease: "power2.out",
-                        y: self.initialCameraWrapperPosition - ((swiper.slides.length - 1) * self.helixOffsetByItem * swiper.progress),
+                        y:
+                            self.initialCameraWrapperPosition -
+                            (swiper.slides.length - 1) *
+                            self.helixOffsetByItem *
+                            swiper.progress,
                     });
                 },
-                slideChange: () => {
-                    // gsap.to(this.cameraWrapper.rotation, {
-                    //     duration: 0.8,
-                    //     ease: "power2.inOut",
-                    //     y: (swiper.activeIndex * this.itemRadiusOffset) + this.initialCameraWrapperRotation,
-                    // });
-                    //
-                    // gsap.to(this.cameraWrapper.position, {
-                    //     duration: 1,
-                    //     ease: "power2.inOut",
-                    //     y: this.initialCameraWrapperPosition - (swiper.activeIndex * this.helixOffsetByItem),
-                    // });
+                init: () => {
+                    // trebamo timeout zbog doma (dok se ne stvor i paginacia)
+                    setTimeout(() => {
+                        progressWidth = this.progressWrapper.clientWidth;
+                    }, 300);
                 },
             },
         });
@@ -430,6 +472,13 @@ export default class TimelineSlider {
                 duration: 1.5,
                 ease: "power3.out",
             });
+
+            gsap.to(this.slider, {
+                x: -this.mouse.x * 3,
+                y: this.mouse.y * 3,
+                duration: 1,
+                ease: "power3.out",
+            });
         });
     }
 
@@ -454,43 +503,5 @@ export default class TimelineSlider {
         const bg = new THREE.Mesh(bgGeometry, bgMaterial);
         bg.position.set(0, 200, -1000);
         this.cameraWrapper.add(bg);
-    }
-
-    draggableInit() {
-        const self = this;
-        let currentRotation = this.cameraWrapper.rotation.y;
-        let currentPosition = this.cameraWrapper.rotation.y;
-
-        Draggable.create(this.timeline, {
-            type: "x",
-            // inertia: true,
-            edgeResistance: 0.65,
-            throwProps: true,
-            onDragStart: () => {
-                currentRotation = this.cameraWrapper.rotation.y;
-                currentPosition = this.cameraWrapper.position.y;
-            },
-            onDrag: function () {
-                gsap.set(self.timeline, {
-                    x: 0,
-                });
-
-                const rotation = this.x / 2000;
-                const position = rotation * 240;
-
-                // console.log(this.x);
-
-                gsap.set(self.cameraWrapper.rotation, {
-                    y: currentRotation - parseFloat(rotation.toFixed(3)),
-                });
-
-                gsap.set(self.cameraWrapper.position, {
-                    y: currentPosition + parseFloat(position.toFixed(3)),
-                });
-            },
-            onThrowUpdate: function () {
-                console.log(this.x);
-            },
-        });
     }
 }
