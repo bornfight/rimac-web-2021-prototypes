@@ -20,6 +20,12 @@ export default class TimelineSlider {
             timelineSliderPrev: ".js-timeline-slider-previous",
             timelineProgressDot: ".js-timeline-pagination-progress-dot",
             timelineProgressWrapper: ".js-timeline-pagination-progress-wrapper",
+
+            popup: ".js-timeline-popup",
+            popupClose: ".js-timeline-popup-close",
+            popupYear: ".js-timeline-popup-year",
+            popupTitle: ".js-timeline-popup-title",
+            popupContent: ".js-timeline-popup-content",
             states: {},
         };
 
@@ -44,6 +50,15 @@ export default class TimelineSlider {
         this.sliderWrapper = document.querySelector(
             this.DOM.timelineSliderWrapper,
         );
+
+        this.popup = document.querySelector(this.DOM.popup);
+        this.popupClose = document.querySelector(this.DOM.popupClose);
+        this.popupYear = document.querySelector(this.DOM.popupYear);
+        this.popupTitle = document.querySelector(this.DOM.popupTitle);
+        this.popupContent = document.querySelector(this.DOM.popupContent);
+
+        this.swiper = null;
+        this.popupOpened = false;
 
         this.timelineItemsImagePath = "static/images/";
         this.timelineItems = [
@@ -140,18 +155,18 @@ export default class TimelineSlider {
             },
         ];
 
-        this.timelineSliderPrev = document.querySelector(
-            this.DOM.timelineSliderPrev,
-        );
-        this.timelineSliderNext = document.querySelector(
-            this.DOM.timelineSliderNext,
-        );
+        // this.timelineSliderPrev = document.querySelector(
+        //     this.DOM.timelineSliderPrev,
+        // );
+        // this.timelineSliderNext = document.querySelector(
+        //     this.DOM.timelineSliderNext,
+        // );
 
         this.camera = null;
         this.scene = null;
         this.renderer = null;
         this.postprocessing = {};
-        this.helixCanvasItems = [];
+        this.helixItems = [];
 
         this.init();
     }
@@ -181,11 +196,13 @@ export default class TimelineSlider {
 
         this.itemRadiusOffset = 0.85;
 
+        this.initialCameraZPosition = 1020;
+
         this.camera.lookAt(0, 0, 0);
 
         this.camera.position.x = 0;
         this.camera.position.y = 0;
-        this.camera.position.z = 1020;
+        this.camera.position.z = this.initialCameraZPosition;
 
         this.initialCameraWrapperPosition = 550;
         this.initialCameraWrapperRotation = 3.15;
@@ -205,6 +222,7 @@ export default class TimelineSlider {
 
         const planeBackMaterial = new THREE.MeshBasicMaterial({
             color: 0x333333,
+            transparent: true,
         });
 
         this.geometryAspectRatio = 16 / 9;
@@ -225,12 +243,12 @@ export default class TimelineSlider {
             );
         }
 
-        const topOfTheHelix = this.helixCanvasItems[0].position.y;
-        const bottomOfTheHelix = this.helixCanvasItems[this.helixCanvasItems.length - 1].position.y;
+        const topOfTheHelix = this.helixItems[0].position.y;
+        const bottomOfTheHelix = this.helixItems[this.helixItems.length - 1].position.y;
         const helixHeight =
             Math.abs(bottomOfTheHelix) + Math.abs(topOfTheHelix);
         this.helixOffsetByItem =
-            helixHeight / (this.helixCanvasItems.length - 1);
+            helixHeight / (this.helixItems.length - 1);
 
         // canvas renderer
         this.canvasRenderer = new THREE.WebGLRenderer();
@@ -284,6 +302,8 @@ export default class TimelineSlider {
         this.addBgImage();
 
         this.swiperInit();
+
+        this.popupController();
     }
 
     onWindowResize() {
@@ -342,6 +362,7 @@ export default class TimelineSlider {
 
         const planeMaterial = new THREE.MeshBasicMaterial({
             map: texture,
+            transparent: true,
         });
 
         planeGroup.position.setFromCylindricalCoords(640, theta, y);
@@ -352,25 +373,25 @@ export default class TimelineSlider {
 
         const planeBack = new THREE.Mesh(planeGeometryBack, planeBackMaterial);
         planeBack.name = "item image back";
-        const helixCanvasItem = new THREE.Mesh(planeGeometry, planeMaterial);
-        helixCanvasItem.name = "item image";
+        const helixItem = new THREE.Mesh(planeGeometry, planeMaterial);
+        helixItem.name = "item image";
         planeGroup.name = `canvas-plane-${timelineLoopItem.title}, index: ${i}`;
 
-        planeGroup.add(helixCanvasItem);
+        planeGroup.add(helixItem);
         planeGroup.add(planeBack);
         this.scene.add(planeGroup);
 
         planeGroup.position.setFromCylindricalCoords(640, theta, y);
 
         planeGroup.lookAt(this.vector);
-        this.helixCanvasItems.push(planeGroup);
+        this.helixItems.push(planeGroup);
     }
 
     swiperInit() {
         const self = this;
         let progressWidth = this.progressWrapper.clientWidth;
 
-        const swiper = new Swiper(this.slider, {
+        this.swiper = new Swiper(this.slider, {
             loop: false,
             slidesPerView: 1,
             // direction: "vertical",
@@ -393,10 +414,10 @@ export default class TimelineSlider {
             // fadeEffect: {
             //     crossFade: true,
             // },
-            navigation: {
-                nextEl: this.timelineSliderNext,
-                prevEl: this.timelineSliderPrev,
-            },
+            // navigation: {
+            //     nextEl: this.timelineSliderNext,
+            //     prevEl: this.timelineSliderPrev,
+            // },
             pagination: {
                 el: '.js-timeline-pagination',
                 clickable: true,
@@ -503,5 +524,152 @@ export default class TimelineSlider {
         const bg = new THREE.Mesh(bgGeometry, bgMaterial);
         bg.position.set(0, 200, -1000);
         this.cameraWrapper.add(bg);
+    }
+
+    popupController() {
+        if (this.swiper == null) {
+            return;
+        }
+
+        for (let i = 0; i < this.swiper.slides.length; i++) {
+            this.swiper.slides[i].addEventListener("click", () => {
+                if (!this.popupOpened) {
+                    this.slideZoom();
+                    this.hideHelixItems(this.swiper.slides[i], i);
+                    this.openPopup(i);
+                }
+            });
+        }
+
+        this.popupClose.addEventListener("click", () => {
+            if (this.popupOpened) {
+                this.slideZoom();
+                this.closePopup();
+                this.showHelixItems();
+            }
+        });
+
+        window.addEventListener("keyup", (ev) => {
+            if (ev.key === "Escape" && this.popupOpened) {
+                this.slideZoom();
+                this.closePopup();
+                this.showHelixItems();
+            }
+        });
+    }
+
+    openPopup(index) {
+        this.popupOpened = true;
+        gsap.to(this.popup, {
+            autoAlpha: 1,
+            delay: 0.5,
+            onComplete: () => {
+                this.popup.classList.add("is-active");
+            },
+        });
+
+        this.popupYear.innerText = this.timelineItems[index].year;
+        this.popupTitle.innerText = this.timelineItems[index].title;
+        this.popupContent.innerText = this.timelineItems[index].text;
+
+        gsap.to([".js-timeline-pagination", ".js-back-btn", this.swiper.slides, this.progressWrapper], {
+            autoAlpha: 0,
+            duration: 0.2,
+        });
+    }
+
+    closePopup() {
+        this.popupOpened = false;
+        this.popupYear.innerText = "";
+        this.popupTitle.innerText = "";
+        this.popupContent.innerText = "";
+        this.popup.classList.remove("is-active");
+
+        gsap.to(this.popup, {
+            autoAlpha: 0,
+        });
+
+        gsap.to([".js-timeline-pagination", ".js-back-btn", this.swiper.slides, this.progressWrapper], {
+            autoAlpha: 1,
+            duration: 0.2,
+        });
+    }
+
+    slideZoom() {
+        const currentCameraWrapperYPosition = this.initialCameraWrapperPosition - (this.swiper.slides.length - 1) * this.helixOffsetByItem * this.swiper.progress;
+
+        if (this.popupOpened) {
+            gsap.to(this.camera.position, {
+                duration: 0.8,
+                z: this.initialCameraZPosition,
+                ease: "power4.inOut",
+            });
+
+            gsap.to(this.cameraWrapper.position, {
+                duration: 0.8,
+                y: currentCameraWrapperYPosition,
+                ease: "power4.inOut",
+            });
+
+            gsap.to(this.postprocessing.bokeh.uniforms["focus"], {
+                duration: 0.8,
+                value: 360,
+                ease: "power4.inOut",
+            });
+
+            return;
+        }
+
+        gsap.to(this.camera.position, {
+            duration: 0.8,
+            z: 850,
+            ease: "power4.out",
+        });
+
+        gsap.to(this.cameraWrapper.position, {
+            duration: 0.8,
+            y: currentCameraWrapperYPosition + 50,
+            ease: "power4.out",
+        });
+
+        gsap.to(this.postprocessing.bokeh.uniforms["focus"], {
+            duration: 0.8,
+            value: 200,
+            ease: "power4.out",
+        });
+    }
+
+    hideHelixItems(slide, index) {
+        this.helixItems.forEach((plane, i) => {
+            if (i !== index) {
+                if (plane.children[0]) {
+                    gsap.to(plane.children[0].material, {
+                        opacity: 0,
+                    });
+                }
+
+                if (plane.children[1]) {
+                    gsap.to(plane.children[1].material, {
+                        opacity: 0,
+                    });
+                }
+            }
+        });
+    }
+
+    showHelixItems() {
+        this.helixItems.forEach((plane) => {
+            if (plane.children[0]) {
+                gsap.to(plane.children[0].material, {
+                    opacity: 1,
+                });
+            }
+
+            if (plane.children[1]) {
+                gsap.to(plane.children[1].material, {
+                    opacity: 1,
+                });
+            }
+        });
     }
 }

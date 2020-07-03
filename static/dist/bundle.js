@@ -444,6 +444,11 @@ var TimelineSlider = /*#__PURE__*/function () {
       timelineSliderPrev: ".js-timeline-slider-previous",
       timelineProgressDot: ".js-timeline-pagination-progress-dot",
       timelineProgressWrapper: ".js-timeline-pagination-progress-wrapper",
+      popup: ".js-timeline-popup",
+      popupClose: ".js-timeline-popup-close",
+      popupYear: ".js-timeline-popup-year",
+      popupTitle: ".js-timeline-popup-title",
+      popupContent: ".js-timeline-popup-content",
       states: {}
     };
     this.options = {
@@ -461,6 +466,13 @@ var TimelineSlider = /*#__PURE__*/function () {
     this.progressDot = document.querySelector(this.DOM.timelineProgressDot);
     this.progressWrapper = document.querySelector(this.DOM.timelineProgressWrapper);
     this.sliderWrapper = document.querySelector(this.DOM.timelineSliderWrapper);
+    this.popup = document.querySelector(this.DOM.popup);
+    this.popupClose = document.querySelector(this.DOM.popupClose);
+    this.popupYear = document.querySelector(this.DOM.popupYear);
+    this.popupTitle = document.querySelector(this.DOM.popupTitle);
+    this.popupContent = document.querySelector(this.DOM.popupContent);
+    this.swiper = null;
+    this.popupOpened = false;
     this.timelineItemsImagePath = "static/images/";
     this.timelineItems = [{
       image: "timeline-01.jpg",
@@ -527,14 +539,18 @@ var TimelineSlider = /*#__PURE__*/function () {
       year: "2020",
       title: "Lorem ipsum dolor sit.",
       text: "Makes example posts, pages, custom terms, helps to style and develop new and current themes."
-    }];
-    this.timelineSliderPrev = document.querySelector(this.DOM.timelineSliderPrev);
-    this.timelineSliderNext = document.querySelector(this.DOM.timelineSliderNext);
+    }]; // this.timelineSliderPrev = document.querySelector(
+    //     this.DOM.timelineSliderPrev,
+    // );
+    // this.timelineSliderNext = document.querySelector(
+    //     this.DOM.timelineSliderNext,
+    // );
+
     this.camera = null;
     this.scene = null;
     this.renderer = null;
     this.postprocessing = {};
-    this.helixCanvasItems = [];
+    this.helixItems = [];
     this.init();
   }
 
@@ -557,10 +573,11 @@ var TimelineSlider = /*#__PURE__*/function () {
       };
       this.camera = new THREE.PerspectiveCamera(options.camera.fov, this.winWidth / this.winHeight, options.camera.near, options.camera.far);
       this.itemRadiusOffset = 0.85;
+      this.initialCameraZPosition = 1020;
       this.camera.lookAt(0, 0, 0);
       this.camera.position.x = 0;
       this.camera.position.y = 0;
-      this.camera.position.z = 1020;
+      this.camera.position.z = this.initialCameraZPosition;
       this.initialCameraWrapperPosition = 550;
       this.initialCameraWrapperRotation = 3.15;
       this.cameraWrapper = new THREE.Object3D();
@@ -571,7 +588,8 @@ var TimelineSlider = /*#__PURE__*/function () {
       this.scene.add(this.cameraWrapper);
       this.vector = new THREE.Vector3();
       var planeBackMaterial = new THREE.MeshBasicMaterial({
-        color: 0x333333
+        color: 0x333333,
+        transparent: true
       });
       this.geometryAspectRatio = 16 / 9;
       var planeGeometry = new THREE.PlaneGeometry(330, 186, 1, 1);
@@ -582,10 +600,10 @@ var TimelineSlider = /*#__PURE__*/function () {
         this.cretateItem(i, this.timelineItems[i], planeGeometryBack, planeBackMaterial, planeGeometry);
       }
 
-      var topOfTheHelix = this.helixCanvasItems[0].position.y;
-      var bottomOfTheHelix = this.helixCanvasItems[this.helixCanvasItems.length - 1].position.y;
+      var topOfTheHelix = this.helixItems[0].position.y;
+      var bottomOfTheHelix = this.helixItems[this.helixItems.length - 1].position.y;
       var helixHeight = Math.abs(bottomOfTheHelix) + Math.abs(topOfTheHelix);
-      this.helixOffsetByItem = helixHeight / (this.helixCanvasItems.length - 1); // canvas renderer
+      this.helixOffsetByItem = helixHeight / (this.helixItems.length - 1); // canvas renderer
 
       this.canvasRenderer = new THREE.WebGLRenderer();
       this.canvasRenderer.setPixelRatio(window.devicePixelRatio);
@@ -620,6 +638,7 @@ var TimelineSlider = /*#__PURE__*/function () {
 
       this.addBgImage();
       this.swiperInit();
+      this.popupController();
     }
   }, {
     key: "onWindowResize",
@@ -669,7 +688,8 @@ var TimelineSlider = /*#__PURE__*/function () {
         texture.offset.x = 0.5 * (1 - texture.repeat.x);
       });
       var planeMaterial = new THREE.MeshBasicMaterial({
-        map: texture
+        map: texture,
+        transparent: true
       });
       planeGroup.position.setFromCylindricalCoords(640, theta, y);
       this.vector.x = planeGroup.position.x * 2;
@@ -677,15 +697,15 @@ var TimelineSlider = /*#__PURE__*/function () {
       this.vector.z = planeGroup.position.z * 2;
       var planeBack = new THREE.Mesh(planeGeometryBack, planeBackMaterial);
       planeBack.name = "item image back";
-      var helixCanvasItem = new THREE.Mesh(planeGeometry, planeMaterial);
-      helixCanvasItem.name = "item image";
+      var helixItem = new THREE.Mesh(planeGeometry, planeMaterial);
+      helixItem.name = "item image";
       planeGroup.name = "canvas-plane-".concat(timelineLoopItem.title, ", index: ").concat(i);
-      planeGroup.add(helixCanvasItem);
+      planeGroup.add(helixItem);
       planeGroup.add(planeBack);
       this.scene.add(planeGroup);
       planeGroup.position.setFromCylindricalCoords(640, theta, y);
       planeGroup.lookAt(this.vector);
-      this.helixCanvasItems.push(planeGroup);
+      this.helixItems.push(planeGroup);
     }
   }, {
     key: "swiperInit",
@@ -694,7 +714,7 @@ var TimelineSlider = /*#__PURE__*/function () {
 
       var self = this;
       var progressWidth = this.progressWrapper.clientWidth;
-      var swiper = new _swiper.default(this.slider, {
+      this.swiper = new _swiper.default(this.slider, {
         loop: false,
         slidesPerView: 1,
         // direction: "vertical",
@@ -717,10 +737,10 @@ var TimelineSlider = /*#__PURE__*/function () {
         // fadeEffect: {
         //     crossFade: true,
         // },
-        navigation: {
-          nextEl: this.timelineSliderNext,
-          prevEl: this.timelineSliderPrev
-        },
+        // navigation: {
+        //     nextEl: this.timelineSliderNext,
+        //     prevEl: this.timelineSliderPrev,
+        // },
         pagination: {
           el: '.js-timeline-pagination',
           clickable: true,
@@ -814,6 +834,173 @@ var TimelineSlider = /*#__PURE__*/function () {
       var bg = new THREE.Mesh(bgGeometry, bgMaterial);
       bg.position.set(0, 200, -1000);
       this.cameraWrapper.add(bg);
+    }
+  }, {
+    key: "popupController",
+    value: function popupController() {
+      var _this7 = this;
+
+      if (this.swiper == null) {
+        return;
+      }
+
+      var _loop = function _loop(i) {
+        _this7.swiper.slides[i].addEventListener("click", function () {
+          if (!_this7.popupOpened) {
+            _this7.slideZoom();
+
+            _this7.hideHelixItems(_this7.swiper.slides[i], i);
+
+            _this7.openPopup(i);
+          }
+        });
+      };
+
+      for (var i = 0; i < this.swiper.slides.length; i++) {
+        _loop(i);
+      }
+
+      this.popupClose.addEventListener("click", function () {
+        if (_this7.popupOpened) {
+          _this7.slideZoom();
+
+          _this7.closePopup();
+
+          _this7.showHelixItems();
+        }
+      });
+      window.addEventListener("keyup", function (ev) {
+        if (ev.key === "Escape" && _this7.popupOpened) {
+          _this7.slideZoom();
+
+          _this7.closePopup();
+
+          _this7.showHelixItems();
+        }
+      });
+    }
+  }, {
+    key: "openPopup",
+    value: function openPopup(index) {
+      var _this8 = this;
+
+      this.popupOpened = true;
+
+      _gsap.gsap.to(this.popup, {
+        autoAlpha: 1,
+        delay: 0.5,
+        onComplete: function onComplete() {
+          _this8.popup.classList.add("is-active");
+        }
+      });
+
+      this.popupYear.innerText = this.timelineItems[index].year;
+      this.popupTitle.innerText = this.timelineItems[index].title;
+      this.popupContent.innerText = this.timelineItems[index].text;
+
+      _gsap.gsap.to([".js-timeline-pagination", ".js-back-btn", this.swiper.slides, this.progressWrapper], {
+        autoAlpha: 0,
+        duration: 0.2
+      });
+    }
+  }, {
+    key: "closePopup",
+    value: function closePopup() {
+      this.popupOpened = false;
+      this.popupYear.innerText = "";
+      this.popupTitle.innerText = "";
+      this.popupContent.innerText = "";
+      this.popup.classList.remove("is-active");
+
+      _gsap.gsap.to(this.popup, {
+        autoAlpha: 0
+      });
+
+      _gsap.gsap.to([".js-timeline-pagination", ".js-back-btn", this.swiper.slides, this.progressWrapper], {
+        autoAlpha: 1,
+        duration: 0.2
+      });
+    }
+  }, {
+    key: "slideZoom",
+    value: function slideZoom() {
+      var currentCameraWrapperYPosition = this.initialCameraWrapperPosition - (this.swiper.slides.length - 1) * this.helixOffsetByItem * this.swiper.progress;
+
+      if (this.popupOpened) {
+        _gsap.gsap.to(this.camera.position, {
+          duration: 0.8,
+          z: this.initialCameraZPosition,
+          ease: "power4.inOut"
+        });
+
+        _gsap.gsap.to(this.cameraWrapper.position, {
+          duration: 0.8,
+          y: currentCameraWrapperYPosition,
+          ease: "power4.inOut"
+        });
+
+        _gsap.gsap.to(this.postprocessing.bokeh.uniforms["focus"], {
+          duration: 0.8,
+          value: 360,
+          ease: "power4.inOut"
+        });
+
+        return;
+      }
+
+      _gsap.gsap.to(this.camera.position, {
+        duration: 0.8,
+        z: 850,
+        ease: "power4.out"
+      });
+
+      _gsap.gsap.to(this.cameraWrapper.position, {
+        duration: 0.8,
+        y: currentCameraWrapperYPosition + 50,
+        ease: "power4.out"
+      });
+
+      _gsap.gsap.to(this.postprocessing.bokeh.uniforms["focus"], {
+        duration: 0.8,
+        value: 200,
+        ease: "power4.out"
+      });
+    }
+  }, {
+    key: "hideHelixItems",
+    value: function hideHelixItems(slide, index) {
+      this.helixItems.forEach(function (plane, i) {
+        if (i !== index) {
+          if (plane.children[0]) {
+            _gsap.gsap.to(plane.children[0].material, {
+              opacity: 0
+            });
+          }
+
+          if (plane.children[1]) {
+            _gsap.gsap.to(plane.children[1].material, {
+              opacity: 0
+            });
+          }
+        }
+      });
+    }
+  }, {
+    key: "showHelixItems",
+    value: function showHelixItems() {
+      this.helixItems.forEach(function (plane) {
+        if (plane.children[0]) {
+          _gsap.gsap.to(plane.children[0].material, {
+            opacity: 1
+          });
+        }
+
+        if (plane.children[1]) {
+          _gsap.gsap.to(plane.children[1].material, {
+            opacity: 1
+          });
+        }
+      });
     }
   }]);
 
