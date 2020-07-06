@@ -828,11 +828,18 @@ a {
 
 .c-timeline {
   position: relative;
-  height: 100vh; }
+  height: 100vh;
+  background-color: #010D10; }
 
 .c-timeline__canvas {
-  position: relative;
-  z-index: 0 !important; }
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0 !important;
+  -webkit-transition: 0.5s ease-out;
+  transition: 0.5s ease-out; }
 
 .c-timeline__canvas canvas {
   position: absolute;
@@ -851,10 +858,15 @@ a {
 
 .c-timeline__buttons {
   width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
   -webkit-box-align: end;
       -ms-flex-align: end;
           align-items: flex-end;
-  display: none; }
+  position: absolute;
+  bottom: 100px;
+  right: 8.33333%; }
 
 .is-rotating-left .c-timeline__buttons,
 .is-rotating-right .c-timeline__buttons {
@@ -939,7 +951,6 @@ a {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
   color: #ffffff;
   z-index: 99;
   pointer-events: none;
@@ -949,12 +960,70 @@ a {
 .c-timeline__popup.is-active {
   pointer-events: auto; }
 
+.c-timeline__popup-inner {
+  margin-left: 50%;
+  width: 50%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  padding-left: 4.16667%;
+  min-height: 100vh; }
+
+.c-timeline__popup-year {
+  padding-bottom: 15px; }
+
+.c-timeline__popup-title {
+  padding-bottom: 30px;
+  max-width: 400px;
+  width: 100%; }
+
+.c-timeline__popup-content {
+  max-width: 350px;
+  width: 100%; }
+
+.c-timeline__popup-close {
+  position: absolute;
+  right: 8.33333%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  top: 100px; }
+
+.c-timeline__popup-close:after, .c-timeline__popup-close:before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 25px;
+  height: 2px;
+  background-color: #ffffff; }
+
+.c-timeline__popup-close:after {
+  -webkit-transform: translate(-50%, -50%) rotate(-45deg);
+          transform: translate(-50%, -50%) rotate(-45deg); }
+
+.c-timeline__popup-close:before {
+  -webkit-transform: translate(-50%, -50%) rotate(45deg);
+          transform: translate(-50%, -50%) rotate(45deg); }
+
 .c-timeline .swiper-container {
   position: absolute;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh; }
+
+.is-popup-opened .c-timeline .swiper-container {
+  pointer-events: none !important; }
 
 .c-timeline-item {
   width: 100vw;

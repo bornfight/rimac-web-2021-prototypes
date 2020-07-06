@@ -46,7 +46,9 @@ export default class TimelineSlider {
         this.timeline = document.querySelector(this.DOM.timeline);
         this.slider = document.querySelector(this.DOM.timelineSlider);
         this.progressDot = document.querySelector(this.DOM.timelineProgressDot);
-        this.progressWrapper = document.querySelector(this.DOM.timelineProgressWrapper);
+        this.progressWrapper = document.querySelector(
+            this.DOM.timelineProgressWrapper,
+        );
         this.sliderWrapper = document.querySelector(
             this.DOM.timelineSliderWrapper,
         );
@@ -155,12 +157,12 @@ export default class TimelineSlider {
             },
         ];
 
-        // this.timelineSliderPrev = document.querySelector(
-        //     this.DOM.timelineSliderPrev,
-        // );
-        // this.timelineSliderNext = document.querySelector(
-        //     this.DOM.timelineSliderNext,
-        // );
+        this.timelineSliderPrev = document.querySelector(
+            this.DOM.timelineSliderPrev,
+        );
+        this.timelineSliderNext = document.querySelector(
+            this.DOM.timelineSliderNext,
+        );
 
         this.camera = null;
         this.scene = null;
@@ -244,11 +246,11 @@ export default class TimelineSlider {
         }
 
         const topOfTheHelix = this.helixItems[0].position.y;
-        const bottomOfTheHelix = this.helixItems[this.helixItems.length - 1].position.y;
+        const bottomOfTheHelix = this.helixItems[this.helixItems.length - 1]
+            .position.y;
         const helixHeight =
             Math.abs(bottomOfTheHelix) + Math.abs(topOfTheHelix);
-        this.helixOffsetByItem =
-            helixHeight / (this.helixItems.length - 1);
+        this.helixOffsetByItem = helixHeight / (this.helixItems.length - 1);
 
         // canvas renderer
         this.canvasRenderer = new THREE.WebGLRenderer();
@@ -414,12 +416,12 @@ export default class TimelineSlider {
             // fadeEffect: {
             //     crossFade: true,
             // },
-            // navigation: {
-            //     nextEl: this.timelineSliderNext,
-            //     prevEl: this.timelineSliderPrev,
-            // },
+            navigation: {
+                nextEl: this.timelineSliderNext,
+                prevEl: this.timelineSliderPrev,
+            },
             pagination: {
-                el: '.js-timeline-pagination',
+                el: ".js-timeline-pagination",
                 clickable: true,
                 renderBullet: (index, className) => {
                     return `<span class="c-timeline__pagination-bullet ${className}">${this.timelineItems[index].year}</span>`;
@@ -428,37 +430,92 @@ export default class TimelineSlider {
             on: {
                 progress: function () {
                     let swiper = this;
-
                     gsap.to(self.progressDot, {
                         x: swiper.progress * progressWidth,
                     });
 
-                    gsap.to(self.cameraWrapper.rotation, {
-                        duration: 0.8,
-                        ease: "power2.out",
-                        y:
-                            (swiper.slides.length - 1) *
-                            self.itemRadiusOffset *
-                            swiper.progress +
-                            self.initialCameraWrapperRotation,
-                    });
-
-                    gsap.to(self.cameraWrapper.position, {
-                        duration: 1,
-                        ease: "power2.out",
-                        y:
-                            self.initialCameraWrapperPosition -
-                            (swiper.slides.length - 1) *
-                            self.helixOffsetByItem *
-                            swiper.progress,
-                    });
+                    if (!self.popupOpened) {
+                        self.progressController(swiper);
+                    } else {
+                        self.hideAllHelixItems();
+                        self.progressController(swiper);
+                    }
+                },
+                slideChange: function () {
+                    let swiper = this;
+                    if (self.popupOpened) {
+                        self.changePopupContent(swiper.activeIndex);
+                        setTimeout(() => {
+                            self.showHelixItem(swiper.activeIndex);
+                        }, 500);
+                    }
                 },
                 init: () => {
-                    // trebamo timeout zbog doma (dok se ne stvor i paginacia)
+                    // trebamo timeout zbog dom-a (dok se ne stvori paginacija)
                     setTimeout(() => {
                         progressWidth = this.progressWrapper.clientWidth;
                     }, 300);
                 },
+            },
+        });
+    }
+
+    progressController(swiper) {
+        let delay = 0;
+
+        if (this.popupOpened) {
+            delay = 0.5;
+        }
+
+        gsap.to(this.cameraWrapper.rotation, {
+            duration: this.popupOpened ? 0 : 0.8,
+            delay: delay,
+            ease: "power2.out",
+            y:
+                (swiper.slides.length - 1) *
+                this.itemRadiusOffset *
+                swiper.progress +
+                this.initialCameraWrapperRotation,
+        });
+
+        if (!this.popupOpened) {
+            gsap.to(this.cameraWrapper.position, {
+                duration: 1,
+                ease: "power2.out",
+                y:
+                    this.initialCameraWrapperPosition -
+                    (swiper.slides.length - 1) *
+                    this.helixOffsetByItem *
+                    swiper.progress,
+            });
+        } else {
+            gsap.to(this.cameraWrapper.position, {
+                duration: 0,
+                ease: "power2.out",
+                delay: delay,
+                y:
+                    this.initialCameraWrapperPosition -
+                    (swiper.slides.length - 1) *
+                    this.helixOffsetByItem *
+                    swiper.progress +
+                    50,
+            });
+        }
+    }
+
+    changePopupContent(index) {
+        gsap.to(this.popup, {
+            autoAlpha: 0,
+            duration: 0.2,
+            onComplete: () => {
+                this.popupYear.innerText = this.timelineItems[index].year;
+                this.popupTitle.innerText = this.timelineItems[index].title;
+                this.popupContent.innerText = this.timelineItems[index].text;
+
+                gsap.to(this.popup, {
+                    autoAlpha: 1,
+                    duration: 0.4,
+                });
             },
         });
     }
@@ -504,20 +561,20 @@ export default class TimelineSlider {
     }
 
     addBgImage() {
-        let texture = new THREE.TextureLoader().load(
-            this.timelineItemsImagePath + "timeline-background.png",
-            () => {
-                // image position to cover the plane
-                const imageAspectRatio =
-                    texture.image.width / texture.image.height;
-                texture.wrapT = THREE.RepeatWrapping;
-                texture.repeat.x = this.geometryAspectRatio / imageAspectRatio;
-                texture.offset.x = 0.5 * (1 - texture.repeat.x);
-            },
-        );
+        // let texture = new THREE.TextureLoader().load(
+        //     this.timelineItemsImagePath + "timeline-background.png",
+        //     () => {
+        //         // image position to cover the plane
+        //         const imageAspectRatio =
+        //             texture.image.width / texture.image.height;
+        //         texture.wrapT = THREE.RepeatWrapping;
+        //         texture.repeat.x = this.geometryAspectRatio / imageAspectRatio;
+        //         texture.offset.x = 0.5 * (1 - texture.repeat.x);
+        //     },
+        // );
 
         let bgMaterial = new THREE.MeshBasicMaterial({
-            map: texture,
+            color: 0x010d10,
         });
 
         const bgGeometry = new THREE.PlaneGeometry(6400, 3600, 1, 1);
@@ -535,7 +592,7 @@ export default class TimelineSlider {
             this.swiper.slides[i].addEventListener("click", () => {
                 if (!this.popupOpened) {
                     this.slideZoom();
-                    this.hideHelixItems(this.swiper.slides[i], i);
+                    this.hideHelixItems(i);
                     this.openPopup(i);
                 }
             });
@@ -543,79 +600,143 @@ export default class TimelineSlider {
 
         this.popupClose.addEventListener("click", () => {
             if (this.popupOpened) {
-                this.slideZoom();
                 this.closePopup();
-                this.showHelixItems();
             }
         });
 
         window.addEventListener("keyup", (ev) => {
             if (ev.key === "Escape" && this.popupOpened) {
-                this.slideZoom();
                 this.closePopup();
-                this.showHelixItems();
             }
         });
     }
 
     openPopup(index) {
         this.popupOpened = true;
-        gsap.to(this.popup, {
-            autoAlpha: 1,
-            delay: 0.5,
-            onComplete: () => {
-                this.popup.classList.add("is-active");
-            },
-        });
+        document.documentElement.classList.add("is-popup-opened");
+
+        gsap.timeline()
+            .to(this.timeline, {
+                duration: 0.4,
+                scale: 0.5,
+                x: "-25%",
+                ease: "power3.out",
+            })
+            .to(this.popup, {
+                autoAlpha: 1,
+                delay: 0.5,
+                onComplete: () => {
+                    this.popup.classList.add("is-active");
+                },
+            });
 
         this.popupYear.innerText = this.timelineItems[index].year;
         this.popupTitle.innerText = this.timelineItems[index].title;
         this.popupContent.innerText = this.timelineItems[index].text;
 
-        gsap.to([".js-timeline-pagination", ".js-back-btn", this.swiper.slides, this.progressWrapper], {
-            autoAlpha: 0,
-            duration: 0.2,
-        });
+        gsap.to(
+            [
+                ".js-timeline-pagination",
+                ".js-back-btn",
+                this.swiper.slides,
+                this.progressWrapper,
+            ],
+            {
+                autoAlpha: 0,
+                duration: 0.2,
+            },
+        );
     }
 
     closePopup() {
-        this.popupOpened = false;
-        this.popupYear.innerText = "";
-        this.popupTitle.innerText = "";
-        this.popupContent.innerText = "";
+        document.documentElement.classList.remove("is-popup-opened");
         this.popup.classList.remove("is-active");
 
-        gsap.to(this.popup, {
-            autoAlpha: 0,
-        });
-
-        gsap.to([".js-timeline-pagination", ".js-back-btn", this.swiper.slides, this.progressWrapper], {
-            autoAlpha: 1,
-            duration: 0.2,
-        });
+        gsap.timeline({
+            onComplete: () => {
+                this.popupYear.innerText = "";
+                this.popupTitle.innerText = "";
+                this.popupContent.innerText = "";
+                this.showHelixItems();
+                this.popupOpened = false;
+            },
+        })
+            .to(this.popup, {
+                autoAlpha: 0,
+            })
+            .to(
+                this.timeline,
+                {
+                    duration: 0.3,
+                    x: "0%",
+                    ease: "power3.out",
+                    onComplete: () => {
+                        this.slideZoom();
+                    },
+                },
+                "-=0.3",
+            )
+            .to(
+                this.timeline,
+                {
+                    duration: 0.3,
+                    scale: 1,
+                    ease: "power3.out",
+                },
+                "-=0.3",
+            )
+            .to(
+                [
+                    ".js-timeline-pagination",
+                    ".js-back-btn",
+                    this.swiper.slides,
+                    this.progressWrapper,
+                ],
+                {
+                    autoAlpha: 1,
+                    duration: 0.2,
+                    delay: 0.2,
+                },
+            );
     }
 
     slideZoom() {
-        const currentCameraWrapperYPosition = this.initialCameraWrapperPosition - (this.swiper.slides.length - 1) * this.helixOffsetByItem * this.swiper.progress;
+        const currentCameraWrapperYPosition =
+            this.initialCameraWrapperPosition -
+            (this.swiper.slides.length - 1) *
+            this.helixOffsetByItem *
+            this.swiper.progress;
 
         if (this.popupOpened) {
-            gsap.to(this.camera.position, {
-                duration: 0.8,
-                z: this.initialCameraZPosition,
-                ease: "power4.inOut",
-            });
-
-            gsap.to(this.cameraWrapper.position, {
-                duration: 0.8,
-                y: currentCameraWrapperYPosition,
-                ease: "power4.inOut",
-            });
-
-            gsap.to(this.postprocessing.bokeh.uniforms["focus"], {
-                duration: 0.8,
-                value: 360,
-                ease: "power4.inOut",
-            });
+            gsap.timeline({})
+                .add("start")
+                .to(
+                    this.camera.position,
+                    {
+                        duration: 0.8,
+                        z: this.initialCameraZPosition,
+                        ease: "power4.inOut",
+                    },
+                    "start",
+                )
+                .to(
+                    this.cameraWrapper.position,
+                    {
+                        duration: 0.8,
+                        y: currentCameraWrapperYPosition,
+                        ease: "power4.inOut",
+                    },
+                    "start",
+                )
+                .to(
+                    this.postprocessing.bokeh.uniforms["focus"],
+                    {
+                        duration: 0.8,
+                        value: 360,
+                        ease: "power4.inOut",
+                    },
+                    "start",
+                );
 
             return;
         }
@@ -639,7 +760,7 @@ export default class TimelineSlider {
         });
     }
 
-    hideHelixItems(slide, index) {
+    hideHelixItems(index) {
         this.helixItems.forEach((plane, i) => {
             if (i !== index) {
                 if (plane.children[0]) {
@@ -653,6 +774,24 @@ export default class TimelineSlider {
                         opacity: 0,
                     });
                 }
+            }
+        });
+    }
+
+    hideAllHelixItems() {
+        this.helixItems.forEach((plane) => {
+            if (plane.children[0]) {
+                gsap.to(plane.children[0].material, {
+                    duration: 0.2,
+                    opacity: 0,
+                });
+            }
+
+            if (plane.children[1]) {
+                gsap.to(plane.children[1].material, {
+                    duration: 0.2,
+                    opacity: 0,
+                });
             }
         });
     }
@@ -671,5 +810,19 @@ export default class TimelineSlider {
                 });
             }
         });
+    }
+
+    showHelixItem(index) {
+        if (this.helixItems[index].children[0]) {
+            gsap.to(this.helixItems[index].children[0].material, {
+                opacity: 1,
+            });
+        }
+
+        if (this.helixItems[index].children[1]) {
+            // gsap.to(this.helixItems[index].children[1].material, {
+            //     opacity: 1,
+            // });
+        }
     }
 }

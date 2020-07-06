@@ -1,10 +1,16 @@
 .c-timeline {
     position: relative;
     height: 100vh;
+    background-color: #010D10;
 
     &__canvas {
-        position: relative;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
         z-index: 0 !important;
+        transition: 0.5s ease-out;
 
         canvas {
             position: absolute;
@@ -26,9 +32,11 @@
 
     &__buttons {
         width: 100%;
-        //display: flex;
+        display: flex;
         align-items: flex-end;
-        display: none;
+        position: absolute;
+        bottom: 100px;
+        right: percentage(2/24);
 
         .is-rotating-left &,
         .is-rotating-right & {
@@ -116,7 +124,6 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: $black-50;
         color: $white;
         z-index: 99;
         pointer-events: none;
@@ -128,16 +135,58 @@
         }
     }
 
-    &__popup-year {
+    &__popup-inner {
+        margin-left: 50%;
+        width: 50%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        flex-direction: column;
+        padding-left: percentage(1/24);
+        min-height: 100vh;
+    }
 
+    &__popup-year {
+        padding-bottom: 15px;
     }
 
     &__popup-title {
-
+        padding-bottom: 30px;
+        max-width: 400px;
+        width: 100%;
     }
 
-    &__popup-conten {
+    &__popup-content {
+        max-width: 350px;
+        width: 100%;
+    }
 
+    &__popup-close {
+        position: absolute;
+        right: percentage(2/24);
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        top: 100px;
+
+        &:after,
+        &:before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 25px;
+            height: 2px;
+            background-color: $white;
+        }
+
+        &:after {
+            transform: translate(-50%, -50%) rotate(-45deg);
+        }
+
+        &:before {
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
     }
 
     // overrides
@@ -147,6 +196,10 @@
         left: 0;
         width: 100vw;
         height: 100vh;
+
+        .is-popup-opened & {
+            pointer-events: none !important;
+        }
     }
 }
 

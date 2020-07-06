@@ -539,13 +539,9 @@ var TimelineSlider = /*#__PURE__*/function () {
       year: "2020",
       title: "Lorem ipsum dolor sit.",
       text: "Makes example posts, pages, custom terms, helps to style and develop new and current themes."
-    }]; // this.timelineSliderPrev = document.querySelector(
-    //     this.DOM.timelineSliderPrev,
-    // );
-    // this.timelineSliderNext = document.querySelector(
-    //     this.DOM.timelineSliderNext,
-    // );
-
+    }];
+    this.timelineSliderPrev = document.querySelector(this.DOM.timelineSliderPrev);
+    this.timelineSliderNext = document.querySelector(this.DOM.timelineSliderNext);
     this.camera = null;
     this.scene = null;
     this.renderer = null;
@@ -737,12 +733,12 @@ var TimelineSlider = /*#__PURE__*/function () {
         // fadeEffect: {
         //     crossFade: true,
         // },
-        // navigation: {
-        //     nextEl: this.timelineSliderNext,
-        //     prevEl: this.timelineSliderPrev,
-        // },
+        navigation: {
+          nextEl: this.timelineSliderNext,
+          prevEl: this.timelineSliderPrev
+        },
         pagination: {
-          el: '.js-timeline-pagination',
+          el: ".js-timeline-pagination",
           clickable: true,
           renderBullet: function renderBullet(index, className) {
             return "<span class=\"c-timeline__pagination-bullet ".concat(className, "\">").concat(_this4.timelineItems[index].year, "</span>");
@@ -756,24 +752,80 @@ var TimelineSlider = /*#__PURE__*/function () {
               x: swiper.progress * progressWidth
             });
 
-            _gsap.gsap.to(self.cameraWrapper.rotation, {
-              duration: 0.8,
-              ease: "power2.out",
-              y: (swiper.slides.length - 1) * self.itemRadiusOffset * swiper.progress + self.initialCameraWrapperRotation
-            });
+            if (!self.popupOpened) {
+              self.progressController(swiper);
+            } else {
+              self.hideAllHelixItems();
+              self.progressController(swiper);
+            }
+          },
+          slideChange: function slideChange() {
+            var swiper = this;
 
-            _gsap.gsap.to(self.cameraWrapper.position, {
-              duration: 1,
-              ease: "power2.out",
-              y: self.initialCameraWrapperPosition - (swiper.slides.length - 1) * self.helixOffsetByItem * swiper.progress
-            });
+            if (self.popupOpened) {
+              self.changePopupContent(swiper.activeIndex);
+              setTimeout(function () {
+                self.showHelixItem(swiper.activeIndex);
+              }, 500);
+            }
           },
           init: function init() {
-            // trebamo timeout zbog doma (dok se ne stvor i paginacia)
+            // trebamo timeout zbog dom-a (dok se ne stvori paginacija)
             setTimeout(function () {
               progressWidth = _this4.progressWrapper.clientWidth;
             }, 300);
           }
+        }
+      });
+    }
+  }, {
+    key: "progressController",
+    value: function progressController(swiper) {
+      var delay = 0;
+
+      if (this.popupOpened) {
+        delay = 0.5;
+      }
+
+      _gsap.gsap.to(this.cameraWrapper.rotation, {
+        duration: this.popupOpened ? 0 : 0.8,
+        delay: delay,
+        ease: "power2.out",
+        y: (swiper.slides.length - 1) * this.itemRadiusOffset * swiper.progress + this.initialCameraWrapperRotation
+      });
+
+      if (!this.popupOpened) {
+        _gsap.gsap.to(this.cameraWrapper.position, {
+          duration: 1,
+          ease: "power2.out",
+          y: this.initialCameraWrapperPosition - (swiper.slides.length - 1) * this.helixOffsetByItem * swiper.progress
+        });
+      } else {
+        _gsap.gsap.to(this.cameraWrapper.position, {
+          duration: 0,
+          ease: "power2.out",
+          delay: delay,
+          y: this.initialCameraWrapperPosition - (swiper.slides.length - 1) * this.helixOffsetByItem * swiper.progress + 50
+        });
+      }
+    }
+  }, {
+    key: "changePopupContent",
+    value: function changePopupContent(index) {
+      var _this5 = this;
+
+      _gsap.gsap.to(this.popup, {
+        autoAlpha: 0,
+        duration: 0.2,
+        onComplete: function onComplete() {
+          _this5.popupYear.innerText = _this5.timelineItems[index].year;
+          _this5.popupTitle.innerText = _this5.timelineItems[index].title;
+          _this5.popupContent.innerText = _this5.timelineItems[index].text;
+
+          _gsap.gsap.to(_this5.popup, {
+            autoAlpha: 1,
+            duration: 0.4
+          });
         }
       });
     }
@@ -794,22 +846,22 @@ var TimelineSlider = /*#__PURE__*/function () {
   }, {
     key: "mouseMove",
     value: function mouseMove() {
-      var _this5 = this;
+      var _this6 = this;
 
       window.addEventListener("mousemove", function (ev) {
-        _this5.mouse.x = 20 / _this5.winWidth * (ev.clientX - _this5.winWidth / 2);
-        _this5.mouse.y = 20 / _this5.winHeight * (ev.clientY - _this5.winHeight / 2);
+        _this6.mouse.x = 20 / _this6.winWidth * (ev.clientX - _this6.winWidth / 2);
+        _this6.mouse.y = 20 / _this6.winHeight * (ev.clientY - _this6.winHeight / 2);
 
-        _gsap.gsap.to(_this5.camera.position, {
-          x: _this5.mouse.x,
-          y: _this5.mouse.y,
+        _gsap.gsap.to(_this6.camera.position, {
+          x: _this6.mouse.x,
+          y: _this6.mouse.y,
           duration: 1.5,
           ease: "power3.out"
         });
 
-        _gsap.gsap.to(_this5.slider, {
-          x: -_this5.mouse.x * 3,
-          y: _this5.mouse.y * 3,
+        _gsap.gsap.to(_this6.slider, {
+          x: -_this6.mouse.x * 3,
+          y: _this6.mouse.y * 3,
           duration: 1,
           ease: "power3.out"
         });
@@ -818,17 +870,19 @@ var TimelineSlider = /*#__PURE__*/function () {
   }, {
     key: "addBgImage",
     value: function addBgImage() {
-      var _this6 = this;
-
-      var texture = new THREE.TextureLoader().load(this.timelineItemsImagePath + "timeline-background.png", function () {
-        // image position to cover the plane
-        var imageAspectRatio = texture.image.width / texture.image.height;
-        texture.wrapT = THREE.RepeatWrapping;
-        texture.repeat.x = _this6.geometryAspectRatio / imageAspectRatio;
-        texture.offset.x = 0.5 * (1 - texture.repeat.x);
-      });
+      // let texture = new THREE.TextureLoader().load(
+      //     this.timelineItemsImagePath + "timeline-background.png",
+      //     () => {
+      //         // image position to cover the plane
+      //         const imageAspectRatio =
+      //             texture.image.width / texture.image.height;
+      //         texture.wrapT = THREE.RepeatWrapping;
+      //         texture.repeat.x = this.geometryAspectRatio / imageAspectRatio;
+      //         texture.offset.x = 0.5 * (1 - texture.repeat.x);
+      //     },
+      // );
       var bgMaterial = new THREE.MeshBasicMaterial({
-        map: texture
+        color: 0x010d10
       });
       var bgGeometry = new THREE.PlaneGeometry(6400, 3600, 1, 1);
       var bg = new THREE.Mesh(bgGeometry, bgMaterial);
@@ -849,7 +903,7 @@ var TimelineSlider = /*#__PURE__*/function () {
           if (!_this7.popupOpened) {
             _this7.slideZoom();
 
-            _this7.hideHelixItems(_this7.swiper.slides[i], i);
+            _this7.hideHelixItems(i);
 
             _this7.openPopup(i);
           }
@@ -862,20 +916,12 @@ var TimelineSlider = /*#__PURE__*/function () {
 
       this.popupClose.addEventListener("click", function () {
         if (_this7.popupOpened) {
-          _this7.slideZoom();
-
           _this7.closePopup();
-
-          _this7.showHelixItems();
         }
       });
       window.addEventListener("keyup", function (ev) {
         if (ev.key === "Escape" && _this7.popupOpened) {
-          _this7.slideZoom();
-
           _this7.closePopup();
-
-          _this7.showHelixItems();
         }
       });
     }
@@ -885,8 +931,14 @@ var TimelineSlider = /*#__PURE__*/function () {
       var _this8 = this;
 
       this.popupOpened = true;
+      document.documentElement.classList.add("is-popup-opened");
 
-      _gsap.gsap.to(this.popup, {
+      _gsap.gsap.timeline().to(this.timeline, {
+        duration: 0.4,
+        scale: 0.5,
+        x: "-25%",
+        ease: "power3.out"
+      }).to(this.popup, {
         autoAlpha: 1,
         delay: 0.5,
         onComplete: function onComplete() {
@@ -906,19 +958,38 @@ var TimelineSlider = /*#__PURE__*/function () {
   }, {
     key: "closePopup",
     value: function closePopup() {
-      this.popupOpened = false;
-      this.popupYear.innerText = "";
-      this.popupTitle.innerText = "";
-      this.popupContent.innerText = "";
+      var _this9 = this;
+
+      document.documentElement.classList.remove("is-popup-opened");
       this.popup.classList.remove("is-active");
 
-      _gsap.gsap.to(this.popup, {
-        autoAlpha: 0
-      });
+      _gsap.gsap.timeline({
+        onComplete: function onComplete() {
+          _this9.popupYear.innerText = "";
+          _this9.popupTitle.innerText = "";
+          _this9.popupContent.innerText = "";
 
-      _gsap.gsap.to([".js-timeline-pagination", ".js-back-btn", this.swiper.slides, this.progressWrapper], {
+          _this9.showHelixItems();
+
+          _this9.popupOpened = false;
+        }
+      }).to(this.popup, {
+        autoAlpha: 0
+      }).to(this.timeline, {
+        duration: 0.3,
+        x: "0%",
+        ease: "power3.out",
+        onComplete: function onComplete() {
+          _this9.slideZoom();
+        }
+      }, "-=0.3").to(this.timeline, {
+        duration: 0.3,
+        scale: 1,
+        ease: "power3.out"
+      }, "-=0.3").to([".js-timeline-pagination", ".js-back-btn", this.swiper.slides, this.progressWrapper], {
         autoAlpha: 1,
-        duration: 0.2
+        duration: 0.2,
+        delay: 0.2
       });
     }
   }, {
@@ -927,23 +998,19 @@ var TimelineSlider = /*#__PURE__*/function () {
       var currentCameraWrapperYPosition = this.initialCameraWrapperPosition - (this.swiper.slides.length - 1) * this.helixOffsetByItem * this.swiper.progress;
 
       if (this.popupOpened) {
-        _gsap.gsap.to(this.camera.position, {
+        _gsap.gsap.timeline({}).add("start").to(this.camera.position, {
           duration: 0.8,
           z: this.initialCameraZPosition,
           ease: "power4.inOut"
-        });
-
-        _gsap.gsap.to(this.cameraWrapper.position, {
+        }, "start").to(this.cameraWrapper.position, {
           duration: 0.8,
           y: currentCameraWrapperYPosition,
           ease: "power4.inOut"
-        });
-
-        _gsap.gsap.to(this.postprocessing.bokeh.uniforms["focus"], {
+        }, "start").to(this.postprocessing.bokeh.uniforms["focus"], {
           duration: 0.8,
           value: 360,
           ease: "power4.inOut"
-        });
+        }, "start");
 
         return;
       }
@@ -968,7 +1035,7 @@ var TimelineSlider = /*#__PURE__*/function () {
     }
   }, {
     key: "hideHelixItems",
-    value: function hideHelixItems(slide, index) {
+    value: function hideHelixItems(index) {
       this.helixItems.forEach(function (plane, i) {
         if (i !== index) {
           if (plane.children[0]) {
@@ -982,6 +1049,25 @@ var TimelineSlider = /*#__PURE__*/function () {
               opacity: 0
             });
           }
+        }
+      });
+    }
+  }, {
+    key: "hideAllHelixItems",
+    value: function hideAllHelixItems() {
+      this.helixItems.forEach(function (plane) {
+        if (plane.children[0]) {
+          _gsap.gsap.to(plane.children[0].material, {
+            duration: 0.2,
+            opacity: 0
+          });
+        }
+
+        if (plane.children[1]) {
+          _gsap.gsap.to(plane.children[1].material, {
+            duration: 0.2,
+            opacity: 0
+          });
         }
       });
     }
@@ -1001,6 +1087,20 @@ var TimelineSlider = /*#__PURE__*/function () {
           });
         }
       });
+    }
+  }, {
+    key: "showHelixItem",
+    value: function showHelixItem(index) {
+      if (this.helixItems[index].children[0]) {
+        _gsap.gsap.to(this.helixItems[index].children[0].material, {
+          opacity: 1
+        });
+      }
+
+      if (this.helixItems[index].children[1]) {// gsap.to(this.helixItems[index].children[1].material, {
+        //     opacity: 1,
+        // });
+      }
     }
   }]);
 
