@@ -26,6 +26,8 @@ export default class TimelineSlider {
             popupYear: ".js-timeline-popup-year",
             popupTitle: ".js-timeline-popup-title",
             popupContent: ".js-timeline-popup-content",
+            popupProgressWrapper: ".js-timeline-popup-progress-wrapper",
+            popupProgressIndicator: ".js-timeline-popup-progress-indicator",
             states: {},
         };
 
@@ -58,6 +60,9 @@ export default class TimelineSlider {
         this.popupYear = document.querySelector(this.DOM.popupYear);
         this.popupTitle = document.querySelector(this.DOM.popupTitle);
         this.popupContent = document.querySelector(this.DOM.popupContent);
+        this.popupProgressIndicator = document.querySelector(this.DOM.popupProgressIndicator);
+        this.popupProgressWrapper = document.querySelector(this.DOM.popupProgressWrapper);
+        this.popupProgressWrapperWidth = this.popupProgressWrapper.clientWidth;
 
         this.swiper = null;
         this.popupOpened = false;
@@ -450,10 +455,12 @@ export default class TimelineSlider {
                         }, 500);
                     }
                 },
-                init: () => {
+                init: function () {
+                    let swiper = this;
                     // trebamo timeout zbog dom-a (dok se ne stvori paginacija)
                     setTimeout(() => {
-                        progressWidth = this.progressWrapper.clientWidth;
+                        progressWidth = self.progressWrapper.clientWidth;
+                        self.popupProgressIndicator.style.width = `${self.popupProgressWrapperWidth / swiper.slides.length}px`;
                     }, 300);
                 },
             },
@@ -504,7 +511,9 @@ export default class TimelineSlider {
     }
 
     changePopupContent(index) {
-        gsap.to(this.popup, {
+        const popupItems = [this.popupYear, this.popupTitle, this.popupContent];
+
+        gsap.to(popupItems, {
             autoAlpha: 0,
             duration: 0.2,
             onComplete: () => {
@@ -512,11 +521,18 @@ export default class TimelineSlider {
                 this.popupTitle.innerText = this.timelineItems[index].title;
                 this.popupContent.innerText = this.timelineItems[index].text;
 
-                gsap.to(this.popup, {
+                gsap.to(popupItems, {
                     autoAlpha: 1,
                     duration: 0.4,
                 });
             },
+        });
+
+        gsap.to(this.popupProgressIndicator, {
+            duration: 0.5,
+            transformOrigin: "left",
+            left: (this.popupProgressWrapperWidth / this.timelineItems.length) * index,
+            ease: "power4.inOut",
         });
     }
 

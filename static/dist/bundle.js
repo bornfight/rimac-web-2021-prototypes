@@ -449,6 +449,8 @@ var TimelineSlider = /*#__PURE__*/function () {
       popupYear: ".js-timeline-popup-year",
       popupTitle: ".js-timeline-popup-title",
       popupContent: ".js-timeline-popup-content",
+      popupProgressWrapper: ".js-timeline-popup-progress-wrapper",
+      popupProgressIndicator: ".js-timeline-popup-progress-indicator",
       states: {}
     };
     this.options = {
@@ -471,6 +473,9 @@ var TimelineSlider = /*#__PURE__*/function () {
     this.popupYear = document.querySelector(this.DOM.popupYear);
     this.popupTitle = document.querySelector(this.DOM.popupTitle);
     this.popupContent = document.querySelector(this.DOM.popupContent);
+    this.popupProgressIndicator = document.querySelector(this.DOM.popupProgressIndicator);
+    this.popupProgressWrapper = document.querySelector(this.DOM.popupProgressWrapper);
+    this.popupProgressWrapperWidth = this.popupProgressWrapper.clientWidth;
     this.swiper = null;
     this.popupOpened = false;
     this.timelineItemsImagePath = "static/images/";
@@ -770,9 +775,11 @@ var TimelineSlider = /*#__PURE__*/function () {
             }
           },
           init: function init() {
-            // trebamo timeout zbog dom-a (dok se ne stvori paginacija)
+            var swiper = this; // trebamo timeout zbog dom-a (dok se ne stvori paginacija)
+
             setTimeout(function () {
-              progressWidth = _this4.progressWrapper.clientWidth;
+              progressWidth = self.progressWrapper.clientWidth;
+              self.popupProgressIndicator.style.width = "".concat(self.popupProgressWrapperWidth / swiper.slides.length, "px");
             }, 300);
           }
         }
@@ -814,7 +821,9 @@ var TimelineSlider = /*#__PURE__*/function () {
     value: function changePopupContent(index) {
       var _this5 = this;
 
-      _gsap.gsap.to(this.popup, {
+      var popupItems = [this.popupYear, this.popupTitle, this.popupContent];
+
+      _gsap.gsap.to(popupItems, {
         autoAlpha: 0,
         duration: 0.2,
         onComplete: function onComplete() {
@@ -822,11 +831,18 @@ var TimelineSlider = /*#__PURE__*/function () {
           _this5.popupTitle.innerText = _this5.timelineItems[index].title;
           _this5.popupContent.innerText = _this5.timelineItems[index].text;
 
-          _gsap.gsap.to(_this5.popup, {
+          _gsap.gsap.to(popupItems, {
             autoAlpha: 1,
             duration: 0.4
           });
         }
+      });
+
+      _gsap.gsap.to(this.popupProgressIndicator, {
+        duration: 0.5,
+        transformOrigin: "left",
+        left: this.popupProgressWrapperWidth / this.timelineItems.length * index,
+        ease: "power4.inOut"
       });
     }
   }, {
