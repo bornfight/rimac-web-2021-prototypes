@@ -151,6 +151,260 @@ exports.default = GradientBg;
 },{"gsap":"gsap","gsap/ScrollTrigger":"gsap/ScrollTrigger"}],3:[function(require,module,exports){
 "use strict";
 
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var THREE = _interopRequireWildcard(require("three"));
+
+var _OrbitControls = require("three/examples/jsm/controls/OrbitControls");
+
+var _datGuiModule = require("three/examples/jsm/libs/dat.gui.module.js");
+
+var _gsap = require("gsap");
+
+var _swiper = _interopRequireDefault(require("swiper"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var HomeVerticalSlider = /*#__PURE__*/function () {
+  function HomeVerticalSlider() {
+    _classCallCheck(this, HomeVerticalSlider);
+
+    this.DOM = {
+      sliderWrapper: ".js-video-slider",
+      canvasWrapper: ".js-canvas-wrapper"
+    };
+    this.videoSliderWrapper = document.querySelector(this.DOM.sliderWrapper);
+
+    if (this.videoSliderWrapper == null) {
+      return;
+    }
+
+    this.canvasWrapper = document.querySelector(this.DOM.canvasWrapper);
+    this.renderer = undefined;
+    this.camera = undefined;
+    this.slides = new THREE.Object3D();
+    this.dataPath = "static/video/";
+    this.data = [{
+      title: "Nevera",
+      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
+      linkTitle: "link",
+      link: "#",
+      video: "video-scrub-01.mp4"
+    }, {
+      title: "Nevera 2",
+      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
+      linkTitle: "link",
+      link: "#",
+      video: "video-scrub-02.mp4"
+    }, {
+      title: "Nevera 3",
+      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
+      linkTitle: "link",
+      link: "#",
+      video: "video-scrub-03.mp4"
+    }, {
+      title: "Nevera 4",
+      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
+      linkTitle: "link",
+      link: "#",
+      video: "video-scrub-01.mp4"
+    }, {
+      title: "Nevera 5",
+      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
+      linkTitle: "link",
+      link: "#",
+      video: "video-scrub-02.mp4"
+    }, {
+      title: "Nevera 6",
+      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
+      linkTitle: "link",
+      link: "#",
+      video: "video-scrub-03.mp4"
+    }, {
+      title: "Nevera 7",
+      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
+      linkTitle: "link",
+      link: "#",
+      video: "video-scrub-01.mp4"
+    }, {
+      title: "Nevera 8",
+      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
+      linkTitle: "link",
+      link: "#",
+      video: "video-scrub-02.mp4"
+    }, {
+      title: "Nevera 9",
+      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
+      linkTitle: "link",
+      link: "#",
+      video: "video-scrub-03.mp4"
+    }, {
+      title: "Nevera 10",
+      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
+      linkTitle: "link",
+      link: "#",
+      video: "video-scrub-01.mp4"
+    }, {
+      title: "Nevera 11",
+      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
+      linkTitle: "link",
+      link: "#",
+      video: "video-scrub-02.mp4"
+    }];
+    this.init();
+  }
+
+  _createClass(HomeVerticalSlider, [{
+    key: "init",
+    value: function init() {
+      var _this = this;
+
+      // scene setup
+      this.scene = new THREE.Scene();
+      this.scene.background = new THREE.Color(0x010d10); // light setup
+
+      this.pointLight = new THREE.PointLight(0xffffff, 0);
+      this.pointLight.position.set(-200, 50, 100);
+      this.pointLight.castShadow = true;
+      this.scene.add(this.pointLight);
+      this.scene.add(this.slides); // dime light
+
+      _gsap.gsap.to(this.pointLight, {
+        intensity: 10,
+        duration: 1,
+        delay: 1
+      });
+
+      this.initCamera();
+      this.initRenderer();
+      this.createCanvas();
+      this.addControls();
+      this.render();
+      this.addPlanes();
+      window.addEventListener("resize", function () {
+        _this.onWindowResize();
+      }, false);
+    }
+  }, {
+    key: "addControls",
+    value: function addControls() {
+      this.controls = new _OrbitControls.OrbitControls(this.camera, this.renderer.domElement);
+      this.controls.update();
+    }
+  }, {
+    key: "createCanvas",
+    value: function createCanvas() {
+      // add canvas to dom
+      this.canvasWrapper.appendChild(this.renderer.domElement);
+    }
+  }, {
+    key: "initRenderer",
+    value: function initRenderer() {
+      // WebGL renderer
+      this.renderer = new THREE.WebGLRenderer({
+        antialias: false
+      });
+      this.renderer.setPixelRatio(window.devicePixelRatio);
+      this.renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+  }, {
+    key: "initCamera",
+    value: function initCamera() {
+      // camera setup
+      this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 3000);
+      this.camera.position.z = 550;
+      this.camera.position.y = 0;
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this2 = this;
+
+      this.renderer.render(this.scene, this.camera);
+      requestAnimationFrame(function () {
+        return _this2.render();
+      });
+    } // canvas size update
+
+  }, {
+    key: "onWindowResize",
+    value: function onWindowResize() {
+      this.camera.aspect = window.innerWidth / window.innerHeight;
+      this.camera.updateProjectionMatrix();
+      this.renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+  }, {
+    key: "addPlanes",
+    value: function addPlanes() {
+      console.log(this.data.length);
+
+      for (var i = 0; i < this.data.length; i++) {
+        this.addPlane(this.data[i], i);
+      }
+    }
+  }, {
+    key: "addPlane",
+    value: function addPlane(data, index) {
+      var _this3 = this;
+
+      var promise = new Promise(function (resolve, reject) {
+        _this3.createVideo(index, resolve);
+      });
+      promise.then(function () {
+        var texture = new THREE.VideoTexture(document.querySelectorAll('.js-home-slider-video')[index]);
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        texture.format = THREE.RGBFormat;
+        var geometry = new THREE.PlaneGeometry(160, 90, 1, 1);
+        var material = new THREE.MeshBasicMaterial({
+          map: texture
+        });
+        var plane = new THREE.Mesh(geometry, material);
+        plane.position.set(0, Math.cos(2 * Math.PI / _this3.data.length * index) * 300, Math.sin(2 * Math.PI / _this3.data.length * index) * 300);
+
+        _this3.slides.add(plane);
+      });
+    }
+  }, {
+    key: "createVideo",
+    value: function createVideo(index, resolve) {
+      var video = document.createElement("video");
+      var sourceMP4 = document.createElement("source");
+      sourceMP4.type = "video/mp4";
+      sourceMP4.src = this.dataPath + this.data[index].video;
+      video.appendChild(sourceMP4); // video.preload = true;
+      // video.autoplay = true;
+      // video.controls = true;
+
+      this.videoSliderWrapper.appendChild(video);
+      video.classList.add("js-home-slider-video", "c-homepage__video");
+      resolve();
+    }
+  }]);
+
+  return HomeVerticalSlider;
+}();
+
+exports.default = HomeVerticalSlider;
+
+},{"gsap":"gsap","swiper":"swiper","three":"three","three/examples/jsm/controls/OrbitControls":"three/examples/jsm/controls/OrbitControls","three/examples/jsm/libs/dat.gui.module.js":"three/examples/jsm/libs/dat.gui.module.js"}],4:[function(require,module,exports){
+"use strict";
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -328,7 +582,7 @@ var NavigationController = /*#__PURE__*/function () {
 
 exports.default = NavigationController;
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -396,7 +650,7 @@ var ScrollProgress = /*#__PURE__*/function () {
 
 exports.default = ScrollProgress;
 
-},{"gsap":"gsap","gsap/ScrollTrigger":"gsap/ScrollTrigger"}],5:[function(require,module,exports){
+},{"gsap":"gsap","gsap/ScrollTrigger":"gsap/ScrollTrigger"}],6:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -1132,7 +1386,7 @@ var TimelineSlider = /*#__PURE__*/function () {
 
 exports.default = TimelineSlider;
 
-},{"gsap":"gsap","swiper":"swiper","three":"three","three/examples/jsm/libs/dat.gui.module.js":"three/examples/jsm/libs/dat.gui.module.js","three/examples/jsm/postprocessing/BokehPass":"three/examples/jsm/postprocessing/BokehPass","three/examples/jsm/postprocessing/EffectComposer":"three/examples/jsm/postprocessing/EffectComposer","three/examples/jsm/postprocessing/RenderPass":"three/examples/jsm/postprocessing/RenderPass"}],6:[function(require,module,exports){
+},{"gsap":"gsap","swiper":"swiper","three":"three","three/examples/jsm/libs/dat.gui.module.js":"three/examples/jsm/libs/dat.gui.module.js","three/examples/jsm/postprocessing/BokehPass":"three/examples/jsm/postprocessing/BokehPass","three/examples/jsm/postprocessing/EffectComposer":"three/examples/jsm/postprocessing/EffectComposer","three/examples/jsm/postprocessing/RenderPass":"three/examples/jsm/postprocessing/RenderPass"}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1207,7 +1461,7 @@ var VideoScrub = /*#__PURE__*/function () {
 
 exports.default = VideoScrub;
 
-},{"gsap":"gsap","gsap/ScrollTrigger":"gsap/ScrollTrigger"}],7:[function(require,module,exports){
+},{"gsap":"gsap","gsap/ScrollTrigger":"gsap/ScrollTrigger"}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1267,7 +1521,7 @@ var DarkModeHelper = /*#__PURE__*/function () {
 
 exports.default = DarkModeHelper;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1381,7 +1635,7 @@ var GridHelper = /*#__PURE__*/function () {
 
 exports.default = GridHelper;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 var _GridHelper = _interopRequireDefault(require("./helpers/GridHelper"));
@@ -1399,6 +1653,8 @@ var _ScrollProgress = _interopRequireDefault(require("./components/ScrollProgres
 var _Dummy = _interopRequireDefault(require("./components/Dummy"));
 
 var _GradientBg = _interopRequireDefault(require("./components/GradientBg"));
+
+var _HomeVerticalSlider = _interopRequireDefault(require("./components/HomeVerticalSlider"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1440,6 +1696,7 @@ ready(function () {
   dummy.init();
   var navigation = new _NavigationController.default();
   navigation.init();
+  var homeVerticalSlider = new _HomeVerticalSlider.default();
 
   if (document.getElementById("timeline-slider") !== null) {
     var timelineSlider = new _TimelineSlider.default();
@@ -1461,6 +1718,6 @@ ready(function () {
   }
 });
 
-},{"./components/Dummy":1,"./components/GradientBg":2,"./components/NavigationController":3,"./components/ScrollProgress":4,"./components/TimelineSlider":5,"./components/VideoScrub":6,"./helpers/DarkModeHelper":7,"./helpers/GridHelper":8}]},{},[9])
+},{"./components/Dummy":1,"./components/GradientBg":2,"./components/HomeVerticalSlider":3,"./components/NavigationController":4,"./components/ScrollProgress":5,"./components/TimelineSlider":6,"./components/VideoScrub":7,"./helpers/DarkModeHelper":8,"./helpers/GridHelper":9}]},{},[10])
 
 //# sourceMappingURL=bundle.js.map
