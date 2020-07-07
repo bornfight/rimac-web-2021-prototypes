@@ -838,12 +838,7 @@ var TimelineSlider = /*#__PURE__*/function () {
         }
       });
 
-      _gsap.gsap.to(this.popupProgressIndicator, {
-        duration: 0.5,
-        transformOrigin: "left",
-        left: this.popupProgressWrapperWidth / this.timelineItems.length * index,
-        ease: "power4.inOut"
-      });
+      this.setPopupProgress(index);
     }
   }, {
     key: "dof",
@@ -970,6 +965,8 @@ var TimelineSlider = /*#__PURE__*/function () {
         autoAlpha: 0,
         duration: 0.2
       });
+
+      this.setPopupProgress(index);
     }
   }, {
     key: "closePopup",
@@ -1006,6 +1003,16 @@ var TimelineSlider = /*#__PURE__*/function () {
         autoAlpha: 1,
         duration: 0.2,
         delay: 0.2
+      });
+    }
+  }, {
+    key: "setPopupProgress",
+    value: function setPopupProgress(index) {
+      _gsap.gsap.to(this.popupProgressIndicator, {
+        duration: 0.5,
+        transformOrigin: "left",
+        left: this.popupProgressWrapperWidth / this.timelineItems.length * index,
+        ease: "power4.inOut"
       });
     }
   }, {

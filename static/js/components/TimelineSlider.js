@@ -528,12 +528,7 @@ export default class TimelineSlider {
             },
         });
 
-        gsap.to(this.popupProgressIndicator, {
-            duration: 0.5,
-            transformOrigin: "left",
-            left: (this.popupProgressWrapperWidth / this.timelineItems.length) * index,
-            ease: "power4.inOut",
-        });
+        this.setPopupProgress(index);
     }
 
     dof() {
@@ -662,6 +657,8 @@ export default class TimelineSlider {
                 duration: 0.2,
             },
         );
+
+        this.setPopupProgress(index);
     }
 
     closePopup() {
@@ -714,6 +711,15 @@ export default class TimelineSlider {
                     delay: 0.2,
                 },
             );
+    }
+
+    setPopupProgress(index) {
+        gsap.to(this.popupProgressIndicator, {
+            duration: 0.5,
+            transformOrigin: "left",
+            left: (this.popupProgressWrapperWidth / this.timelineItems.length) * index,
+            ease: "power4.inOut",
+        });
     }
 
     slideZoom() {
