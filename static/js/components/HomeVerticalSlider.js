@@ -117,19 +117,12 @@ export default class HomeVerticalSlider {
         this.scene.background = new THREE.Color(0x010d10);
 
         // light setup
-        this.pointLight = new THREE.PointLight(0xffffff, 0);
-        this.pointLight.position.set(-200, 50, 100);
-        this.pointLight.castShadow = true;
-        this.scene.add(this.pointLight);
+        // this.pointLight = new THREE.PointLight(0xffffff, 0);
+        // this.pointLight.position.set(-200, 50, 100);
+        // this.pointLight.castShadow = true;
+        // this.scene.add(this.pointLight);
 
         this.scene.add(this.slides);
-
-        // dime light
-        gsap.to(this.pointLight, {
-            intensity: 10,
-            duration: 1,
-            delay: 1,
-        });
 
         this.initCamera();
         this.initRenderer();
@@ -166,12 +159,14 @@ export default class HomeVerticalSlider {
     initCamera() {
         // camera setup
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 3000);
-        this.camera.position.z = 550;
+        this.camera.position.z = 490;
         this.camera.position.y = 0;
     }
 
     render() {
         this.renderer.render(this.scene, this.camera);
+        this.slides.rotation.x += 0.005;
+        this.updatePlaneLookAt();
         requestAnimationFrame(() => this.render());
     }
 
@@ -206,11 +201,15 @@ export default class HomeVerticalSlider {
 
             const plane = new THREE.Mesh(geometry, material);
 
+            const offset = ((2 * Math.PI) / this.data.length) * index;
+
             plane.position.set(
                 0,
-                Math.cos((2 * Math.PI / this.data.length) * index) * 300,
-                Math.sin((2 * Math.PI / this.data.length) * index) * 300,
+                Math.cos(offset) * 250,
+                Math.sin(offset) * 300,
             );
+
+            plane.lookAt(this.camera.position);
 
             this.slides.add(plane);
         });
@@ -228,5 +227,11 @@ export default class HomeVerticalSlider {
         this.videoSliderWrapper.appendChild(video);
         video.classList.add("js-home-slider-video", "c-homepage__video");
         resolve();
+    }
+
+    updatePlaneLookAt() {
+        for (let i = 0; i < this.slides.children.length; i++) {
+            this.slides.children[i].lookAt(this.camera.position);
+        }
     }
 }

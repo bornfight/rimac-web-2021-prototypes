@@ -277,19 +277,12 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       // scene setup
       this.scene = new THREE.Scene();
       this.scene.background = new THREE.Color(0x010d10); // light setup
+      // this.pointLight = new THREE.PointLight(0xffffff, 0);
+      // this.pointLight.position.set(-200, 50, 100);
+      // this.pointLight.castShadow = true;
+      // this.scene.add(this.pointLight);
 
-      this.pointLight = new THREE.PointLight(0xffffff, 0);
-      this.pointLight.position.set(-200, 50, 100);
-      this.pointLight.castShadow = true;
-      this.scene.add(this.pointLight);
-      this.scene.add(this.slides); // dime light
-
-      _gsap.gsap.to(this.pointLight, {
-        intensity: 10,
-        duration: 1,
-        delay: 1
-      });
-
+      this.scene.add(this.slides);
       this.initCamera();
       this.initRenderer();
       this.createCanvas();
@@ -327,7 +320,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
     value: function initCamera() {
       // camera setup
       this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 3000);
-      this.camera.position.z = 550;
+      this.camera.position.z = 490;
       this.camera.position.y = 0;
     }
   }, {
@@ -336,6 +329,8 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       var _this2 = this;
 
       this.renderer.render(this.scene, this.camera);
+      this.slides.rotation.x += 0.005;
+      this.updatePlaneLookAt();
       requestAnimationFrame(function () {
         return _this2.render();
       });
@@ -375,7 +370,9 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
           map: texture
         });
         var plane = new THREE.Mesh(geometry, material);
-        plane.position.set(0, Math.cos(2 * Math.PI / _this3.data.length * index) * 300, Math.sin(2 * Math.PI / _this3.data.length * index) * 300);
+        var offset = 2 * Math.PI / _this3.data.length * index;
+        plane.position.set(0, Math.cos(offset) * 250, Math.sin(offset) * 300);
+        plane.lookAt(_this3.camera.position);
 
         _this3.slides.add(plane);
       });
@@ -394,6 +391,13 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       this.videoSliderWrapper.appendChild(video);
       video.classList.add("js-home-slider-video", "c-homepage__video");
       resolve();
+    }
+  }, {
+    key: "updatePlaneLookAt",
+    value: function updatePlaneLookAt() {
+      for (var i = 0; i < this.slides.children.length; i++) {
+        this.slides.children[i].lookAt(this.camera.position);
+      }
     }
   }]);
 
