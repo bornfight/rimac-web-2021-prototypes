@@ -1,5 +1,10 @@
 import * as THREE from "three";
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
+import {EffectComposer} from "three/examples/jsm/postprocessing/EffectComposer";
+import {RenderPass} from "three/examples/jsm/postprocessing/RenderPass";
+import {BokehPass} from "three/examples/jsm/postprocessing/BokehPass";
+
+import {GUI} from "three/examples/jsm/libs/dat.gui.module.js";
 
 import {gsap} from "gsap";
 
@@ -25,6 +30,11 @@ export default class HomeVerticalSlider {
         if (this.videoSliderWrapper == null) {
             return;
         }
+
+        this.zoomingOut = false;
+        this.zoomedIn = false;
+
+        this.postprocessing = {};
 
         this.winWidth = window.innerWidth;
         this.winHeight = window.innerHeight;
@@ -68,56 +78,7 @@ export default class HomeVerticalSlider {
                 linkTitle: "link",
                 link: "#",
                 video: "video-scrub-01.mp4",
-            },
-            {
-                title: "Nevera 5",
-                content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
-                linkTitle: "link",
-                link: "#",
-                video: "video-scrub-02.mp4",
-            },
-            {
-                title: "Nevera 6",
-                content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
-                linkTitle: "link",
-                link: "#",
-                video: "video-scrub-03.mp4",
-            },
-            {
-                title: "Nevera 7",
-                content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
-                linkTitle: "link",
-                link: "#",
-                video: "video-scrub-01.mp4",
-            },
-            {
-                title: "Nevera 8",
-                content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
-                linkTitle: "link",
-                link: "#",
-                video: "video-scrub-02.mp4",
-            },
-            {
-                title: "Nevera 9",
-                content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
-                linkTitle: "link",
-                link: "#",
-                video: "video-scrub-03.mp4",
-            },
-            {
-                title: "Nevera 10",
-                content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
-                linkTitle: "link",
-                link: "#",
-                video: "video-scrub-01.mp4",
-            },
-            {
-                title: "Nevera 11",
-                content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
-                linkTitle: "link",
-                link: "#",
-                video: "video-scrub-02.mp4",
-            },
+            }
         ];
 
         this.init();
@@ -140,9 +101,36 @@ export default class HomeVerticalSlider {
         this.initRenderer();
         this.createCanvas();
         // this.addControls();
-        this.render();
-
         this.addPlanes();
+        this.dof();
+
+        const effectController = {
+            focus: 180,
+            aperture: 10,
+            maxblur: 0.01,
+        };
+
+        const matChanger = () => {
+            this.postprocessing.bokeh.uniforms["focus"].value =
+                effectController.focus;
+            this.postprocessing.bokeh.uniforms["aperture"].value =
+                effectController.aperture * 0.00001;
+            this.postprocessing.bokeh.uniforms["maxblur"].value =
+                effectController.maxblur;
+        };
+
+        const gui = new GUI();
+        gui.add(effectController, "focus", 120, 240, 1).onChange(
+            matChanger,
+        );
+        gui.add(effectController, "aperture", 0, 10, 0.1).onChange(matChanger);
+        gui.add(effectController, "maxblur", 0.0, 0.01, 0.001).onChange(
+            matChanger,
+        );
+        gui.close();
+
+        matChanger();
+        // end DAT gui controls
 
         for (let i = 0; i < this.data.length; i++) {
             this.addSlides(i, this.data[i]);
@@ -152,6 +140,7 @@ export default class HomeVerticalSlider {
 
         this.mouseMove();
 
+        this.render();
         window.addEventListener("resize", () => {
             this.onWindowResize();
         }, false);
@@ -179,12 +168,13 @@ export default class HomeVerticalSlider {
     initCamera() {
         // camera setup
         this.camera = new THREE.PerspectiveCamera(50, this.winWidth / this.winHeight, 1, 800);
-        this.camera.position.z = 490;
+        this.camera.position.z = 280;
         this.camera.position.y = 0;
     }
 
     render() {
-        this.renderer.render(this.scene, this.camera);
+        // this.renderer.render(this.scene, this.camera);
+        this.postprocessing.composer.render(0.1);
         // this.slides.rotation.x += 0.005;
         this.updatePlaneLookAt();
         requestAnimationFrame(() => this.render());
@@ -195,6 +185,7 @@ export default class HomeVerticalSlider {
         this.camera.aspect = this.winWidth / this.winHeight;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(this.winWidth, this.winHeight);
+        this.postprocessing.composer.setSize(this.winWidth, this.winHeight);
     }
 
     addPlanes() {
@@ -225,8 +216,8 @@ export default class HomeVerticalSlider {
 
             plane.position.set(
                 0,
-                Math.cos(offset) * 300,
-                Math.sin(offset) * 300,
+                Math.cos(offset) * 150,
+                Math.sin(offset) * 150,
             );
 
             plane.lookAt(this.camera.position);
@@ -255,12 +246,37 @@ export default class HomeVerticalSlider {
         }
     }
 
+    dof() {
+        const renderPass = new RenderPass(this.scene, this.camera);
+
+        const bokehPass = new BokehPass(this.scene, this.camera, {
+            width: this.winWidth,
+            height: this.winHeight,
+        });
+
+        const composer = new EffectComposer(this.renderer);
+
+        composer.addPass(renderPass);
+        composer.addPass(bokehPass);
+
+        this.postprocessing.composer = composer;
+        this.postprocessing.bokeh = bokehPass;
+    }
+
     progressController(swiper, fullCircleOffset) {
         gsap.to(this.slides.rotation, {
             duration: 0.8,
             ease: "power2.out",
             x: swiper.progress * fullCircleOffset,
         });
+
+        // gsap.to(this.camera.position, {
+        //     duration: 0.8,
+        //     ease: "power4.inOut",
+        //     z: 330 - (50 * Math.sin(swiper.progress * (this.data.length - 1) + 1)),
+        // });
+        //
+        // console.log(Math.sin(swiper.progress * (this.data.length - 1) + 1));
     }
 
     // slider
@@ -293,7 +309,7 @@ export default class HomeVerticalSlider {
 
     initSlider() {
         const fullCircleOffset = ((Math.PI * 2) / this.data.length) * (this.data.length - 1);
-
+        let progress = 0;
         const self = this;
         // let progressWidth = this.progressWrapper.clientWidth;
 
@@ -309,7 +325,7 @@ export default class HomeVerticalSlider {
             mousewheel: true,
             freeMode: true,
             freeModeSticky: true,
-            freeModeMomentum: true,
+            freeModeMomentum: false,
             freeModeMomentumRatio: 1,
             freeModeMomentumVelocityRatio: 1,
             freeModeMomentumBounce: true,
@@ -331,22 +347,71 @@ export default class HomeVerticalSlider {
             //     },
             // },
             on: {
+                transitionEnd: () => {
+                    console.log("transitionEnd");
+                    if (!self.zoomedIn) {
+                        self.zoomIn();
+                    }
+                },
                 progress: function () {
                     let swiper = this;
+                    // console.log(swiper.progress);
                     // gsap.to(self.progressDot, {
                     //     x: swiper.progress * progressWidth,
                     // });
 
+                    if (!self.zoomingOut) {
+                        self.zoomOut();
+                    }
+
                     self.progressController(swiper, fullCircleOffset);
                 },
-                init: function () {
+                slideChange: () => {
+                    console.log("slideChange");
+                    // add delay and detect if its zoomed in and active slide
+                },
+                init: () => {
+                    if (!self.zoomedIn) {
+                        self.zoomIn();
+                    }
                     // let swiper = this;
                     // setTimeout(() => {
                     // progressWidth = self.progressWrapper.clientWidth;
                     // self.popupProgressIndicator.style.width = `${self.popupProgressWrapperWidth / swiper.slides.length}px`;
                     // }, 300);
                 },
+                reachEnd: () => {
+                    console.log(1);
+                },
+                reachBeginning: () => {
+                    console.log();
+                    if (!self.zoomedIn) {
+                        self.zoomIn();
+                    }
+                },
             },
+        });
+    }
+
+    zoomOut() {
+        this.zoomingOut = true;
+        gsap.to(this.camera.position, {
+            duration: 0.5,
+            ease: "power3.out",
+            z: 330,
+            onComplete: () => {
+                this.zoomingOut = false;
+                this.zoomedIn = false;
+            },
+        });
+    }
+
+    zoomIn() {
+        this.zoomedIn = true;
+        gsap.to(this.camera.position, {
+            duration: 0.5,
+            ease: "power3.inOut",
+            z: 280,
         });
     }
 

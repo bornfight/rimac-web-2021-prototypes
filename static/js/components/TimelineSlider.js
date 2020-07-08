@@ -241,7 +241,7 @@ export default class TimelineSlider {
 
         // create items
         for (let i = 0, l = this.timelineItems.length; i < l; i++) {
-            this.cretateItem(
+            this.createItem(
                 i,
                 this.timelineItems[i],
                 planeGeometryBack,
@@ -280,7 +280,7 @@ export default class TimelineSlider {
             maxblur: 0.007,
         };
 
-        var matChanger = () => {
+        const matChanger = () => {
             this.postprocessing.bokeh.uniforms["focus"].value =
                 effectController.focus;
             this.postprocessing.bokeh.uniforms["aperture"].value =
@@ -324,7 +324,7 @@ export default class TimelineSlider {
         this.postprocessing.composer.render(0.1);
     }
 
-    cretateItem(
+    createItem(
         i,
         timelineLoopItem,
         planeGeometryBack,
@@ -532,9 +532,9 @@ export default class TimelineSlider {
     }
 
     dof() {
-        var renderPass = new RenderPass(this.scene, this.camera);
+        const renderPass = new RenderPass(this.scene, this.camera);
 
-        var bokehPass = new BokehPass(this.scene, this.camera, {
+        const bokehPass = new BokehPass(this.scene, this.camera, {
             width: this.winWidth,
             height: this.winHeight,
         });

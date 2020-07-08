@@ -162,6 +162,14 @@ var THREE = _interopRequireWildcard(require("three"));
 
 var _OrbitControls = require("three/examples/jsm/controls/OrbitControls");
 
+var _EffectComposer = require("three/examples/jsm/postprocessing/EffectComposer");
+
+var _RenderPass = require("three/examples/jsm/postprocessing/RenderPass");
+
+var _BokehPass = require("three/examples/jsm/postprocessing/BokehPass");
+
+var _datGuiModule = require("three/examples/jsm/libs/dat.gui.module.js");
+
 var _gsap = require("gsap");
 
 var _swiper = _interopRequireDefault(require("swiper"));
@@ -198,6 +206,9 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       return;
     }
 
+    this.zoomingOut = false;
+    this.zoomedIn = false;
+    this.postprocessing = {};
     this.winWidth = window.innerWidth;
     this.winHeight = window.innerHeight;
     this.slider = document.querySelector(this.DOM.slider);
@@ -231,48 +242,6 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       linkTitle: "link",
       link: "#",
       video: "video-scrub-01.mp4"
-    }, {
-      title: "Nevera 5",
-      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
-      linkTitle: "link",
-      link: "#",
-      video: "video-scrub-02.mp4"
-    }, {
-      title: "Nevera 6",
-      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
-      linkTitle: "link",
-      link: "#",
-      video: "video-scrub-03.mp4"
-    }, {
-      title: "Nevera 7",
-      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
-      linkTitle: "link",
-      link: "#",
-      video: "video-scrub-01.mp4"
-    }, {
-      title: "Nevera 8",
-      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
-      linkTitle: "link",
-      link: "#",
-      video: "video-scrub-02.mp4"
-    }, {
-      title: "Nevera 9",
-      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
-      linkTitle: "link",
-      link: "#",
-      video: "video-scrub-03.mp4"
-    }, {
-      title: "Nevera 10",
-      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
-      linkTitle: "link",
-      link: "#",
-      video: "video-scrub-01.mp4"
-    }, {
-      title: "Nevera 11",
-      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
-      linkTitle: "link",
-      link: "#",
-      video: "video-scrub-02.mp4"
     }];
     this.init();
   }
@@ -295,8 +264,26 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       this.initRenderer();
       this.createCanvas(); // this.addControls();
 
-      this.render();
       this.addPlanes();
+      this.dof();
+      var effectController = {
+        focus: 180,
+        aperture: 10,
+        maxblur: 0.01
+      };
+
+      var matChanger = function matChanger() {
+        _this.postprocessing.bokeh.uniforms["focus"].value = effectController.focus;
+        _this.postprocessing.bokeh.uniforms["aperture"].value = effectController.aperture * 0.00001;
+        _this.postprocessing.bokeh.uniforms["maxblur"].value = effectController.maxblur;
+      };
+
+      var gui = new _datGuiModule.GUI();
+      gui.add(effectController, "focus", 120, 240, 1).onChange(matChanger);
+      gui.add(effectController, "aperture", 0, 10, 0.1).onChange(matChanger);
+      gui.add(effectController, "maxblur", 0.0, 0.01, 0.001).onChange(matChanger);
+      gui.close();
+      matChanger(); // end DAT gui controls
 
       for (var i = 0; i < this.data.length; i++) {
         this.addSlides(i, this.data[i]);
@@ -304,6 +291,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
 
       this.initSlider();
       this.mouseMove();
+      this.render();
       window.addEventListener("resize", function () {
         _this.onWindowResize();
       }, false);
@@ -335,7 +323,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
     value: function initCamera() {
       // camera setup
       this.camera = new THREE.PerspectiveCamera(50, this.winWidth / this.winHeight, 1, 800);
-      this.camera.position.z = 490;
+      this.camera.position.z = 280;
       this.camera.position.y = 0;
     }
   }, {
@@ -343,7 +331,8 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
     value: function render() {
       var _this2 = this;
 
-      this.renderer.render(this.scene, this.camera); // this.slides.rotation.x += 0.005;
+      // this.renderer.render(this.scene, this.camera);
+      this.postprocessing.composer.render(0.1); // this.slides.rotation.x += 0.005;
 
       this.updatePlaneLookAt();
       requestAnimationFrame(function () {
@@ -357,6 +346,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       this.camera.aspect = this.winWidth / this.winHeight;
       this.camera.updateProjectionMatrix();
       this.renderer.setSize(this.winWidth, this.winHeight);
+      this.postprocessing.composer.setSize(this.winWidth, this.winHeight);
     }
   }, {
     key: "addPlanes",
@@ -384,7 +374,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
         });
         var plane = new THREE.Mesh(geometry, material);
         var offset = 2 * Math.PI / _this3.data.length * index + Math.PI / 2;
-        plane.position.set(0, Math.cos(offset) * 300, Math.sin(offset) * 300);
+        plane.position.set(0, Math.cos(offset) * 150, Math.sin(offset) * 150);
         plane.lookAt(_this3.camera.position);
 
         _this3.slides.add(plane);
@@ -413,13 +403,34 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       }
     }
   }, {
+    key: "dof",
+    value: function dof() {
+      var renderPass = new _RenderPass.RenderPass(this.scene, this.camera);
+      var bokehPass = new _BokehPass.BokehPass(this.scene, this.camera, {
+        width: this.winWidth,
+        height: this.winHeight
+      });
+      var composer = new _EffectComposer.EffectComposer(this.renderer);
+      composer.addPass(renderPass);
+      composer.addPass(bokehPass);
+      this.postprocessing.composer = composer;
+      this.postprocessing.bokeh = bokehPass;
+    }
+  }, {
     key: "progressController",
     value: function progressController(swiper, fullCircleOffset) {
       _gsap.gsap.to(this.slides.rotation, {
         duration: 0.8,
         ease: "power2.out",
         x: swiper.progress * fullCircleOffset
-      });
+      }); // gsap.to(this.camera.position, {
+      //     duration: 0.8,
+      //     ease: "power4.inOut",
+      //     z: 330 - (50 * Math.sin(swiper.progress * (this.data.length - 1) + 1)),
+      // });
+      //
+      // console.log(Math.sin(swiper.progress * (this.data.length - 1) + 1));
+
     } // slider
 
   }, {
@@ -449,6 +460,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
     key: "initSlider",
     value: function initSlider() {
       var fullCircleOffset = Math.PI * 2 / this.data.length * (this.data.length - 1);
+      var progress = 0;
       var self = this; // let progressWidth = this.progressWrapper.clientWidth;
 
       this.swiper = new _swiper.default(this.slider, {
@@ -463,7 +475,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
         mousewheel: true,
         freeMode: true,
         freeModeSticky: true,
-        freeModeMomentum: true,
+        freeModeMomentum: false,
         freeModeMomentumRatio: 1,
         freeModeMomentumVelocityRatio: 1,
         freeModeMomentumBounce: true,
@@ -485,41 +497,98 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
         //     },
         // },
         on: {
+          transitionEnd: function transitionEnd() {
+            console.log("transitionEnd");
+
+            if (!self.zoomedIn) {
+              self.zoomIn();
+            }
+          },
           progress: function progress() {
-            var swiper = this; // gsap.to(self.progressDot, {
+            var swiper = this; // console.log(swiper.progress);
+            // gsap.to(self.progressDot, {
             //     x: swiper.progress * progressWidth,
             // });
 
+            if (!self.zoomingOut) {
+              self.zoomOut();
+            }
+
             self.progressController(swiper, fullCircleOffset);
           },
-          init: function init() {// let swiper = this;
+          slideChange: function slideChange() {
+            console.log("slideChange"); // add delay and detect if its zoomed in and active slide
+          },
+          init: function init() {
+            if (!self.zoomedIn) {
+              self.zoomIn();
+            } // let swiper = this;
             // setTimeout(() => {
             // progressWidth = self.progressWrapper.clientWidth;
             // self.popupProgressIndicator.style.width = `${self.popupProgressWrapperWidth / swiper.slides.length}px`;
             // }, 300);
+
+          },
+          reachEnd: function reachEnd() {
+            console.log(1);
+          },
+          reachBeginning: function reachBeginning() {
+            console.log();
+
+            if (!self.zoomedIn) {
+              self.zoomIn();
+            }
           }
         }
       });
     }
   }, {
-    key: "mouseMove",
-    value: function mouseMove() {
+    key: "zoomOut",
+    value: function zoomOut() {
       var _this4 = this;
 
-      window.addEventListener("mousemove", function (ev) {
-        _this4.mouse.x = 0.05 / _this4.winWidth * (ev.clientX - _this4.winWidth / 2);
-        _this4.mouse.y = 0.05 / _this4.winHeight * (ev.clientY - _this4.winHeight / 2);
+      this.zoomingOut = true;
 
-        _gsap.gsap.to(_this4.camera.rotation, {
-          x: -_this4.mouse.y,
-          y: -_this4.mouse.x,
+      _gsap.gsap.to(this.camera.position, {
+        duration: 0.5,
+        ease: "power3.out",
+        z: 330,
+        onComplete: function onComplete() {
+          _this4.zoomingOut = false;
+          _this4.zoomedIn = false;
+        }
+      });
+    }
+  }, {
+    key: "zoomIn",
+    value: function zoomIn() {
+      this.zoomedIn = true;
+
+      _gsap.gsap.to(this.camera.position, {
+        duration: 0.5,
+        ease: "power3.inOut",
+        z: 280
+      });
+    }
+  }, {
+    key: "mouseMove",
+    value: function mouseMove() {
+      var _this5 = this;
+
+      window.addEventListener("mousemove", function (ev) {
+        _this5.mouse.x = 0.05 / _this5.winWidth * (ev.clientX - _this5.winWidth / 2);
+        _this5.mouse.y = 0.05 / _this5.winHeight * (ev.clientY - _this5.winHeight / 2);
+
+        _gsap.gsap.to(_this5.camera.rotation, {
+          x: -_this5.mouse.y,
+          y: -_this5.mouse.x,
           duration: 1.5,
           ease: "power3.out"
         });
 
-        _gsap.gsap.to(_this4.slider, {
-          x: -_this4.mouse.x * 300,
-          y: _this4.mouse.y * 300,
+        _gsap.gsap.to(_this5.slider, {
+          x: -_this5.mouse.x * 300,
+          y: _this5.mouse.y * 300,
           duration: 1,
           ease: "power3.out"
         });
@@ -532,7 +601,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
 
 exports.default = HomeVerticalSlider;
 
-},{"gsap":"gsap","swiper":"swiper","three":"three","three/examples/jsm/controls/OrbitControls":"three/examples/jsm/controls/OrbitControls"}],4:[function(require,module,exports){
+},{"gsap":"gsap","swiper":"swiper","three":"three","three/examples/jsm/controls/OrbitControls":"three/examples/jsm/controls/OrbitControls","three/examples/jsm/libs/dat.gui.module.js":"three/examples/jsm/libs/dat.gui.module.js","three/examples/jsm/postprocessing/BokehPass":"three/examples/jsm/postprocessing/BokehPass","three/examples/jsm/postprocessing/EffectComposer":"three/examples/jsm/postprocessing/EffectComposer","three/examples/jsm/postprocessing/RenderPass":"three/examples/jsm/postprocessing/RenderPass"}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -982,7 +1051,7 @@ var TimelineSlider = /*#__PURE__*/function () {
       planeGeometryBack.applyMatrix(new THREE.Matrix4().makeRotationY(Math.PI)); // create items
 
       for (var i = 0, l = this.timelineItems.length; i < l; i++) {
-        this.cretateItem(i, this.timelineItems[i], planeGeometryBack, planeBackMaterial, planeGeometry);
+        this.createItem(i, this.timelineItems[i], planeGeometryBack, planeBackMaterial, planeGeometry);
       }
 
       var topOfTheHelix = this.helixItems[0].position.y;
@@ -1043,8 +1112,8 @@ var TimelineSlider = /*#__PURE__*/function () {
       this.postprocessing.composer.render(0.1);
     }
   }, {
-    key: "cretateItem",
-    value: function cretateItem(i, timelineLoopItem, planeGeometryBack, planeBackMaterial, planeGeometry) {
+    key: "createItem",
+    value: function createItem(i, timelineLoopItem, planeGeometryBack, planeBackMaterial, planeGeometry) {
       var _this3 = this;
 
       var timelineItem = document.createElement("div");
