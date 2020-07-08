@@ -334,7 +334,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
     key: "initCamera",
     value: function initCamera() {
       // camera setup
-      this.camera = new THREE.PerspectiveCamera(45, this.winWidth / this.winHeight, 1, 3000);
+      this.camera = new THREE.PerspectiveCamera(50, this.winWidth / this.winHeight, 1, 800);
       this.camera.position.z = 490;
       this.camera.position.y = 0;
     }
@@ -431,7 +431,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       itemInner.className = "c-home-slider-item__inner";
       item.appendChild(itemInner);
       var title = document.createElement("p");
-      title.className = "c-home-slider-item__title";
+      title.className = "c-home-slider-item__title u-a7";
       title.textContent = itemData.title;
       itemInner.appendChild(title);
       var content = document.createElement("p");
@@ -439,7 +439,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       content.textContent = itemData.content;
       itemInner.appendChild(content);
       var link = document.createElement("a");
-      link.className = "c-home-slider-item__content";
+      link.className = "c-home-slider-item__link";
       link.href = itemData.link;
       link.textContent = itemData.linkTitle;
       itemInner.appendChild(link);

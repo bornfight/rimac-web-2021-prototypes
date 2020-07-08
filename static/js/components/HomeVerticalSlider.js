@@ -178,7 +178,7 @@ export default class HomeVerticalSlider {
 
     initCamera() {
         // camera setup
-        this.camera = new THREE.PerspectiveCamera(45, this.winWidth / this.winHeight, 1, 3000);
+        this.camera = new THREE.PerspectiveCamera(50, this.winWidth / this.winHeight, 1, 800);
         this.camera.position.z = 490;
         this.camera.position.y = 0;
     }
@@ -273,7 +273,7 @@ export default class HomeVerticalSlider {
         item.appendChild(itemInner);
 
         let title = document.createElement("p");
-        title.className = "c-home-slider-item__title";
+        title.className = "c-home-slider-item__title u-a7";
         title.textContent = itemData.title;
         itemInner.appendChild(title);
 
@@ -283,7 +283,7 @@ export default class HomeVerticalSlider {
         itemInner.appendChild(content);
 
         let link = document.createElement("a");
-        link.className = "c-home-slider-item__content";
+        link.className = "c-home-slider-item__link";
         link.href = itemData.link;
         link.textContent = itemData.linkTitle;
         itemInner.appendChild(link);
