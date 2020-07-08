@@ -47,3 +47,29 @@ export default class ScrollProgress {
         }
     }
 }
+
+class EqualHeight {
+
+    constructor() {
+        this.DOM = {
+            element: ".js-list-item h3",
+            states: {},
+        };
+
+        this.elements = document.querySelectorAll(this.DOM.element);
+
+        this.init();
+    }
+
+    init() {
+        this.setHeights(this.elements);
+    }
+
+    setHeights(elements) {
+        for (let i = 0, l = elements.legth; i < l; i++) {
+            console.log(elements[i]);
+        }
+    }
+}
+
+new EqualHeight();

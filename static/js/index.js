@@ -1,4 +1,5 @@
 import GridHelper from "./helpers/GridHelper";
+import EqualHeight from "./helpers/EqualHeight";
 import DarkModeHelper from "./helpers/DarkModeHelper";
 import NavigationController from "./components/NavigationController";
 import TimelineSlider from "./components/TimelineSlider";
@@ -57,6 +58,8 @@ ready(() => {
 
     const navigation = new NavigationController();
     navigation.init();
+
+    const equalHeight = new EqualHeight();
 
     if (document.getElementById("timeline-slider") !== null) {
         const timelineSlider = new TimelineSlider();
