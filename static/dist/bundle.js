@@ -111,29 +111,28 @@ var GradientBg = /*#__PURE__*/function () {
     value: function onMouseMove() {
       var _this = this;
 
-      document.addEventListener("mousemove", function (evt) {
-        var x = evt.clientX / innerWidth;
-        var y = evt.clientY / innerHeight;
-        var decimalX = evt.clientX / window.innerWidth - 0.5;
-        var decimalY = evt.clientY / window.innerHeight - 0.5;
+      document.addEventListener("mousemove", function (ev) {
+        var mouseScale = 0.25;
+        var x = ev.offsetX / innerWidth * 100 - 50;
+        var y = ev.offsetY / innerHeight * 100 - 50;
 
         _gsap.gsap.to("html", {
           duration: 1.4,
-          "--mouse-x": x,
+          "--mouseX": "".concat((x * mouseScale).toFixed(3), "%"),
           ease: "power3.easIn"
         });
 
         _gsap.gsap.to("html", {
           duration: 1.4,
-          "--mouse-y": y,
+          "--mouseY": "".concat((y * mouseScale).toFixed(3), "%"),
           ease: "power3.easIn"
         });
 
         _gsap.gsap.to(_this.bgGradientMouseMove, {
           duration: 1.4,
-          rotationY: 5 * decimalY,
+          rotationY: 5 * y,
           x: 50 * decimalX,
-          rotationX: 2.5 * decimalX,
+          rotationX: 2.5 * x,
           y: -100 * decimalY,
           ease: "quad.easOut",
           transformPerspective: 700,

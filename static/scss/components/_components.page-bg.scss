@@ -7,6 +7,8 @@
     z-index: 0;
     overflow: hidden;
 
+    --size: 85%;
+
     &__gradient {
         display: block;
         position: absolute;
@@ -17,16 +19,12 @@
             top: 0;
             left: 0;
             width: 100%;
-            opacity: 0.5;
+            opacity: 1;
             height: 100%;
-            background: transparent
-                radial-gradient(
-                    at calc(var(--mouse-x, 0) * 100%)
-                        calc(var(--mouse-y, 0) * 100%),
-                    rgba(255, 255, 255, 0),
-                    rgba(255, 255, 255, 1)
-                )
-                no-repeat 0 0;
+            background:
+                radial-gradient(circle at calc(50% + var(--mouseX)) calc(100% + var(--mouseY)), #00141d 0%, rgba(255,0,0,0) var(--size)),
+                radial-gradient(circle at calc(0% + var(--mouseX)) calc(0% + var(--mouseY)), #2e4a55 0%, rgba(0,255,0,0) var(--size)),
+                radial-gradient(circle at calc(100% + var(--mouseX)) calc(0% + var(--mouseY)), #18343f 0%, rgba(0,0,255,0) var(--size));
 
             // #00141d — dark
             // #18343f — medium
@@ -34,17 +32,21 @@
         }
 
         &--layer-2 {
+
+            --size: 120%;
             z-index: 2;
             top: -10%;
             left: -10%;
             width: 120%;
             height: 120%;
+            opacity: 0.3;
             //background-color: red;
             //mix-blend-mode: screen;
-            background: linear-gradient(#00141d 15%, transparent),
-                linear-gradient(to top right, #091f28, transparent),
-                linear-gradient(to top left, #12ccc4, transparent);
-            background-blend-mode: multiply;
+            background:
+                radial-gradient(circle at calc(50% + var(--mouseX)) calc(100% + var(--mouseY)), #00141d 0%, rgba(255,0,0,0) var(--size)),
+                radial-gradient(circle at calc(0% + var(--mouseX)) calc(0% + var(--mouseY)), #2e4a55 0%, rgba(0,255,0,0) var(--size)),
+                radial-gradient(circle at calc(100% + var(--mouseX)) calc(0% + var(--mouseY)), #18343f 0%, rgba(0,0,255,0) var(--size));
+            mix-blend-mode: multiply;
         }
     }
 
