@@ -162,8 +162,6 @@ var THREE = _interopRequireWildcard(require("three"));
 
 var _OrbitControls = require("three/examples/jsm/controls/OrbitControls");
 
-var _datGuiModule = require("three/examples/jsm/libs/dat.gui.module.js");
-
 var _gsap = require("gsap");
 
 var _swiper = _interopRequireDefault(require("swiper"));
@@ -186,14 +184,24 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
 
     this.DOM = {
       sliderWrapper: ".js-video-slider",
-      canvasWrapper: ".js-canvas-wrapper"
+      canvasWrapper: ".js-canvas-wrapper",
+      slider: ".js-slider",
+      slidesWrapper: ".js-slider-wrapper"
     };
     this.videoSliderWrapper = document.querySelector(this.DOM.sliderWrapper);
+    this.mouse = {
+      x: 0,
+      y: 0
+    };
 
     if (this.videoSliderWrapper == null) {
       return;
     }
 
+    this.winWidth = window.innerWidth;
+    this.winHeight = window.innerHeight;
+    this.slider = document.querySelector(this.DOM.slider);
+    this.slidesWrapper = document.querySelector(this.DOM.slidesWrapper);
     this.canvasWrapper = document.querySelector(this.DOM.canvasWrapper);
     this.renderer = undefined;
     this.camera = undefined;
@@ -285,10 +293,17 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       this.scene.add(this.slides);
       this.initCamera();
       this.initRenderer();
-      this.createCanvas();
-      this.addControls();
+      this.createCanvas(); // this.addControls();
+
       this.render();
       this.addPlanes();
+
+      for (var i = 0; i < this.data.length; i++) {
+        this.addSlides(i, this.data[i]);
+      }
+
+      this.initSlider();
+      this.mouseMove();
       window.addEventListener("resize", function () {
         _this.onWindowResize();
       }, false);
@@ -313,13 +328,13 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
         antialias: false
       });
       this.renderer.setPixelRatio(window.devicePixelRatio);
-      this.renderer.setSize(window.innerWidth, window.innerHeight);
+      this.renderer.setSize(this.winWidth, this.winHeight);
     }
   }, {
     key: "initCamera",
     value: function initCamera() {
       // camera setup
-      this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 3000);
+      this.camera = new THREE.PerspectiveCamera(45, this.winWidth / this.winHeight, 1, 3000);
       this.camera.position.z = 490;
       this.camera.position.y = 0;
     }
@@ -328,8 +343,8 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
     value: function render() {
       var _this2 = this;
 
-      this.renderer.render(this.scene, this.camera);
-      this.slides.rotation.x += 0.005;
+      this.renderer.render(this.scene, this.camera); // this.slides.rotation.x += 0.005;
+
       this.updatePlaneLookAt();
       requestAnimationFrame(function () {
         return _this2.render();
@@ -339,15 +354,13 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
   }, {
     key: "onWindowResize",
     value: function onWindowResize() {
-      this.camera.aspect = window.innerWidth / window.innerHeight;
+      this.camera.aspect = this.winWidth / this.winHeight;
       this.camera.updateProjectionMatrix();
-      this.renderer.setSize(window.innerWidth, window.innerHeight);
+      this.renderer.setSize(this.winWidth, this.winHeight);
     }
   }, {
     key: "addPlanes",
     value: function addPlanes() {
-      console.log(this.data.length);
-
       for (var i = 0; i < this.data.length; i++) {
         this.addPlane(this.data[i], i);
       }
@@ -370,8 +383,8 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
           map: texture
         });
         var plane = new THREE.Mesh(geometry, material);
-        var offset = 2 * Math.PI / _this3.data.length * index;
-        plane.position.set(0, Math.cos(offset) * 250, Math.sin(offset) * 300);
+        var offset = 2 * Math.PI / _this3.data.length * index + Math.PI / 2;
+        plane.position.set(0, Math.cos(offset) * 300, Math.sin(offset) * 300);
         plane.lookAt(_this3.camera.position);
 
         _this3.slides.add(plane);
@@ -399,6 +412,119 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
         this.slides.children[i].lookAt(this.camera.position);
       }
     }
+  }, {
+    key: "progressController",
+    value: function progressController(swiper, fullCircleOffset) {
+      _gsap.gsap.to(this.slides.rotation, {
+        duration: 0.8,
+        ease: "power2.out",
+        x: swiper.progress * fullCircleOffset
+      });
+    } // slider
+
+  }, {
+    key: "addSlides",
+    value: function addSlides(index, itemData) {
+      var item = document.createElement("div");
+      item.className = "c-home-slider-item swiper-slide";
+      var itemInner = document.createElement("div");
+      itemInner.className = "c-home-slider-item__inner";
+      item.appendChild(itemInner);
+      var title = document.createElement("p");
+      title.className = "c-home-slider-item__title";
+      title.textContent = itemData.title;
+      itemInner.appendChild(title);
+      var content = document.createElement("p");
+      content.className = "c-home-slider-item__content";
+      content.textContent = itemData.content;
+      itemInner.appendChild(content);
+      var link = document.createElement("a");
+      link.className = "c-home-slider-item__content";
+      link.href = itemData.link;
+      link.textContent = itemData.linkTitle;
+      itemInner.appendChild(link);
+      this.slidesWrapper.appendChild(item);
+    }
+  }, {
+    key: "initSlider",
+    value: function initSlider() {
+      var fullCircleOffset = Math.PI * 2 / this.data.length * (this.data.length - 1);
+      var self = this; // let progressWidth = this.progressWrapper.clientWidth;
+
+      this.swiper = new _swiper.default(this.slider, {
+        loop: false,
+        slidesPerView: 1,
+        direction: "vertical",
+        centeredSlides: true,
+        speed: 800,
+        grabCursor: true,
+        watchSlidesProgress: true,
+        mousewheelControl: true,
+        mousewheel: true,
+        freeMode: true,
+        freeModeSticky: true,
+        freeModeMomentum: true,
+        freeModeMomentumRatio: 1,
+        freeModeMomentumVelocityRatio: 1,
+        freeModeMomentumBounce: true,
+        freeModeMomentumBounceRatio: 1,
+        freeModeMinimumVelocity: 0.02,
+        // effect: "fade",
+        // fadeEffect: {
+        //     crossFade: true,
+        // },
+        // navigation: {
+        // nextEl: this.timelineSliderNext,
+        // prevEl: this.timelineSliderPrev,
+        // },
+        // pagination: {
+        //     el: ".js-timeline-pagination",
+        //     clickable: true,
+        //     renderBullet: (index, className) => {
+        //         return `<span class="c-timeline__pagination-bullet ${className}">${this.data[index].year}</span>`;
+        //     },
+        // },
+        on: {
+          progress: function progress() {
+            var swiper = this; // gsap.to(self.progressDot, {
+            //     x: swiper.progress * progressWidth,
+            // });
+
+            self.progressController(swiper, fullCircleOffset);
+          },
+          init: function init() {// let swiper = this;
+            // setTimeout(() => {
+            // progressWidth = self.progressWrapper.clientWidth;
+            // self.popupProgressIndicator.style.width = `${self.popupProgressWrapperWidth / swiper.slides.length}px`;
+            // }, 300);
+          }
+        }
+      });
+    }
+  }, {
+    key: "mouseMove",
+    value: function mouseMove() {
+      var _this4 = this;
+
+      window.addEventListener("mousemove", function (ev) {
+        _this4.mouse.x = 0.05 / _this4.winWidth * (ev.clientX - _this4.winWidth / 2);
+        _this4.mouse.y = 0.05 / _this4.winHeight * (ev.clientY - _this4.winHeight / 2);
+
+        _gsap.gsap.to(_this4.camera.rotation, {
+          x: -_this4.mouse.y,
+          y: -_this4.mouse.x,
+          duration: 1.5,
+          ease: "power3.out"
+        });
+
+        _gsap.gsap.to(_this4.slider, {
+          x: -_this4.mouse.x * 300,
+          y: _this4.mouse.y * 300,
+          duration: 1,
+          ease: "power3.out"
+        });
+      });
+    }
   }]);
 
   return HomeVerticalSlider;
@@ -406,7 +532,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
 
 exports.default = HomeVerticalSlider;
 
-},{"gsap":"gsap","swiper":"swiper","three":"three","three/examples/jsm/controls/OrbitControls":"three/examples/jsm/controls/OrbitControls","three/examples/jsm/libs/dat.gui.module.js":"three/examples/jsm/libs/dat.gui.module.js"}],4:[function(require,module,exports){
+},{"gsap":"gsap","swiper":"swiper","three":"three","three/examples/jsm/controls/OrbitControls":"three/examples/jsm/controls/OrbitControls"}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

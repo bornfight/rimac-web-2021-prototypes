@@ -1,8 +1,6 @@
 import * as THREE from "three";
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 
-import {GUI} from "three/examples/jsm/libs/dat.gui.module.js";
-
 import {gsap} from "gsap";
 
 import Swiper from "swiper";
@@ -12,13 +10,27 @@ export default class HomeVerticalSlider {
         this.DOM = {
             sliderWrapper: ".js-video-slider",
             canvasWrapper: ".js-canvas-wrapper",
+
+            slider: ".js-slider",
+            slidesWrapper: ".js-slider-wrapper",
         };
 
         this.videoSliderWrapper = document.querySelector(this.DOM.sliderWrapper);
 
+        this.mouse = {
+            x: 0,
+            y: 0,
+        };
+
         if (this.videoSliderWrapper == null) {
             return;
         }
+
+        this.winWidth = window.innerWidth;
+        this.winHeight = window.innerHeight;
+
+        this.slider = document.querySelector(this.DOM.slider);
+        this.slidesWrapper = document.querySelector(this.DOM.slidesWrapper);
 
         this.canvasWrapper = document.querySelector(this.DOM.canvasWrapper);
 
@@ -127,10 +139,18 @@ export default class HomeVerticalSlider {
         this.initCamera();
         this.initRenderer();
         this.createCanvas();
-        this.addControls();
+        // this.addControls();
         this.render();
 
         this.addPlanes();
+
+        for (let i = 0; i < this.data.length; i++) {
+            this.addSlides(i, this.data[i]);
+        }
+
+        this.initSlider();
+
+        this.mouseMove();
 
         window.addEventListener("resize", () => {
             this.onWindowResize();
@@ -153,32 +173,31 @@ export default class HomeVerticalSlider {
             antialias: false,
         });
         this.renderer.setPixelRatio(window.devicePixelRatio);
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setSize(this.winWidth, this.winHeight);
     }
 
     initCamera() {
         // camera setup
-        this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 3000);
+        this.camera = new THREE.PerspectiveCamera(45, this.winWidth / this.winHeight, 1, 3000);
         this.camera.position.z = 490;
         this.camera.position.y = 0;
     }
 
     render() {
         this.renderer.render(this.scene, this.camera);
-        this.slides.rotation.x += 0.005;
+        // this.slides.rotation.x += 0.005;
         this.updatePlaneLookAt();
         requestAnimationFrame(() => this.render());
     }
 
     // canvas size update
     onWindowResize() {
-        this.camera.aspect = window.innerWidth / window.innerHeight;
+        this.camera.aspect = this.winWidth / this.winHeight;
         this.camera.updateProjectionMatrix();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setSize(this.winWidth, this.winHeight);
     }
 
     addPlanes() {
-        console.log(this.data.length);
         for (let i = 0; i < this.data.length; i++) {
             this.addPlane(this.data[i], i);
         }
@@ -195,17 +214,18 @@ export default class HomeVerticalSlider {
             texture.magFilter = THREE.LinearFilter;
             texture.format = THREE.RGBFormat;
             const geometry = new THREE.PlaneGeometry(160, 90, 1, 1);
+
             const material = new THREE.MeshBasicMaterial({
                 map: texture,
             });
 
             const plane = new THREE.Mesh(geometry, material);
 
-            const offset = ((2 * Math.PI) / this.data.length) * index;
+            const offset = ((2 * Math.PI) / this.data.length) * index + (Math.PI / 2);
 
             plane.position.set(
                 0,
-                Math.cos(offset) * 250,
+                Math.cos(offset) * 300,
                 Math.sin(offset) * 300,
             );
 
@@ -233,5 +253,123 @@ export default class HomeVerticalSlider {
         for (let i = 0; i < this.slides.children.length; i++) {
             this.slides.children[i].lookAt(this.camera.position);
         }
+    }
+
+    progressController(swiper, fullCircleOffset) {
+        gsap.to(this.slides.rotation, {
+            duration: 0.8,
+            ease: "power2.out",
+            x: swiper.progress * fullCircleOffset,
+        });
+    }
+
+    // slider
+    addSlides(index, itemData) {
+        let item = document.createElement("div");
+        item.className = "c-home-slider-item swiper-slide";
+
+        let itemInner = document.createElement("div");
+        itemInner.className = "c-home-slider-item__inner";
+        item.appendChild(itemInner);
+
+        let title = document.createElement("p");
+        title.className = "c-home-slider-item__title";
+        title.textContent = itemData.title;
+        itemInner.appendChild(title);
+
+        let content = document.createElement("p");
+        content.className = "c-home-slider-item__content";
+        content.textContent = itemData.content;
+        itemInner.appendChild(content);
+
+        let link = document.createElement("a");
+        link.className = "c-home-slider-item__content";
+        link.href = itemData.link;
+        link.textContent = itemData.linkTitle;
+        itemInner.appendChild(link);
+
+        this.slidesWrapper.appendChild(item);
+    }
+
+    initSlider() {
+        const fullCircleOffset = ((Math.PI * 2) / this.data.length) * (this.data.length - 1);
+
+        const self = this;
+        // let progressWidth = this.progressWrapper.clientWidth;
+
+        this.swiper = new Swiper(this.slider, {
+            loop: false,
+            slidesPerView: 1,
+            direction: "vertical",
+            centeredSlides: true,
+            speed: 800,
+            grabCursor: true,
+            watchSlidesProgress: true,
+            mousewheelControl: true,
+            mousewheel: true,
+            freeMode: true,
+            freeModeSticky: true,
+            freeModeMomentum: true,
+            freeModeMomentumRatio: 1,
+            freeModeMomentumVelocityRatio: 1,
+            freeModeMomentumBounce: true,
+            freeModeMomentumBounceRatio: 1,
+            freeModeMinimumVelocity: 0.02,
+            // effect: "fade",
+            // fadeEffect: {
+            //     crossFade: true,
+            // },
+            // navigation: {
+            // nextEl: this.timelineSliderNext,
+            // prevEl: this.timelineSliderPrev,
+            // },
+            // pagination: {
+            //     el: ".js-timeline-pagination",
+            //     clickable: true,
+            //     renderBullet: (index, className) => {
+            //         return `<span class="c-timeline__pagination-bullet ${className}">${this.data[index].year}</span>`;
+            //     },
+            // },
+            on: {
+                progress: function () {
+                    let swiper = this;
+                    // gsap.to(self.progressDot, {
+                    //     x: swiper.progress * progressWidth,
+                    // });
+
+                    self.progressController(swiper, fullCircleOffset);
+                },
+                init: function () {
+                    // let swiper = this;
+                    // setTimeout(() => {
+                    // progressWidth = self.progressWrapper.clientWidth;
+                    // self.popupProgressIndicator.style.width = `${self.popupProgressWrapperWidth / swiper.slides.length}px`;
+                    // }, 300);
+                },
+            },
+        });
+    }
+
+    mouseMove() {
+        window.addEventListener("mousemove", (ev) => {
+            this.mouse.x =
+                (0.05 / this.winWidth) * (ev.clientX - this.winWidth / 2);
+            this.mouse.y =
+                (0.05 / this.winHeight) * (ev.clientY - this.winHeight / 2);
+
+            gsap.to(this.camera.rotation, {
+                x: -this.mouse.y,
+                y: -this.mouse.x,
+                duration: 1.5,
+                ease: "power3.out",
+            });
+
+            gsap.to(this.slider, {
+                x: -this.mouse.x * 300,
+                y: this.mouse.y * 300,
+                duration: 1,
+                ease: "power3.out",
+            });
+        });
     }
 }

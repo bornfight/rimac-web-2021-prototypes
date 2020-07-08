@@ -1,11 +1,15 @@
 .c-homepage {
-
     &__canvas {
-
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
     }
 
     &__inner {
-
+        position: relative;
+        z-index: 1;
     }
 
     &__video {
@@ -17,4 +21,14 @@
         max-height: 100%;
         z-index: -1;
     }
+
+    .swiper-container{
+        width: 100vw;
+        height: 100vh;
+    }
+}
+
+.c-home-slider-item {
+    width: 100vw;
+    height: 100vh;
 }
