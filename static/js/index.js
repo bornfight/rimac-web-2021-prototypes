@@ -7,6 +7,7 @@ import VideoScrub from "./components/VideoScrub";
 import ScrollProgress from "./components/ScrollProgress";
 import Dummy from "./components/Dummy";
 import GradientBg from "./components/GradientBg";
+import HomeVerticalSlider from "./components/HomeVerticalSlider";
 
 const ready = (callbackFunc) => {
     if (document.readyState !== "loading") {
@@ -60,6 +61,8 @@ ready(() => {
     navigation.init();
 
     const equalHeight = new EqualHeight();
+
+    const homeVerticalSlider = new HomeVerticalSlider();
 
     if (document.getElementById("timeline-slider") !== null) {
         const timelineSlider = new TimelineSlider();
