@@ -111,29 +111,28 @@ var GradientBg = /*#__PURE__*/function () {
     value: function onMouseMove() {
       var _this = this;
 
-      document.addEventListener("mousemove", function (evt) {
-        var x = evt.clientX / innerWidth;
-        var y = evt.clientY / innerHeight;
-        var decimalX = evt.clientX / window.innerWidth - 0.5;
-        var decimalY = evt.clientY / window.innerHeight - 0.5;
+      document.addEventListener("mousemove", function (ev) {
+        var mouseScale = 0.25;
+        var x = ev.offsetX / innerWidth * 100 - 50;
+        var y = ev.offsetY / innerHeight * 100 - 50;
 
         _gsap.gsap.to("html", {
           duration: 1.4,
-          "--mouse-x": x,
+          "--mouseX": "".concat((x * mouseScale).toFixed(3), "%"),
           ease: "power3.easIn"
         });
 
         _gsap.gsap.to("html", {
           duration: 1.4,
-          "--mouse-y": y,
+          "--mouseY": "".concat((y * mouseScale).toFixed(3), "%"),
           ease: "power3.easIn"
         });
 
         _gsap.gsap.to(_this.bgGradientMouseMove, {
           duration: 1.4,
-          rotationY: 5 * decimalY,
+          rotationY: 5 * y,
           x: 50 * decimalX,
-          rotationX: 2.5 * decimalX,
+          rotationX: 2.5 * x,
           y: -100 * decimalY,
           ease: "quad.easOut",
           transformPerspective: 700,
@@ -848,6 +847,37 @@ var ScrollProgress = /*#__PURE__*/function () {
 }();
 
 exports.default = ScrollProgress;
+
+var EqualHeight = /*#__PURE__*/function () {
+  function EqualHeight() {
+    _classCallCheck(this, EqualHeight);
+
+    this.DOM = {
+      element: ".js-list-item h3",
+      states: {}
+    };
+    this.elements = document.querySelectorAll(this.DOM.element);
+    this.init();
+  }
+
+  _createClass(EqualHeight, [{
+    key: "init",
+    value: function init() {
+      this.setHeights(this.elements);
+    }
+  }, {
+    key: "setHeights",
+    value: function setHeights(elements) {
+      for (var i = 0, l = elements.legth; i < l; i++) {
+        console.log(elements[i]);
+      }
+    }
+  }]);
+
+  return EqualHeight;
+}();
+
+new EqualHeight();
 
 },{"gsap":"gsap","gsap/ScrollTrigger":"gsap/ScrollTrigger"}],6:[function(require,module,exports){
 "use strict";
@@ -1734,6 +1764,66 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+var EqualHeight = /*#__PURE__*/function () {
+  function EqualHeight() {
+    _classCallCheck(this, EqualHeight);
+
+    this.DOM = {
+      element: ".js-list-item",
+      elementContent: "h3",
+      states: {}
+    };
+    this.elements = document.querySelectorAll(this.DOM.element);
+    this.height = 0;
+    this.init();
+  }
+
+  _createClass(EqualHeight, [{
+    key: "init",
+    value: function init() {
+      this.getHeight(this.elements);
+    }
+  }, {
+    key: "getHeight",
+    value: function getHeight() {
+      for (var i = 0, l = this.elements.length; i < l; i++) {
+        var height = this.elements[i].querySelector(this.DOM.elementContent).offsetHeight;
+
+        if (height > this.height) {
+          this.height = height;
+        }
+      }
+
+      this.setEqualHeights(this.height);
+    }
+  }, {
+    key: "setEqualHeights",
+    value: function setEqualHeights(height) {
+      for (var i = 0, l = this.elements.length; i < l; i++) {
+        this.elements[i].style.minHeight = "".concat(height, "px");
+      }
+    }
+  }]);
+
+  return EqualHeight;
+}();
+
+exports.default = EqualHeight;
+
+},{}],10:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 var GridHelper = /*#__PURE__*/function () {
   /**
    *
@@ -1834,10 +1924,12 @@ var GridHelper = /*#__PURE__*/function () {
 
 exports.default = GridHelper;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 var _GridHelper = _interopRequireDefault(require("./helpers/GridHelper"));
+
+var _EqualHeight = _interopRequireDefault(require("./helpers/EqualHeight"));
 
 var _DarkModeHelper = _interopRequireDefault(require("./helpers/DarkModeHelper"));
 
@@ -1895,6 +1987,7 @@ ready(function () {
   dummy.init();
   var navigation = new _NavigationController.default();
   navigation.init();
+  var equalHeight = new _EqualHeight.default();
   var homeVerticalSlider = new _HomeVerticalSlider.default();
 
   if (document.getElementById("timeline-slider") !== null) {
@@ -1917,6 +2010,6 @@ ready(function () {
   }
 });
 
-},{"./components/Dummy":1,"./components/GradientBg":2,"./components/HomeVerticalSlider":3,"./components/NavigationController":4,"./components/ScrollProgress":5,"./components/TimelineSlider":6,"./components/VideoScrub":7,"./helpers/DarkModeHelper":8,"./helpers/GridHelper":9}]},{},[10])
+},{"./components/Dummy":1,"./components/GradientBg":2,"./components/HomeVerticalSlider":3,"./components/NavigationController":4,"./components/ScrollProgress":5,"./components/TimelineSlider":6,"./components/VideoScrub":7,"./helpers/DarkModeHelper":8,"./helpers/EqualHeight":9,"./helpers/GridHelper":10}]},{},[11])
 
 //# sourceMappingURL=bundle.js.map

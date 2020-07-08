@@ -7,7 +7,6 @@ export default class EqualHeight {
         };
 
         this.elements = document.querySelectorAll(this.DOM.element);
-
         this.height = 0;
 
         this.init();
@@ -25,7 +24,6 @@ export default class EqualHeight {
                 this.height = height;
             }
         }
-
         this.setEqualHeights(this.height);
     }
 
