@@ -111,29 +111,28 @@ var GradientBg = /*#__PURE__*/function () {
     value: function onMouseMove() {
       var _this = this;
 
-      document.addEventListener("mousemove", function (evt) {
-        var x = evt.clientX / innerWidth;
-        var y = evt.clientY / innerHeight;
-        var decimalX = evt.clientX / window.innerWidth - 0.5;
-        var decimalY = evt.clientY / window.innerHeight - 0.5;
+      document.addEventListener("mousemove", function (ev) {
+        var mouseScale = 0.25;
+        var x = ev.offsetX / innerWidth * 100 - 50;
+        var y = ev.offsetY / innerHeight * 100 - 50;
 
         _gsap.gsap.to("html", {
           duration: 1.4,
-          "--mouse-x": x,
+          "--mouseX": "".concat((x * mouseScale).toFixed(3), "%"),
           ease: "power3.easIn"
         });
 
         _gsap.gsap.to("html", {
           duration: 1.4,
-          "--mouse-y": y,
+          "--mouseY": "".concat((y * mouseScale).toFixed(3), "%"),
           ease: "power3.easIn"
         });
 
         _gsap.gsap.to(_this.bgGradientMouseMove, {
           duration: 1.4,
-          rotationY: 5 * decimalY,
+          rotationY: 5 * y,
           x: 50 * decimalX,
-          rotationX: 2.5 * decimalX,
+          rotationX: 2.5 * x,
           y: -100 * decimalY,
           ease: "quad.easOut",
           transformPerspective: 700,
@@ -784,388 +783,6 @@ exports.default = NavigationController;
 },{}],5:[function(require,module,exports){
 "use strict";
 
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var THREE = _interopRequireWildcard(require("three"));
-
-var _datGuiModule = require("three/examples/jsm/libs/dat.gui.module.js");
-
-var _gsap = require("gsap");
-
-function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-var HomeVerticalSlider = /*#__PURE__*/function () {
-  function HomeVerticalSlider() {
-    _classCallCheck(this, HomeVerticalSlider);
-
-    this.DOM = {
-      wrapper: ".js-perlin-gradient"
-    };
-  }
-
-  _createClass(HomeVerticalSlider, [{
-    key: "init",
-    value: function init() {
-      var self = this;
-      var Theme = {
-        primary: 0xFFFFFF,
-        secundary: 0x292733,
-        danger: 0xFF0000,
-        darker: 0x000000
-      };
-
-      var _primitive;
-
-      var shapeGroup = new THREE.Group();
-      var start = Date.now();
-      var mat;
-      this.width = window.innerWidth;
-      this.height = window.innerHeight; //---
-
-      this.scene = new THREE.Scene();
-      this.scene.background = new THREE.Color(Theme.secundary); //---
-
-      this.camera = new THREE.PerspectiveCamera(35, this.width / this.height, 1, 1000);
-      this.camera.position.set(0, 0, 16); //---
-
-      this.renderer = new THREE.WebGLRenderer({
-        antialias: false,
-        alpha: false
-      });
-      this.renderer.setSize(this.width, this.height);
-      this.renderer.shadowMap.enabled = true; //---
-
-      document.body.appendChild(this.renderer.domElement); //---
-
-      window.addEventListener('resize', this.onWindowResize, false);
-
-      var primitiveElement = function primitiveElement() {
-        this.mesh = new THREE.Object3D();
-        mat = new THREE.ShaderMaterial({
-          side: THREE.DoubleSide,
-          uniforms: {
-            time: {
-              type: "f",
-              value: 0.1
-            },
-            pointscale: {
-              type: "f",
-              value: 0.2
-            },
-            decay: {
-              type: "f",
-              value: 0.3
-            },
-            size: {
-              type: "f",
-              value: 0.3
-            },
-            displace: {
-              type: "f",
-              value: 0.3
-            },
-            complex: {
-              type: "f",
-              value: 0.0
-            },
-            waves: {
-              type: "f",
-              value: 0.10
-            },
-            eqcolor: {
-              type: "f",
-              value: 0.0
-            },
-            rcolor: {
-              type: "f",
-              value: 0.0
-            },
-            gcolor: {
-              type: "f",
-              value: 0.0
-            },
-            bcolor: {
-              type: "f",
-              value: 0.0
-            },
-            fragment: {
-              type: "i",
-              value: true
-            },
-            redhell: {
-              type: "i",
-              value: true
-            }
-          },
-          vertexShader: document.getElementById('vertexShader').textContent,
-          fragmentShader: document.getElementById('fragmentShader').textContent
-        }); //---
-
-        var geo = new THREE.IcosahedronBufferGeometry(2, 6);
-        var wir = new THREE.IcosahedronBufferGeometry(2.3, 2);
-        this.shape = new THREE.Mesh(geo, mat);
-        this.point = new THREE.Points(wir, mat); //---
-
-        shapeGroup.add(this.point);
-        shapeGroup.add(this.shape);
-        self.scene.add(shapeGroup);
-      };
-
-      function createPrimitive() {
-        _primitive = new primitiveElement();
-      }
-
-      var options = {
-        perlin: {
-          speed: 0.4,
-          size: 0.7,
-          perlins: 1.0,
-          decay: 1.20,
-          displace: 1.00,
-          complex: 0.50,
-          waves: 3.7,
-          eqcolor: 10.0,
-          rcolor: 1.5,
-          gcolor: 1.5,
-          bcolor: 1.5,
-          fragment: true,
-          points: false,
-          redhell: false
-        },
-        perlinRandom: function perlinRandom() {
-          _gsap.gsap.to(this.perlin, {
-            duration: 2,
-            //decay: Math.random() * 1.0,
-            waves: Math.random() * 20.0,
-            complex: Math.random() * 1.0,
-            displace: Math.random() * 2.5,
-            ease: Elastic.easeOut
-          });
-        },
-        random: function random() {
-          //this.perlin.redhell = Math.random() >= 0.5; // 10 1 0.1 1.2
-          _gsap.gsap.to(this.perlin, {
-            duration: 1,
-            eqcolor: 11.0,
-            rcolor: Math.random() * 1.5,
-            gcolor: Math.random() * 0.5,
-            bcolor: Math.random() * 1.5
-          });
-        },
-        normal: function normal() {
-          this.perlin.redhell = true; // 10 1 0.1 1.2
-
-          _gsap.gsap.to(this.perlin, {
-            duration: 1,
-            //speed: 0.12,
-            eqcolor: 10.0,
-            rcolor: 1.5,
-            gcolor: 1.5,
-            bcolor: 1.5
-          });
-        },
-        darker: function darker() {
-          this.perlin.redhell = false; // 10 1 0.1 1.2
-
-          _gsap.gsap.to(this.perlin, {
-            duration: 1,
-            //speed: 0.5,
-            eqcolor: 9.0,
-            rcolor: 0.4,
-            gcolor: 0.05,
-            bcolor: 0.6
-          });
-        },
-        volcano: function volcano() {
-          this.perlin.redhell = false; // 10 1 0.1 1.2
-          //this.perlin.speed = 0.83;
-
-          _gsap.gsap.to(this.perlin, {
-            duration: 1,
-            size: 0.7,
-            waves: 0.6,
-            complex: 1.0,
-            displace: 0.3,
-            eqcolor: 9.0,
-            rcolor: 0.85,
-            gcolor: 0.05,
-            bcolor: 0.32
-          });
-        },
-        cloud: function cloud() {
-          this.perlin.redhell = true; // 10 1 0.1 1.2
-          //this.perlin.speed = 0.1;
-
-          _gsap.gsap.to(this.perlin, {
-            duration: 1,
-            size: 1.0,
-            waves: 20.0,
-            complex: 0.1,
-            displace: 0.1,
-            eqcolor: 4.0,
-            rcolor: 1.5,
-            gcolor: 0.7,
-            bcolor: 1.5
-          });
-        },
-        tornasol: function tornasol() {
-          this.perlin.redhell = true; // 10 1 0.1 1.2
-          //this.perlin.speed = 0.25;
-
-          _gsap.gsap.to(this.perlin, {
-            duration: 1,
-            size: 1.0,
-            waves: 3.0,
-            complex: 0.65,
-            displace: 0.5,
-            eqcolor: 9.5,
-            rcolor: 1.5,
-            gcolor: 1.5,
-            bcolor: 1.5
-          });
-        }
-      };
-
-      var createGUI = function createGUI() {
-        var gui = new _datGuiModule.GUI();
-        var perlinGUI = gui.addFolder('Shape Setup');
-        perlinGUI.add(options, 'perlinRandom').name('• Random Shape');
-        perlinGUI.add(options.perlin, 'speed', 0.1, 1.0).name('Speed').listen();
-        perlinGUI.add(options.perlin, 'size', 0.0, 3.0).name('Size').listen(); //perlinGUI.add(options.perlin, 'decay', 0.0, 1.0).name('Decay').listen();
-
-        perlinGUI.add(options.perlin, 'waves', 0.0, 20.0).name('Waves').listen();
-        perlinGUI.add(options.perlin, 'complex', 0.1, 1.0).name('Complex').listen();
-        perlinGUI.add(options.perlin, 'displace', 0.1, 2.5).name('Displacement').listen(); //perlinGUI.open();
-
-        var colorGUI = gui.addFolder('Color');
-        colorGUI.add(options, 'random').name('• Random colors');
-        colorGUI.add(options, 'normal').name('• Normal colors');
-        colorGUI.add(options, 'darker').name('• Dark colors');
-        colorGUI.add(options.perlin, 'eqcolor', 0.0, 30.0).name('Hue').listen();
-        colorGUI.add(options.perlin, 'rcolor', 0.0, 2.5).name('R').listen();
-        colorGUI.add(options.perlin, 'gcolor', 0.0, 2.5).name('G').listen();
-        colorGUI.add(options.perlin, 'bcolor', 0.0, 2.5).name('B').listen();
-        colorGUI.add(options.perlin, 'redhell', true).name('Electroflow'); //colorGUI.open();
-
-        gui.add(options, 'volcano').name('• Volcano');
-        gui.add(options, 'tornasol').name('• Tornasol');
-        gui.add(options, 'cloud').name('• Cotton Candy');
-        gui.add(options.perlin, 'points', true).name('Points');
-      }; //--------------------------------------------------------------------
-
-
-      function animation() {
-        _primitive.point.visible = options.perlin.points;
-        mat.uniforms['time'].value = options.perlin.speed / 1000 * (Date.now() - start);
-        mat.uniforms['pointscale'].value = options.perlin.perlins;
-        mat.uniforms['decay'].value = options.perlin.decay;
-        mat.uniforms['size'].value = options.perlin.size;
-        mat.uniforms['displace'].value = options.perlin.displace; // mat.uniforms['complex'].value = options.perlin.complex;
-        // mat.uniforms['waves'].value = options.perlin.waves;
-        // mat.uniforms['fragment'].value = options.perlin.fragment;
-
-        mat.uniforms['redhell'].value = options.perlin.redhell;
-        mat.uniforms['eqcolor'].value = options.perlin.eqcolor;
-        mat.uniforms['rcolor'].value = options.perlin.rcolor;
-        mat.uniforms['gcolor'].value = options.perlin.gcolor;
-        mat.uniforms['bcolor'].value = options.perlin.bcolor; //---
-
-        requestAnimationFrame(animation);
-        self.renderer.render(self.scene, self.camera);
-      }
-
-      createGUI();
-      createPrimitive();
-      animation();
-      mat.uniforms['rcolor'].value = 0.46;
-      mat.uniforms['gcolor'].value = 0.74;
-      mat.uniforms['bcolor'].value = 0.85; // color animation
-      // gsap.timeline({
-      //     onComplete: function () {
-      //         this.restart();
-      //         console.log(1);
-      //     },
-      // })
-      //     .add("light")
-      //     .to(mat.uniforms['rcolor'], {
-      //         value: 46,
-      //         duration: 20,
-      //         ease: "power2.inOut",
-      //     }, "light")
-      //     .to(mat.uniforms['gcolor'], {
-      //         value: 74,
-      //         duration: 20,
-      //         ease: "power2.inOut",
-      //     }, "light")
-      //     .to(mat.uniforms['bcolor'], {
-      //         value: 85,
-      //         duration: 20,
-      //         ease: "power2.inOut",
-      //     }, "light")
-      //     .add("dark")
-      //     .to(mat.uniforms['rcolor'], {
-      //         value: 0,
-      //         duration: 20,
-      //         ease: "power2.inOut",
-      //     }, "dark")
-      //     .to(mat.uniforms['gcolor'], {
-      //         value: 20,
-      //         duration: 20,
-      //         ease: "power2.inOut",
-      //     }, "dark")
-      //     .to(mat.uniforms['bcolor'], {
-      //         value: 29,
-      //         duration: 20,
-      //         ease: "power2.inOut",
-      //     }, "dark")
-      //     .add("medium")
-      //     .to(mat.uniforms['rcolor'], {
-      //         value: 24,
-      //         duration: 20,
-      //         ease: "power2.inOut",
-      //     }, "medium")
-      //     .to(mat.uniforms['gcolor'], {
-      //         value: 52,
-      //         duration: 20,
-      //         ease: "power2.inOut",
-      //     }, "medium")
-      //     .to(mat.uniforms['bcolor'], {
-      //         value: 63,
-      //         duration: 20,
-      //         ease: "power2.inOut",
-      //     }, "medium")
-    }
-  }, {
-    key: "onWindowResize",
-    value: function onWindowResize() {
-      this.renderer.setSize(this.width, this.height);
-      this.camera.aspect = this.width / this.height;
-      this.camera.updateProjectionMatrix();
-      console.log('- resize -');
-    }
-  }]);
-
-  return HomeVerticalSlider;
-}();
-
-exports.default = HomeVerticalSlider;
-
-},{"gsap":"gsap","three":"three","three/examples/jsm/libs/dat.gui.module.js":"three/examples/jsm/libs/dat.gui.module.js"}],6:[function(require,module,exports){
-"use strict";
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -1231,7 +848,38 @@ var ScrollProgress = /*#__PURE__*/function () {
 
 exports.default = ScrollProgress;
 
-},{"gsap":"gsap","gsap/ScrollTrigger":"gsap/ScrollTrigger"}],7:[function(require,module,exports){
+var EqualHeight = /*#__PURE__*/function () {
+  function EqualHeight() {
+    _classCallCheck(this, EqualHeight);
+
+    this.DOM = {
+      element: ".js-list-item h3",
+      states: {}
+    };
+    this.elements = document.querySelectorAll(this.DOM.element);
+    this.init();
+  }
+
+  _createClass(EqualHeight, [{
+    key: "init",
+    value: function init() {
+      this.setHeights(this.elements);
+    }
+  }, {
+    key: "setHeights",
+    value: function setHeights(elements) {
+      for (var i = 0, l = elements.legth; i < l; i++) {
+        console.log(elements[i]);
+      }
+    }
+  }]);
+
+  return EqualHeight;
+}();
+
+new EqualHeight();
+
+},{"gsap":"gsap","gsap/ScrollTrigger":"gsap/ScrollTrigger"}],6:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -1967,7 +1615,7 @@ var TimelineSlider = /*#__PURE__*/function () {
 
 exports.default = TimelineSlider;
 
-},{"gsap":"gsap","swiper":"swiper","three":"three","three/examples/jsm/libs/dat.gui.module.js":"three/examples/jsm/libs/dat.gui.module.js","three/examples/jsm/postprocessing/BokehPass":"three/examples/jsm/postprocessing/BokehPass","three/examples/jsm/postprocessing/EffectComposer":"three/examples/jsm/postprocessing/EffectComposer","three/examples/jsm/postprocessing/RenderPass":"three/examples/jsm/postprocessing/RenderPass"}],8:[function(require,module,exports){
+},{"gsap":"gsap","swiper":"swiper","three":"three","three/examples/jsm/libs/dat.gui.module.js":"three/examples/jsm/libs/dat.gui.module.js","three/examples/jsm/postprocessing/BokehPass":"three/examples/jsm/postprocessing/BokehPass","three/examples/jsm/postprocessing/EffectComposer":"three/examples/jsm/postprocessing/EffectComposer","three/examples/jsm/postprocessing/RenderPass":"three/examples/jsm/postprocessing/RenderPass"}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2042,7 +1690,7 @@ var VideoScrub = /*#__PURE__*/function () {
 
 exports.default = VideoScrub;
 
-},{"gsap":"gsap","gsap/ScrollTrigger":"gsap/ScrollTrigger"}],9:[function(require,module,exports){
+},{"gsap":"gsap","gsap/ScrollTrigger":"gsap/ScrollTrigger"}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2101,6 +1749,66 @@ var DarkModeHelper = /*#__PURE__*/function () {
 }();
 
 exports.default = DarkModeHelper;
+
+},{}],9:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var EqualHeight = /*#__PURE__*/function () {
+  function EqualHeight() {
+    _classCallCheck(this, EqualHeight);
+
+    this.DOM = {
+      element: ".js-list-item",
+      elementContent: "h3",
+      states: {}
+    };
+    this.elements = document.querySelectorAll(this.DOM.element);
+    this.height = 0;
+    this.init();
+  }
+
+  _createClass(EqualHeight, [{
+    key: "init",
+    value: function init() {
+      this.getHeight(this.elements);
+    }
+  }, {
+    key: "getHeight",
+    value: function getHeight() {
+      for (var i = 0, l = this.elements.length; i < l; i++) {
+        var height = this.elements[i].querySelector(this.DOM.elementContent).offsetHeight;
+
+        if (height > this.height) {
+          this.height = height;
+        }
+      }
+
+      this.setEqualHeights(this.height);
+    }
+  }, {
+    key: "setEqualHeights",
+    value: function setEqualHeights(height) {
+      for (var i = 0, l = this.elements.length; i < l; i++) {
+        this.elements[i].style.minHeight = "".concat(height, "px");
+      }
+    }
+  }]);
+
+  return EqualHeight;
+}();
+
+exports.default = EqualHeight;
 
 },{}],10:[function(require,module,exports){
 "use strict";
@@ -2221,6 +1929,8 @@ exports.default = GridHelper;
 
 var _GridHelper = _interopRequireDefault(require("./helpers/GridHelper"));
 
+var _EqualHeight = _interopRequireDefault(require("./helpers/EqualHeight"));
+
 var _DarkModeHelper = _interopRequireDefault(require("./helpers/DarkModeHelper"));
 
 var _NavigationController = _interopRequireDefault(require("./components/NavigationController"));
@@ -2236,8 +1946,6 @@ var _Dummy = _interopRequireDefault(require("./components/Dummy"));
 var _GradientBg = _interopRequireDefault(require("./components/GradientBg"));
 
 var _HomeVerticalSlider = _interopRequireDefault(require("./components/HomeVerticalSlider"));
-
-var _PerlinGradient = _interopRequireDefault(require("./components/PerlinGradient"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2279,8 +1987,7 @@ ready(function () {
   dummy.init();
   var navigation = new _NavigationController.default();
   navigation.init();
-  var perlinGradient = new _PerlinGradient.default();
-  perlinGradient.init();
+  var equalHeight = new _EqualHeight.default();
   var homeVerticalSlider = new _HomeVerticalSlider.default();
 
   if (document.getElementById("timeline-slider") !== null) {
@@ -2303,6 +2010,6 @@ ready(function () {
   }
 });
 
-},{"./components/Dummy":1,"./components/GradientBg":2,"./components/HomeVerticalSlider":3,"./components/NavigationController":4,"./components/PerlinGradient":5,"./components/ScrollProgress":6,"./components/TimelineSlider":7,"./components/VideoScrub":8,"./helpers/DarkModeHelper":9,"./helpers/GridHelper":10}]},{},[11])
+},{"./components/Dummy":1,"./components/GradientBg":2,"./components/HomeVerticalSlider":3,"./components/NavigationController":4,"./components/ScrollProgress":5,"./components/TimelineSlider":6,"./components/VideoScrub":7,"./helpers/DarkModeHelper":8,"./helpers/EqualHeight":9,"./helpers/GridHelper":10}]},{},[11])
 
 //# sourceMappingURL=bundle.js.map

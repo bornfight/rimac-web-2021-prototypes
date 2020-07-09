@@ -65,30 +65,30 @@ export default class GradientBg {
     }
 
     onMouseMove() {
-        document.addEventListener("mousemove", (evt) => {
-            let x = evt.clientX / innerWidth;
-            let y = evt.clientY / innerHeight;
+        document.addEventListener("mousemove", (ev) => {
 
-            let decimalX = evt.clientX / window.innerWidth - 0.5;
-            let decimalY = evt.clientY / window.innerHeight - 0.5;
+            const mouseScale = 0.25;
+
+            const x = ev.offsetX / innerWidth * 100 - 50;
+            const y = ev.offsetY / innerHeight * 100 - 50;
 
             gsap.to("html", {
                 duration: 1.4,
-                "--mouse-x": x,
+                "--mouseX": `${(x * mouseScale).toFixed(3)}%`,
                 ease: "power3.easIn",
             });
 
             gsap.to("html", {
                 duration: 1.4,
-                "--mouse-y": y,
+                "--mouseY": `${(y * mouseScale).toFixed(3)}%`,
                 ease: "power3.easIn",
             });
 
             gsap.to(this.bgGradientMouseMove, {
                 duration: 1.4,
-                rotationY: 5 * decimalY,
+                rotationY: 5 * y,
                 x: 50 * decimalX,
-                rotationX: 2.5 * decimalX,
+                rotationX: 2.5 * x,
                 y: -100 * decimalY,
                 ease: "quad.easOut",
                 transformPerspective: 700,

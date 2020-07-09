@@ -10,3 +10,46 @@
         border: 1px solid transparentize($black, 0.8);
     }
 }
+
+.c-card-list {
+    list-style: none;
+    display: flex;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 100px 10px;
+    border: 1px solid lightgrey;
+
+    &__item {
+        margin-right: 10px;
+        display: flex;
+        align-self: stretch;
+
+        &:nth-child(3n) {
+            margin-right: 0;
+        }
+    }
+}
+
+.c-card {
+    padding: 30px 20px;
+    background-color: lightgrey;
+    border: 1px solid grey;
+    height: 100%;
+
+    &__title {
+        border-bottom: 1px solid grey;
+        display: block;
+
+        h3 {
+            padding-bottom: 20px;
+        }
+    }
+
+    &__content {
+        padding-top: 20px;
+    }
+
+    &__footer {
+        padding-top: 20px;
+    }
+}
