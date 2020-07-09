@@ -7,6 +7,7 @@ import ScrollProgress from "./components/ScrollProgress";
 import Dummy from "./components/Dummy";
 import GradientBg from "./components/GradientBg";
 import HomeVerticalSlider from "./components/HomeVerticalSlider";
+import PerlinGradient from "./components/PerlinGradient";
 
 const ready = (callbackFunc) => {
     if (document.readyState !== "loading") {
@@ -58,6 +59,9 @@ ready(() => {
 
     const navigation = new NavigationController();
     navigation.init();
+
+    const perlinGradient = new PerlinGradient();
+    perlinGradient.init();
 
     const homeVerticalSlider = new HomeVerticalSlider();
 
