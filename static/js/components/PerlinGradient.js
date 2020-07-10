@@ -12,349 +12,207 @@ export default class HomeVerticalSlider {
     }
 
     init() {
-        const self = this;
+        //--------------------------------------------------------------------
+        var scene, camera, renderer, container;
+        var _width, _height;
+        var mat;
 
-        var Theme = {
-            primary: 0xFFFFFF,
-            secundary: 0x292733,
-            danger: 0xFF0000,
-            darker: 0x000000
-        };
-
-        var _primitive;
-        var shapeGroup = new THREE.Group();
-        var start = Date.now();
-        let mat;
-
-        this.width = window.innerWidth;
-        this.height = window.innerHeight;
-        //---
-        this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(Theme.secundary);
-        //---
-        this.camera = new THREE.PerspectiveCamera(35, this.width / this.height, 1, 1000);
-        this.camera.position.set(0, 0, 16);
-        //---
-        this.renderer = new THREE.WebGLRenderer({antialias: false, alpha: false});
-        this.renderer.setSize(this.width, this.height);
-        this.renderer.shadowMap.enabled = true;
-        //---
-        document.body.appendChild(this.renderer.domElement);
-        //---
-        window.addEventListener('resize', this.onWindowResize, false);
-
-
-        var primitiveElement = function () {
-            this.mesh = new THREE.Object3D();
-            mat = new THREE.ShaderMaterial({
-                side: THREE.DoubleSide,
-                uniforms: {
-                    time: {
-                        type: "f",
-                        value: 0.1
-                    },
-                    pointscale: {
-                        type: "f",
-                        value: 0.2
-                    },
-                    decay: {
-                        type: "f",
-                        value: 0.3
-                    },
-                    size: {
-                        type: "f",
-                        value: 0.3
-                    },
-                    displace: {
-                        type: "f",
-                        value: 0.3
-                    },
-                    complex: {
-                        type: "f",
-                        value: 0.0
-                    },
-                    waves: {
-                        type: "f",
-                        value: 0.10
-                    },
-                    eqcolor: {
-                        type: "f",
-                        value: 0.0
-                    },
-                    rcolor: {
-                        type: "f",
-                        value: 0.0
-                    },
-                    gcolor: {
-                        type: "f",
-                        value: 0.0
-                    },
-                    bcolor: {
-                        type: "f",
-                        value: 0.0
-                    },
-                    fragment: {
-                        type: "i",
-                        value: true
-                    },
-                    redhell: {
-                        type: "i",
-                        value: true
-                    }
-                },
-                vertexShader: document.getElementById('vertexShader').textContent,
-                fragmentShader: document.getElementById('fragmentShader').textContent
-            });
+        function createWorld() {
+            _width = window.innerWidth;
+            _height = window.innerHeight;
             //---
-
-            var geo = new THREE.IcosahedronBufferGeometry(2, 6);
-            var wir = new THREE.IcosahedronBufferGeometry(2.3, 2);
-            this.shape = new THREE.Mesh(geo, mat);
-            this.point = new THREE.Points(wir, mat);
+            scene = new THREE.Scene();
+            scene.fog = new THREE.Fog(0x000000, 5, 15);
+            scene.background = new THREE.Color(0x000000);
             //---
-            shapeGroup.add(this.point);
-            shapeGroup.add(this.shape);
+            camera = new THREE.PerspectiveCamera(35, _width / _height, 1, 1000);
+            camera.position.set(0, 0, 10);
+            camera.lookAt(0, 0, 0);
+            //---
+            renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
+            renderer.setSize(_width, _height);
+            renderer.shadowMap.enabled = true;
+            //---
+            document.body.appendChild(renderer.domElement);
+            //---
+            window.addEventListener('resize', onWindowResize, false);
+        }
 
-            self.scene.add(shapeGroup);
-        };
+        function onWindowResize() {
+            _width = window.innerWidth;
+            _height = window.innerHeight;
+            renderer.setSize(_width, _height);
+            camera.aspect = _width / _height;
+            camera.updateProjectionMatrix();
+            console.log('- resize -');
+        }
 
-        function createPrimitive() {
-            _primitive = new primitiveElement();
+//--------------------------------------------------------------------
+        var _ambientLights, _lights;
+
+        function createLights() {
+            //_ambientLights = new THREE.AmbientLight(0xFFFFFF, 1);
+            _ambientLights = new THREE.HemisphereLight(0xFFFFFF, 0x000000, 1.4);
+            _lights = new THREE.PointLight(0xFFFFFF, 1);
+            _lights.position.set(20, 20, 20);
+            //scene.add(_lights);
+            scene.add(_ambientLights);
+        }
+
+//--------------------------------------------------------------------
+        var uniforms = {
+            time: {
+                type: "f",
+                value: 1.0
+            },
+            pointscale: {
+                type: "f",
+                value: 1.0
+            },
+            decay: {
+                type: "f",
+                value: 2.0
+            },
+            complex: {
+                type: "f",
+                value: 2.0
+            },
+            waves: {
+                type: "f",
+                value: 3.0
+            },
+            eqcolor: {
+                type: "f",
+                value: 3.0
+            },
+            fragment: {
+                type: 'i',
+                value: false
+            },
+            dnoise: {
+                type: 'f',
+                value: 0.0
+            },
+            qnoise: {
+                type: 'f',
+                value: 4.0
+            },
+            r_color: {
+                type: 'f',
+                value: 0.0
+            },
+            g_color: {
+                type: 'f',
+                value: 0.0
+            },
+            b_color: {
+                type: 'f',
+                value: 0.0
+            }
         }
 
         var options = {
             perlin: {
-                speed: 0.4,
-                size: 0.7,
+                vel: 0.002,
+                speed: 0.00005,
                 perlins: 1.0,
-                decay: 1.20,
-                displace: 1.00,
-                complex: 0.50,
-                waves: 3.7,
-                eqcolor: 10.0,
-                rcolor: 1.5,
-                gcolor: 1.5,
-                bcolor: 1.5,
-                fragment: true,
-                points: false,
-                redhell: false
+                decay: 0.25,
+                complex: 10.0,
+                waves: 9.0,
+                eqcolor: 3.0,
+                fragment: false,
+                redhell: true
             },
-            perlinRandom: function () {
-                gsap.to(this.perlin, {
-                    duration: 2,
-                    //decay: Math.random() * 1.0,
-                    waves: Math.random() * 20.0,
-                    complex: Math.random() * 1.0,
-                    displace: Math.random() * 2.5,
-                    ease: Elastic.easeOut
-                });
+            rgb: {
+                r_color: 1.5,
+                g_color: 1.5,
+                b_color: 1.5
             },
-            random: function () {
-                //this.perlin.redhell = Math.random() >= 0.5; // 10 1 0.1 1.2
-                gsap.to(this.perlin, {
-                    duration: 1,
-                    eqcolor: 11.0,
-                    rcolor: Math.random() * 1.5,
-                    gcolor: Math.random() * 0.5,
-                    bcolor: Math.random() * 1.5,
-                });
-            },
-            normal: function () {
-                this.perlin.redhell = true; // 10 1 0.1 1.2
-                gsap.to(this.perlin, {
-                    duration: 1,
-                    //speed: 0.12,
-                    eqcolor: 10.0,
-                    rcolor: 1.5,
-                    gcolor: 1.5,
-                    bcolor: 1.5,
-                });
-            },
-            darker: function () {
-                this.perlin.redhell = false; // 10 1 0.1 1.2
-                gsap.to(this.perlin, {
-                    duration: 1,
-                    //speed: 0.5,
-                    eqcolor: 9.0,
-                    rcolor: 0.4,
-                    gcolor: 0.05,
-                    bcolor: 0.6,
-                });
-            },
-            volcano: function () {
-                this.perlin.redhell = false; // 10 1 0.1 1.2
-                //this.perlin.speed = 0.83;
-
-                gsap.to(this.perlin, {
-                    duration: 1,
-                    size: 0.7,
-                    waves: 0.6,
-                    complex: 1.0,
-                    displace: 0.3,
-                    eqcolor: 9.0,
-                    rcolor: 0.85,
-                    gcolor: 0.05,
-                    bcolor: 0.32,
-                });
-            },
-            cloud: function () {
-                this.perlin.redhell = true; // 10 1 0.1 1.2
-                //this.perlin.speed = 0.1;
-
-                gsap.to(this.perlin, {
-                    duration: 1,
-                    size: 1.0,
-                    waves: 20.0,
-                    complex: 0.1,
-                    displace: 0.1,
-                    eqcolor: 4.0,
-                    rcolor: 1.5,
-                    gcolor: 0.7,
-                    bcolor: 1.5,
-                });
-            },
-            tornasol: function () {
-                this.perlin.redhell = true; // 10 1 0.1 1.2
-                //this.perlin.speed = 0.25;
-
-                gsap.to(this.perlin, {
-                    duration: 1,
-                    size: 1.0,
-                    waves: 3.0,
-                    complex: 0.65,
-                    displace: 0.5,
-                    eqcolor: 9.5,
-                    rcolor: 1.5,
-                    gcolor: 1.5,
-                    bcolor: 1.5,
-                });
+            cam: {
+                zoom: 0
             }
         }
 
-        const createGUI = () => {
+        function createGUI() {
             var gui = new GUI();
+            //gui.close();
 
-            var perlinGUI = gui.addFolder('Shape Setup');
-            perlinGUI.add(options, 'perlinRandom').name('• Random Shape');
-            perlinGUI.add(options.perlin, 'speed', 0.1, 1.0).name('Speed').listen();
-            perlinGUI.add(options.perlin, 'size', 0.0, 3.0).name('Size').listen();
-            //perlinGUI.add(options.perlin, 'decay', 0.0, 1.0).name('Decay').listen();
-            perlinGUI.add(options.perlin, 'waves', 0.0, 20.0).name('Waves').listen();
-            perlinGUI.add(options.perlin, 'complex', 0.1, 1.0).name('Complex').listen();
-            perlinGUI.add(options.perlin, 'displace', 0.1, 2.5).name('Displacement').listen();
-            //perlinGUI.open();
+            var configGUI = gui.addFolder('Setup');
+            configGUI.add(options.perlin, 'speed', 0.0, 0.001);
+            configGUI.open();
+
+            var perlinGUI = gui.addFolder('Perlin');
+            perlinGUI.add(options.perlin, 'decay', 0.0, 1.0).name('Decay').listen();
+            //perlinGUI.add(options.perlin, 'complex', 0.0, 100.0).name('Complex').listen();
+            perlinGUI.add(options.perlin, 'waves', 0.0, 10.0).name('Waves').listen();
+            perlinGUI.open();
 
             var colorGUI = gui.addFolder('Color');
-            colorGUI.add(options, 'random').name('• Random colors');
-            colorGUI.add(options, 'normal').name('• Normal colors');
-            colorGUI.add(options, 'darker').name('• Dark colors');
-            colorGUI.add(options.perlin, 'eqcolor', 0.0, 30.0).name('Hue').listen();
-            colorGUI.add(options.perlin, 'rcolor', 0.0, 2.5).name('R').listen();
-            colorGUI.add(options.perlin, 'gcolor', 0.0, 2.5).name('G').listen();
-            colorGUI.add(options.perlin, 'bcolor', 0.0, 2.5).name('B').listen();
-            colorGUI.add(options.perlin, 'redhell', true).name('Electroflow');
+            colorGUI.add(options.perlin, 'eqcolor', 3.0, 50.0).name('Color').listen();
+            colorGUI.add(options.rgb, 'r_color', 0.0, 2.5).name('Red').listen();
+            colorGUI.add(options.rgb, 'g_color', 0.0, 2.5).name('Green').listen();
+            colorGUI.add(options.rgb, 'b_color', 0.0, 2.5).name('Blue').listen();
+            colorGUI.open();
 
-            //colorGUI.open();
-
-            gui.add(options, 'volcano').name('• Volcano');
-            gui.add(options, 'tornasol').name('• Tornasol');
-            gui.add(options, 'cloud').name('• Cotton Candy');
-            gui.add(options.perlin, 'points', true).name('Points');
         }
 
-        //--------------------------------------------------------------------
+        var primitiveElement = function () {
+            this.mesh = new THREE.Object3D();
+            var geo = new THREE.IcosahedronGeometry(4, 7);
+            //var mat = new THREE.MeshPhongMaterial({color:0xFF0000, flatShading:true});
+            mat = new THREE.ShaderMaterial({
+                wireframe: false,
+                uniforms: uniforms,
+                vertexShader: document.getElementById('vertexShader').textContent,
+                fragmentShader: document.getElementById('fragmentShader').textContent
+            });
+            var mesh = new THREE.Mesh(geo, mat);
+            //---
+            this.mesh.add(mesh);
+        }
+        var _primitive;
+
+        function createPrimitive() {
+            _primitive = new primitiveElement();
+            _primitive.mesh.scale.set(1, 1, 1);
+            scene.add(_primitive.mesh);
+        }
+
+        function createGrid() {
+            var gridHelper = new THREE.GridHelper(20, 20);
+            gridHelper.position.y = -1;
+            scene.add(gridHelper);
+        }
+
+//--------------------------------------------------------------------
+        var start = Date.now();
+
         function animation() {
-            _primitive.point.visible = options.perlin.points;
+            requestAnimationFrame(animation);
 
-            mat.uniforms['time'].value = (options.perlin.speed / 1000) * (Date.now() - start);
+            var time = Date.now() * 0.003;
 
+            // TweenMax.to(camera.position, 1, {z:options.cam.zoom+5});
+
+            // _primitive.mesh.rotation.y += 0.001;
+            mat.uniforms['time'].value = options.perlin.speed * (Date.now() - start);
             mat.uniforms['pointscale'].value = options.perlin.perlins;
             mat.uniforms['decay'].value = options.perlin.decay;
-            mat.uniforms['size'].value = options.perlin.size;
-            mat.uniforms['displace'].value = options.perlin.displace;
-            // mat.uniforms['complex'].value = options.perlin.complex;
-            // mat.uniforms['waves'].value = options.perlin.waves;
-            // mat.uniforms['fragment'].value = options.perlin.fragment;
-
-            mat.uniforms['redhell'].value = options.perlin.redhell;
+            mat.uniforms['complex'].value = options.perlin.complex;
+            mat.uniforms['waves'].value = options.perlin.waves;
             mat.uniforms['eqcolor'].value = options.perlin.eqcolor;
-            mat.uniforms['rcolor'].value = options.perlin.rcolor;
-            mat.uniforms['gcolor'].value = options.perlin.gcolor;
-            mat.uniforms['bcolor'].value = options.perlin.bcolor;
+            mat.uniforms['r_color'].value = options.rgb.r_color;
+            mat.uniforms['g_color'].value = options.rgb.g_color;
+            mat.uniforms['b_color'].value = options.rgb.b_color;
+            mat.uniforms['fragment'].value = options.perlin.fragment;
             //---
-            requestAnimationFrame(animation);
-            self.renderer.render(self.scene, self.camera);
+            renderer.render(scene, camera);
         }
 
-        createGUI();
+        createWorld();
+        createLights();
         createPrimitive();
+        createGUI();
         animation();
-
-        mat.uniforms['rcolor'].value = 0.46;
-        mat.uniforms['gcolor'].value = 0.74;
-        mat.uniforms['bcolor'].value = 0.85;
-
-        // color animation
-        // gsap.timeline({
-        //     onComplete: function () {
-        //         this.restart();
-        //         console.log(1);
-        //     },
-        // })
-        //     .add("light")
-        //     .to(mat.uniforms['rcolor'], {
-        //         value: 46,
-        //         duration: 20,
-        //         ease: "power2.inOut",
-        //     }, "light")
-        //     .to(mat.uniforms['gcolor'], {
-        //         value: 74,
-        //         duration: 20,
-        //         ease: "power2.inOut",
-        //     }, "light")
-        //     .to(mat.uniforms['bcolor'], {
-        //         value: 85,
-        //         duration: 20,
-        //         ease: "power2.inOut",
-        //     }, "light")
-        //     .add("dark")
-        //     .to(mat.uniforms['rcolor'], {
-        //         value: 0,
-        //         duration: 20,
-        //         ease: "power2.inOut",
-        //     }, "dark")
-        //     .to(mat.uniforms['gcolor'], {
-        //         value: 20,
-        //         duration: 20,
-        //         ease: "power2.inOut",
-        //     }, "dark")
-        //     .to(mat.uniforms['bcolor'], {
-        //         value: 29,
-        //         duration: 20,
-        //         ease: "power2.inOut",
-        //     }, "dark")
-        //     .add("medium")
-        //     .to(mat.uniforms['rcolor'], {
-        //         value: 24,
-        //         duration: 20,
-        //         ease: "power2.inOut",
-        //     }, "medium")
-        //     .to(mat.uniforms['gcolor'], {
-        //         value: 52,
-        //         duration: 20,
-        //         ease: "power2.inOut",
-        //     }, "medium")
-        //     .to(mat.uniforms['bcolor'], {
-        //         value: 63,
-        //         duration: 20,
-        //         ease: "power2.inOut",
-        //     }, "medium")
-    }
-
-    onWindowResize() {
-        this.renderer.setSize(this.width, this.height);
-        this.camera.aspect = this.width / this.height;
-        this.camera.updateProjectionMatrix();
-        console.log('- resize -');
     }
 }

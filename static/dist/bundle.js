@@ -783,6 +783,256 @@ exports.default = NavigationController;
 },{}],5:[function(require,module,exports){
 "use strict";
 
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var THREE = _interopRequireWildcard(require("three"));
+
+var _datGuiModule = require("three/examples/jsm/libs/dat.gui.module.js");
+
+var _gsap = require("gsap");
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var HomeVerticalSlider = /*#__PURE__*/function () {
+  function HomeVerticalSlider() {
+    _classCallCheck(this, HomeVerticalSlider);
+
+    this.DOM = {
+      wrapper: ".js-perlin-gradient"
+    };
+  }
+
+  _createClass(HomeVerticalSlider, [{
+    key: "init",
+    value: function init() {
+      //--------------------------------------------------------------------
+      var scene, camera, renderer, container;
+
+      var _width, _height;
+
+      var mat;
+
+      function createWorld() {
+        _width = window.innerWidth;
+        _height = window.innerHeight; //---
+
+        scene = new THREE.Scene();
+        scene.fog = new THREE.Fog(0x000000, 5, 15);
+        scene.background = new THREE.Color(0x000000); //---
+
+        camera = new THREE.PerspectiveCamera(35, _width / _height, 1, 1000);
+        camera.position.set(0, 0, 10);
+        camera.lookAt(0, 0, 0); //---
+
+        renderer = new THREE.WebGLRenderer({
+          antialias: true,
+          alpha: true
+        });
+        renderer.setSize(_width, _height);
+        renderer.shadowMap.enabled = true; //---
+
+        document.body.appendChild(renderer.domElement); //---
+
+        window.addEventListener('resize', onWindowResize, false);
+      }
+
+      function onWindowResize() {
+        _width = window.innerWidth;
+        _height = window.innerHeight;
+        renderer.setSize(_width, _height);
+        camera.aspect = _width / _height;
+        camera.updateProjectionMatrix();
+        console.log('- resize -');
+      } //--------------------------------------------------------------------
+
+
+      var _ambientLights, _lights;
+
+      function createLights() {
+        //_ambientLights = new THREE.AmbientLight(0xFFFFFF, 1);
+        _ambientLights = new THREE.HemisphereLight(0xFFFFFF, 0x000000, 1.4);
+        _lights = new THREE.PointLight(0xFFFFFF, 1);
+
+        _lights.position.set(20, 20, 20); //scene.add(_lights);
+
+
+        scene.add(_ambientLights);
+      } //--------------------------------------------------------------------
+
+
+      var uniforms = {
+        time: {
+          type: "f",
+          value: 1.0
+        },
+        pointscale: {
+          type: "f",
+          value: 1.0
+        },
+        decay: {
+          type: "f",
+          value: 2.0
+        },
+        complex: {
+          type: "f",
+          value: 2.0
+        },
+        waves: {
+          type: "f",
+          value: 3.0
+        },
+        eqcolor: {
+          type: "f",
+          value: 3.0
+        },
+        fragment: {
+          type: 'i',
+          value: false
+        },
+        dnoise: {
+          type: 'f',
+          value: 0.0
+        },
+        qnoise: {
+          type: 'f',
+          value: 4.0
+        },
+        r_color: {
+          type: 'f',
+          value: 0.0
+        },
+        g_color: {
+          type: 'f',
+          value: 0.0
+        },
+        b_color: {
+          type: 'f',
+          value: 0.0
+        }
+      };
+      var options = {
+        perlin: {
+          vel: 0.002,
+          speed: 0.00005,
+          perlins: 1.0,
+          decay: 0.25,
+          complex: 10.0,
+          waves: 9.0,
+          eqcolor: 3.0,
+          fragment: false,
+          redhell: true
+        },
+        rgb: {
+          r_color: 1.5,
+          g_color: 1.5,
+          b_color: 1.5
+        },
+        cam: {
+          zoom: 0
+        }
+      };
+
+      function createGUI() {
+        var gui = new _datGuiModule.GUI(); //gui.close();
+
+        var configGUI = gui.addFolder('Setup');
+        configGUI.add(options.perlin, 'speed', 0.0, 0.001);
+        configGUI.open();
+        var perlinGUI = gui.addFolder('Perlin');
+        perlinGUI.add(options.perlin, 'decay', 0.0, 1.0).name('Decay').listen(); //perlinGUI.add(options.perlin, 'complex', 0.0, 100.0).name('Complex').listen();
+
+        perlinGUI.add(options.perlin, 'waves', 0.0, 10.0).name('Waves').listen();
+        perlinGUI.open();
+        var colorGUI = gui.addFolder('Color');
+        colorGUI.add(options.perlin, 'eqcolor', 3.0, 50.0).name('Color').listen();
+        colorGUI.add(options.rgb, 'r_color', 0.0, 2.5).name('Red').listen();
+        colorGUI.add(options.rgb, 'g_color', 0.0, 2.5).name('Green').listen();
+        colorGUI.add(options.rgb, 'b_color', 0.0, 2.5).name('Blue').listen();
+        colorGUI.open();
+      }
+
+      var primitiveElement = function primitiveElement() {
+        this.mesh = new THREE.Object3D();
+        var geo = new THREE.IcosahedronGeometry(4, 7); //var mat = new THREE.MeshPhongMaterial({color:0xFF0000, flatShading:true});
+
+        mat = new THREE.ShaderMaterial({
+          wireframe: false,
+          uniforms: uniforms,
+          vertexShader: document.getElementById('vertexShader').textContent,
+          fragmentShader: document.getElementById('fragmentShader').textContent
+        });
+        var mesh = new THREE.Mesh(geo, mat); //---
+
+        this.mesh.add(mesh);
+      };
+
+      var _primitive;
+
+      function createPrimitive() {
+        _primitive = new primitiveElement();
+
+        _primitive.mesh.scale.set(1, 1, 1);
+
+        scene.add(_primitive.mesh);
+      }
+
+      function createGrid() {
+        var gridHelper = new THREE.GridHelper(20, 20);
+        gridHelper.position.y = -1;
+        scene.add(gridHelper);
+      } //--------------------------------------------------------------------
+
+
+      var start = Date.now();
+
+      function animation() {
+        requestAnimationFrame(animation);
+        var time = Date.now() * 0.003; // TweenMax.to(camera.position, 1, {z:options.cam.zoom+5});
+        // _primitive.mesh.rotation.y += 0.001;
+
+        mat.uniforms['time'].value = options.perlin.speed * (Date.now() - start);
+        mat.uniforms['pointscale'].value = options.perlin.perlins;
+        mat.uniforms['decay'].value = options.perlin.decay;
+        mat.uniforms['complex'].value = options.perlin.complex;
+        mat.uniforms['waves'].value = options.perlin.waves;
+        mat.uniforms['eqcolor'].value = options.perlin.eqcolor;
+        mat.uniforms['r_color'].value = options.rgb.r_color;
+        mat.uniforms['g_color'].value = options.rgb.g_color;
+        mat.uniforms['b_color'].value = options.rgb.b_color;
+        mat.uniforms['fragment'].value = options.perlin.fragment; //---
+
+        renderer.render(scene, camera);
+      }
+
+      createWorld();
+      createLights();
+      createPrimitive();
+      createGUI();
+      animation();
+    }
+  }]);
+
+  return HomeVerticalSlider;
+}();
+
+exports.default = HomeVerticalSlider;
+
+},{"gsap":"gsap","three":"three","three/examples/jsm/libs/dat.gui.module.js":"three/examples/jsm/libs/dat.gui.module.js"}],6:[function(require,module,exports){
+"use strict";
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -879,7 +1129,7 @@ var EqualHeight = /*#__PURE__*/function () {
 
 new EqualHeight();
 
-},{"gsap":"gsap","gsap/ScrollTrigger":"gsap/ScrollTrigger"}],6:[function(require,module,exports){
+},{"gsap":"gsap","gsap/ScrollTrigger":"gsap/ScrollTrigger"}],7:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -1615,7 +1865,7 @@ var TimelineSlider = /*#__PURE__*/function () {
 
 exports.default = TimelineSlider;
 
-},{"gsap":"gsap","swiper":"swiper","three":"three","three/examples/jsm/libs/dat.gui.module.js":"three/examples/jsm/libs/dat.gui.module.js","three/examples/jsm/postprocessing/BokehPass":"three/examples/jsm/postprocessing/BokehPass","three/examples/jsm/postprocessing/EffectComposer":"three/examples/jsm/postprocessing/EffectComposer","three/examples/jsm/postprocessing/RenderPass":"three/examples/jsm/postprocessing/RenderPass"}],7:[function(require,module,exports){
+},{"gsap":"gsap","swiper":"swiper","three":"three","three/examples/jsm/libs/dat.gui.module.js":"three/examples/jsm/libs/dat.gui.module.js","three/examples/jsm/postprocessing/BokehPass":"three/examples/jsm/postprocessing/BokehPass","three/examples/jsm/postprocessing/EffectComposer":"three/examples/jsm/postprocessing/EffectComposer","three/examples/jsm/postprocessing/RenderPass":"three/examples/jsm/postprocessing/RenderPass"}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1690,7 +1940,7 @@ var VideoScrub = /*#__PURE__*/function () {
 
 exports.default = VideoScrub;
 
-},{"gsap":"gsap","gsap/ScrollTrigger":"gsap/ScrollTrigger"}],8:[function(require,module,exports){
+},{"gsap":"gsap","gsap/ScrollTrigger":"gsap/ScrollTrigger"}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1750,7 +2000,7 @@ var DarkModeHelper = /*#__PURE__*/function () {
 
 exports.default = DarkModeHelper;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1810,7 +2060,7 @@ var EqualHeight = /*#__PURE__*/function () {
 
 exports.default = EqualHeight;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1924,7 +2174,7 @@ var GridHelper = /*#__PURE__*/function () {
 
 exports.default = GridHelper;
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 var _GridHelper = _interopRequireDefault(require("./helpers/GridHelper"));
@@ -1946,6 +2196,8 @@ var _Dummy = _interopRequireDefault(require("./components/Dummy"));
 var _GradientBg = _interopRequireDefault(require("./components/GradientBg"));
 
 var _HomeVerticalSlider = _interopRequireDefault(require("./components/HomeVerticalSlider"));
+
+var _PerlinGradient = _interopRequireDefault(require("./components/PerlinGradient"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1988,6 +2240,8 @@ ready(function () {
   var navigation = new _NavigationController.default();
   navigation.init();
   var equalHeight = new _EqualHeight.default();
+  var perlinGradient = new _PerlinGradient.default();
+  perlinGradient.init();
   var homeVerticalSlider = new _HomeVerticalSlider.default();
 
   if (document.getElementById("timeline-slider") !== null) {
@@ -2010,6 +2264,6 @@ ready(function () {
   }
 });
 
-},{"./components/Dummy":1,"./components/GradientBg":2,"./components/HomeVerticalSlider":3,"./components/NavigationController":4,"./components/ScrollProgress":5,"./components/TimelineSlider":6,"./components/VideoScrub":7,"./helpers/DarkModeHelper":8,"./helpers/EqualHeight":9,"./helpers/GridHelper":10}]},{},[11])
+},{"./components/Dummy":1,"./components/GradientBg":2,"./components/HomeVerticalSlider":3,"./components/NavigationController":4,"./components/PerlinGradient":5,"./components/ScrollProgress":6,"./components/TimelineSlider":7,"./components/VideoScrub":8,"./helpers/DarkModeHelper":9,"./helpers/EqualHeight":10,"./helpers/GridHelper":11}]},{},[12])
 
 //# sourceMappingURL=bundle.js.map
