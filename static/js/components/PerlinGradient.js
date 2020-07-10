@@ -1,8 +1,8 @@
 import * as THREE from "three";
 
-import {GUI} from "three/examples/jsm/libs/dat.gui.module.js";
+import { GUI } from "three/examples/jsm/libs/dat.gui.module.js";
 
-import {gsap} from "gsap";
+import { gsap } from "gsap";
 
 export default class HomeVerticalSlider {
     constructor() {
@@ -13,105 +13,89 @@ export default class HomeVerticalSlider {
 
     init() {
         //--------------------------------------------------------------------
-        var scene, camera, renderer, container;
-        var _width, _height;
-        var mat;
+        const self = this;
+        this.width = window.innerWidth;
+        this.height = window.innerHeight;
+        this.start = Date.now();
+        this.primitive = null;
+        this.mat = null;
 
-        function createWorld() {
-            _width = window.innerWidth;
-            _height = window.innerHeight;
-            //---
-            scene = new THREE.Scene();
-            scene.fog = new THREE.Fog(0x000000, 5, 15);
-            scene.background = new THREE.Color(0x000000);
-            //---
-            camera = new THREE.PerspectiveCamera(35, _width / _height, 1, 1000);
-            camera.position.set(0, 0, 10);
-            camera.lookAt(0, 0, 0);
-            //---
-            renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
-            renderer.setSize(_width, _height);
-            renderer.shadowMap.enabled = true;
-            //---
-            document.body.appendChild(renderer.domElement);
-            //---
-            window.addEventListener('resize', onWindowResize, false);
-        }
+        //---
+        this.scene = new THREE.Scene();
+        this.scene.fog = new THREE.Fog(0x000000, 5, 15);
+        this.scene.background = new THREE.Color(0x000000);
+        //---
+        this.camera = new THREE.PerspectiveCamera(
+            35,
+            this.width / this.height,
+            1,
+            1000,
+        );
+        this.camera.position.set(0, 0, 10);
+        this.camera.lookAt(0, 0, 0);
+        //---
+        this.renderer = new THREE.WebGLRenderer({
+            antialias: false,
+            alpha: false,
+        });
+        this.renderer.setSize(this.width, this.height);
+        this.renderer.shadowMap.enabled = true;
+        //---
+        document.body.appendChild(this.renderer.domElement);
+        //---
 
-        function onWindowResize() {
-            _width = window.innerWidth;
-            _height = window.innerHeight;
-            renderer.setSize(_width, _height);
-            camera.aspect = _width / _height;
-            camera.updateProjectionMatrix();
-            console.log('- resize -');
-        }
-
-//--------------------------------------------------------------------
-        var _ambientLights, _lights;
-
-        function createLights() {
-            //_ambientLights = new THREE.AmbientLight(0xFFFFFF, 1);
-            _ambientLights = new THREE.HemisphereLight(0xFFFFFF, 0x000000, 1.4);
-            _lights = new THREE.PointLight(0xFFFFFF, 1);
-            _lights.position.set(20, 20, 20);
-            //scene.add(_lights);
-            scene.add(_ambientLights);
-        }
-
-//--------------------------------------------------------------------
-        var uniforms = {
+        this.uniforms = {
             time: {
                 type: "f",
-                value: 1.0
+                value: 1.0,
             },
             pointscale: {
                 type: "f",
-                value: 1.0
+                value: 1.0,
             },
             decay: {
                 type: "f",
-                value: 2.0
+                value: 2.0,
             },
             complex: {
                 type: "f",
-                value: 2.0
+                value: 2.0,
             },
             waves: {
                 type: "f",
-                value: 3.0
+                value: 3.0,
             },
             eqcolor: {
                 type: "f",
-                value: 3.0
+                value: 3.0,
             },
             fragment: {
-                type: 'i',
-                value: false
+                type: "i",
+                value: false,
             },
             dnoise: {
-                type: 'f',
-                value: 0.0
+                type: "f",
+                value: 0.0,
             },
             qnoise: {
-                type: 'f',
-                value: 4.0
+                type: "f",
+                value: 4.0,
             },
             r_color: {
-                type: 'f',
-                value: 0.0
+                type: "f",
+                value: 0.0,
             },
             g_color: {
-                type: 'f',
-                value: 0.0
+                type: "f",
+                value: 0.0,
             },
             b_color: {
-                type: 'f',
-                value: 0.0
-            }
-        }
+                type: "f",
+                value: 0.0,
+            },
+        };
 
-        var options = {
+        this.options = {
             perlin: {
                 vel: 0.002,
                 speed: 0.00005,
@@ -121,98 +105,127 @@ export default class HomeVerticalSlider {
                 waves: 9.0,
                 eqcolor: 3.0,
                 fragment: false,
-                redhell: true
+                redhell: false,
             },
             rgb: {
                 r_color: 1.5,
                 g_color: 1.5,
-                b_color: 1.5
+                b_color: 1.5,
             },
             cam: {
-                zoom: 0
-            }
+                zoom: 0,
+            },
+        };
+
+        this.createLights();
+        this.createPrimitive();
+        this.createGUI();
+        this.animation();
+        window.addEventListener("resize", this.onWindowResize, false);
+    }
+
+    animation() {
+        // this.primitive.mesh.rotation.y += 0.001;
+        if (this.mat != null) {
+            this.mat.uniforms["time"].value =
+                this.options.perlin.speed * (Date.now() - this.start);
+            this.mat.uniforms["pointscale"].value = this.options.perlin.perlins;
+            this.mat.uniforms["decay"].value = this.options.perlin.decay;
+            this.mat.uniforms["complex"].value = this.options.perlin.complex;
+            this.mat.uniforms["waves"].value = this.options.perlin.waves;
+            this.mat.uniforms["eqcolor"].value = this.options.perlin.eqcolor;
+            this.mat.uniforms["r_color"].value = this.options.rgb.r_color;
+            this.mat.uniforms["g_color"].value = this.options.rgb.g_color;
+            this.mat.uniforms["b_color"].value = this.options.rgb.b_color;
+            this.mat.uniforms["fragment"].value = this.options.perlin.fragment;
         }
+        //---
+        this.renderer.render(this.scene, this.camera);
 
-        function createGUI() {
-            var gui = new GUI();
-            //gui.close();
+        requestAnimationFrame(() => this.animation());
+    }
 
-            var configGUI = gui.addFolder('Setup');
-            configGUI.add(options.perlin, 'speed', 0.0, 0.001);
-            configGUI.open();
+    onWindowResize() {
+        this.renderer.setSize(this.width, this.height);
+        this.camera.aspect = this.width / this.height;
+        this.camera.updateProjectionMatrix();
+        console.log("resize");
+    }
 
-            var perlinGUI = gui.addFolder('Perlin');
-            perlinGUI.add(options.perlin, 'decay', 0.0, 1.0).name('Decay').listen();
-            //perlinGUI.add(options.perlin, 'complex', 0.0, 100.0).name('Complex').listen();
-            perlinGUI.add(options.perlin, 'waves', 0.0, 10.0).name('Waves').listen();
-            perlinGUI.open();
+    createLights() {
+        //const ambientLights = new THREE.AmbientLight(0xFFFFFF, 1);
+        const ambientLights = new THREE.HemisphereLight(
+            0xffffff,
+            0x000000,
+            1.4,
+        );
+        const lights = new THREE.PointLight(0xffffff, 1);
+        lights.position.set(20, 20, 20);
+        // this.scene.add(lights);
+        // this.scene.add(ambientLights);
+    }
 
-            var colorGUI = gui.addFolder('Color');
-            colorGUI.add(options.perlin, 'eqcolor', 3.0, 50.0).name('Color').listen();
-            colorGUI.add(options.rgb, 'r_color', 0.0, 2.5).name('Red').listen();
-            colorGUI.add(options.rgb, 'g_color', 0.0, 2.5).name('Green').listen();
-            colorGUI.add(options.rgb, 'b_color', 0.0, 2.5).name('Blue').listen();
-            colorGUI.open();
+    createGUI() {
+        this.gui = new GUI();
+        //gui.close();
 
-        }
+        const configGUI = this.gui.addFolder("Setup");
+        configGUI.add(this.options.perlin, "speed", 0.0, 0.001);
+        configGUI.open();
 
-        var primitiveElement = function () {
+        const perlinGUI = this.gui.addFolder("Perlin");
+        perlinGUI
+            .add(this.options.perlin, "decay", 0.0, 1.0)
+            .name("Decay")
+            .listen();
+        //perlinGUI.add(options.perlin, 'complex', 0.0, 100.0).name('Complex').listen();
+        perlinGUI
+            .add(this.options.perlin, "waves", 0.0, 10.0)
+            .name("Waves")
+            .listen();
+        perlinGUI.open();
+
+        const colorGUI = this.gui.addFolder("Color");
+        colorGUI
+            .add(this.options.perlin, "eqcolor", 3.0, 50.0)
+            .name("Color")
+            .listen();
+        colorGUI
+            .add(this.options.rgb, "r_color", 0.0, 2.5)
+            .name("Red")
+            .listen();
+        colorGUI
+            .add(this.options.rgb, "g_color", 0.0, 2.5)
+            .name("Green")
+            .listen();
+        colorGUI
+            .add(this.options.rgb, "b_color", 0.0, 2.5)
+            .name("Blue")
+            .listen();
+        colorGUI.open();
+    }
+
+    createPrimitive() {
+        const self = this;
+        const primitiveElement = function () {
             this.mesh = new THREE.Object3D();
-            var geo = new THREE.IcosahedronGeometry(4, 7);
+            const geo = new THREE.IcosahedronGeometry(4, 7);
             //var mat = new THREE.MeshPhongMaterial({color:0xFF0000, flatShading:true});
-            mat = new THREE.ShaderMaterial({
+            self.mat = new THREE.ShaderMaterial({
                 wireframe: false,
-                uniforms: uniforms,
-                vertexShader: document.getElementById('vertexShader').textContent,
-                fragmentShader: document.getElementById('fragmentShader').textContent
+                uniforms: self.uniforms,
+                vertexShader: document.getElementById("vertexShader")
+                    .textContent,
+                fragmentShader: document.getElementById("fragmentShader")
+                    .textContent,
             });
-            var mesh = new THREE.Mesh(geo, mat);
+            const mesh = new THREE.Mesh(geo, self.mat);
             //---
             this.mesh.add(mesh);
-        }
-        var _primitive;
+        };
 
-        function createPrimitive() {
-            _primitive = new primitiveElement();
-            _primitive.mesh.scale.set(1, 1, 1);
-            scene.add(_primitive.mesh);
-        }
-
-        function createGrid() {
-            var gridHelper = new THREE.GridHelper(20, 20);
-            gridHelper.position.y = -1;
-            scene.add(gridHelper);
-        }
-
-//--------------------------------------------------------------------
-        var start = Date.now();
-
-        function animation() {
-            requestAnimationFrame(animation);
-
-            var time = Date.now() * 0.003;
-
-            // TweenMax.to(camera.position, 1, {z:options.cam.zoom+5});
-
-            // _primitive.mesh.rotation.y += 0.001;
-            mat.uniforms['time'].value = options.perlin.speed * (Date.now() - start);
-            mat.uniforms['pointscale'].value = options.perlin.perlins;
-            mat.uniforms['decay'].value = options.perlin.decay;
-            mat.uniforms['complex'].value = options.perlin.complex;
-            mat.uniforms['waves'].value = options.perlin.waves;
-            mat.uniforms['eqcolor'].value = options.perlin.eqcolor;
-            mat.uniforms['r_color'].value = options.rgb.r_color;
-            mat.uniforms['g_color'].value = options.rgb.g_color;
-            mat.uniforms['b_color'].value = options.rgb.b_color;
-            mat.uniforms['fragment'].value = options.perlin.fragment;
-            //---
-            renderer.render(scene, camera);
-        }
-
-        createWorld();
-        createLights();
-        createPrimitive();
-        createGUI();
-        animation();
+        this.primitive = new primitiveElement();
+        this.primitive.mesh.scale.set(1, 1, 1);
+        this.scene.add(this.primitive.mesh);
     }
 }
