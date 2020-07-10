@@ -24,20 +24,20 @@ export default class HomeVerticalSlider {
         const self = this;
         this.width = window.innerWidth;
         this.height = window.innerHeight;
-        //---
+
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x292733);
-        //---
+
         this.camera = new THREE.PerspectiveCamera(35, this.width / this.height, 1, 1000);
         this.camera.position.set(0, 0, 16);
-        //---
+
         this.renderer = new THREE.WebGLRenderer({
             antialias: true,
             alpha: false,
         });
         this.renderer.setSize(this.width, this.height);
         this.renderer.shadowMap.enabled = true;
-        //---
+
         document.querySelector(self.DOM.wrapper).appendChild(this.renderer.domElement);
 
         this.options = {
