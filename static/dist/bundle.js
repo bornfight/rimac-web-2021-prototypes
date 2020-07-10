@@ -822,10 +822,6 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
   _createClass(HomeVerticalSlider, [{
     key: "init",
     value: function init() {
-      function getColorValue(val) {
-        return 1.9 - 1.9 / 255 * val;
-      }
-
       this.primitive;
       this.shapeGroup = new THREE.Group();
       this.start = Date.now();
@@ -858,9 +854,9 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
           complex: 0.1,
           waves: 5,
           eqcolor: 3.0,
-          r_color: getColorValue(46),
-          g_color: getColorValue(74),
-          b_color: getColorValue(85),
+          r_color: this.getColorValue(46),
+          g_color: this.getColorValue(74),
+          b_color: this.getColorValue(85),
           fragment: false,
           redhell: false
         }
@@ -879,21 +875,21 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
           }
         }
       }).add("light").to(this.options.perlin, {
-        r_color: getColorValue(46),
-        g_color: getColorValue(74),
-        b_color: getColorValue(85),
+        r_color: this.getColorValue(46),
+        g_color: this.getColorValue(74),
+        b_color: this.getColorValue(85),
         duration: duration,
         ease: "none"
       }, "light").add("medium").to(this.options.perlin, {
-        r_color: getColorValue(24),
-        g_color: getColorValue(52),
-        b_color: getColorValue(63),
+        r_color: this.getColorValue(24),
+        g_color: this.getColorValue(52),
+        b_color: this.getColorValue(63),
         duration: duration,
         ease: "none"
       }, "medium").add("dark").to(this.options.perlin, {
-        r_color: getColorValue(0),
-        g_color: getColorValue(20),
-        b_color: getColorValue(29),
+        r_color: this.getColorValue(0),
+        g_color: this.getColorValue(20),
+        b_color: this.getColorValue(29),
         duration: duration,
         ease: "none"
       }, "dark");
@@ -1020,6 +1016,11 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       };
 
       this.primitive = new primitiveElement();
+    }
+  }, {
+    key: "getColorValue",
+    value: function getColorValue(val) {
+      return 1.9 - 1.9 / 255 * val;
     }
   }]);
 

@@ -16,11 +16,6 @@ export default class HomeVerticalSlider {
     }
 
     init() {
-
-        function getColorValue(val) {
-            return 1.9 - (1.9 / 255) * val;
-        }
-
         this.primitive;
         this.shapeGroup = new THREE.Group();
         this.start = Date.now();
@@ -55,9 +50,9 @@ export default class HomeVerticalSlider {
                 complex: 0.1,
                 waves: 5,
                 eqcolor: 3.0,
-                r_color: getColorValue(46),
-                g_color: getColorValue(74),
-                b_color: getColorValue(85),
+                r_color: this.getColorValue(46),
+                g_color: this.getColorValue(74),
+                b_color: this.getColorValue(85),
                 fragment: false,
                 redhell: false,
             },
@@ -82,9 +77,9 @@ export default class HomeVerticalSlider {
             .to(
                 this.options.perlin,
                 {
-                    r_color: getColorValue(46),
-                    g_color: getColorValue(74),
-                    b_color: getColorValue(85),
+                    r_color: this.getColorValue(46),
+                    g_color: this.getColorValue(74),
+                    b_color: this.getColorValue(85),
                     duration: duration,
                     ease: "none",
                 },
@@ -94,9 +89,9 @@ export default class HomeVerticalSlider {
             .to(
                 this.options.perlin,
                 {
-                    r_color: getColorValue(24),
-                    g_color: getColorValue(52),
-                    b_color: getColorValue(63),
+                    r_color: this.getColorValue(24),
+                    g_color: this.getColorValue(52),
+                    b_color: this.getColorValue(63),
                     duration: duration,
                     ease: "none",
                 },
@@ -106,9 +101,9 @@ export default class HomeVerticalSlider {
             .to(
                 this.options.perlin,
                 {
-                    r_color: getColorValue(0),
-                    g_color: getColorValue(20),
-                    b_color: getColorValue(29),
+                    r_color: this.getColorValue(0),
+                    g_color: this.getColorValue(20),
+                    b_color: this.getColorValue(29),
                     duration: duration,
                     ease: "none",
                 },
@@ -119,7 +114,7 @@ export default class HomeVerticalSlider {
     createGUI() {
         this.gui = new GUI();
 
-        var perlinGUI = this.gui.addFolder("Shape Setup");
+        const perlinGUI = this.gui.addFolder("Shape Setup");
         perlinGUI
             .add(this.options.perlin, "speed", 0.00001, 0.0001)
             .name("Speed")
@@ -263,5 +258,9 @@ export default class HomeVerticalSlider {
         };
 
         this.primitive = new primitiveElement();
+    }
+
+    getColorValue(val) {
+        return 1.9 - (1.9 / 255) * val;
     }
 }
