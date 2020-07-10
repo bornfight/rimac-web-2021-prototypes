@@ -64,7 +64,6 @@ ready(() => {
     const equalHeight = new EqualHeight();
 
     const perlinGradient = new PerlinGradient();
-    perlinGradient.init();
 
     const homeVerticalSlider = new HomeVerticalSlider();
 
