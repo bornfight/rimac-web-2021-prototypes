@@ -919,6 +919,41 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       this.createGUI();
       this.animation();
       window.addEventListener("resize", this.onWindowResize, false);
+      var duration = 10;
+
+      var tl = _gsap.gsap.timeline({
+        yoyo: true,
+        onComplete: function onComplete() {
+          tl.restart();
+        }
+      }).add("light").to(this.options.rgb, {
+        duration: duration,
+        r_color: 2
+      }, "light").to(this.options.rgb, {
+        duration: duration,
+        g_color: 2
+      }, "light").to(this.options.rgb, {
+        duration: duration,
+        b_color: 2
+      }, "light").add("dark").to(this.options.rgb, {
+        duration: duration,
+        r_color: 0.5
+      }, "dark").to(this.options.rgb, {
+        duration: duration,
+        g_color: 0.5
+      }, "dark").to(this.options.rgb, {
+        duration: duration,
+        b_color: 0.5
+      }, "dark").add("medium").to(this.options.rgb, {
+        duration: duration,
+        r_color: 1.2
+      }, "medium").to(this.options.rgb, {
+        duration: duration,
+        g_color: 1.2
+      }, "medium").to(this.options.rgb, {
+        duration: duration,
+        b_color: 1.2
+      }, "medium");
     }
   }, {
     key: "animation",

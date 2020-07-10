@@ -1,8 +1,8 @@
 import * as THREE from "three";
 
-import { GUI } from "three/examples/jsm/libs/dat.gui.module.js";
+import {GUI} from "three/examples/jsm/libs/dat.gui.module.js";
 
-import { gsap } from "gsap";
+import {gsap} from "gsap";
 
 export default class HomeVerticalSlider {
     constructor() {
@@ -122,6 +122,53 @@ export default class HomeVerticalSlider {
         this.createGUI();
         this.animation();
         window.addEventListener("resize", this.onWindowResize, false);
+
+        const duration = 10;
+        const tl = gsap.timeline({
+            yoyo: true,
+            onComplete: () => {
+                tl.restart();
+            },
+        })
+            .add("light")
+            .to(this.options.rgb, {
+                duration: duration,
+                r_color: 2,
+            }, "light")
+            .to(this.options.rgb, {
+                duration: duration,
+                g_color: 2,
+            }, "light")
+            .to(this.options.rgb, {
+                duration: duration,
+                b_color: 2,
+            }, "light")
+            .add("dark")
+            .to(this.options.rgb, {
+                duration: duration,
+                r_color: 0.5,
+            }, "dark")
+            .to(this.options.rgb, {
+                duration: duration,
+                g_color: 0.5,
+            }, "dark")
+            .to(this.options.rgb, {
+                duration: duration,
+                b_color: 0.5,
+            }, "dark")
+            .add("medium")
+            .to(this.options.rgb, {
+                duration: duration,
+                r_color: 1.2,
+            }, "medium")
+            .to(this.options.rgb, {
+                duration: duration,
+                g_color: 1.2,
+            }, "medium")
+            .to(this.options.rgb, {
+                duration: duration,
+                b_color: 1.2,
+            }, "medium");
     }
 
     animation() {
