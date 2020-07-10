@@ -61,7 +61,10 @@ export default class HomeVerticalSlider {
         this.createGUI();
         this.createPrimitive();
         this.animation();
+        this.colorChange();
+    }
 
+    colorChange() {
         const duration = 3;
         const tl = gsap
             .timeline({

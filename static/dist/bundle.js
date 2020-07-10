@@ -864,6 +864,11 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       this.createGUI();
       this.createPrimitive();
       this.animation();
+      this.colorChange();
+    }
+  }, {
+    key: "colorChange",
+    value: function colorChange() {
       var duration = 3;
 
       var tl = _gsap.gsap.timeline({
