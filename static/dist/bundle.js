@@ -494,7 +494,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
             _gsap.gsap.to(self.sliderProgress, {
               duration: 0.8,
               y: swiper.progress / swiper.slides.length * (swiper.slides.length - 1) * self.sliderPagination.clientHeight,
-              ease: "power3.inOut"
+              ease: "elastic.out(1, 0.5)"
             });
 
             self.progressController(swiper, fullCircleOffset);
