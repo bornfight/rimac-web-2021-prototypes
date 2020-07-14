@@ -18,6 +18,8 @@ export default class HomeVerticalSlider {
 
             slider: ".js-slider",
             slidesWrapper: ".js-slider-wrapper",
+            sliderPagination: ".js-pagination-wrapper",
+            sliderProgress: ".js-pagination-progress",
         };
 
         this.videoSliderWrapper = document.querySelector(this.DOM.sliderWrapper);
@@ -43,6 +45,8 @@ export default class HomeVerticalSlider {
 
         this.slider = document.querySelector(this.DOM.slider);
         this.slidesWrapper = document.querySelector(this.DOM.slidesWrapper);
+        this.sliderProgress = document.querySelector(this.DOM.sliderProgress);
+        this.sliderPagination = document.querySelector(this.DOM.sliderPagination);
 
         this.canvasWrapper = document.querySelector(this.DOM.canvasWrapper);
 
@@ -238,6 +242,7 @@ export default class HomeVerticalSlider {
         // video.preload = true;
         // video.autoplay = true;
         // video.controls = true;
+        video.muted = true;
         this.videoSliderWrapper.appendChild(video);
         video.classList.add("js-home-slider-video", "c-homepage__video");
         this.videoPlayers.push(video);
@@ -335,28 +340,24 @@ export default class HomeVerticalSlider {
             freeModeMomentumBounce: true,
             freeModeMomentumBounceRatio: 1,
             freeModeMinimumVelocity: 0.02,
-            // effect: "fade",
-            // fadeEffect: {
-            //     crossFade: true,
-            // },
-            // navigation: {
-            // nextEl: this.timelineSliderNext,
-            // prevEl: this.timelineSliderPrev,
-            // },
-            // pagination: {
-            //     el: ".js-timeline-pagination",
-            //     clickable: true,
-            //     renderBullet: (index, className) => {
-            //         return `<span class="c-timeline__pagination-bullet ${className}">${this.data[index].year}</span>`;
-            //     },
-            // },
+            pagination: {
+                el: this.DOM.sliderPagination,
+                clickable: true,
+                renderBullet: (index, className) => {
+                    return `<span class="u-uppercase u-b0 u-fw-bold c-homepage__pagination-bullet ${className}">
+                                <i></i>
+                                ${this.data[index].title}
+                            </span>`;
+                },
+            },
             on: {
                 progress: function () {
                     let swiper = this;
-                    // console.log(swiper.progress);
-                    // gsap.to(self.progressDot, {
-                    //     x: swiper.progress * progressWidth,
-                    // });
+                    gsap.to(self.sliderProgress, {
+                        duration: 0.8,
+                        y: ((swiper.progress / swiper.slides.length) * (swiper.slides.length - 1)) * self.sliderPagination.clientHeight,
+                        ease: "power3.inOut",
+                    });
 
                     self.progressController(swiper, fullCircleOffset);
 
@@ -457,7 +458,6 @@ export default class HomeVerticalSlider {
     videoController(swiper) {
         const index = swiper.activeIndex;
         this.videoPlayers.forEach((video) => {
-            console.log(video.dataset.index);
             if (parseInt(video.dataset.index) === index) {
                 video.play();
             } else {

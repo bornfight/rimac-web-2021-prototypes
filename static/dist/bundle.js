@@ -193,7 +193,9 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       sliderWrapper: ".js-video-slider",
       canvasWrapper: ".js-canvas-wrapper",
       slider: ".js-slider",
-      slidesWrapper: ".js-slider-wrapper"
+      slidesWrapper: ".js-slider-wrapper",
+      sliderPagination: ".js-pagination-wrapper",
+      sliderProgress: ".js-pagination-progress"
     };
     this.videoSliderWrapper = document.querySelector(this.DOM.sliderWrapper);
     this.mouse = {
@@ -213,6 +215,8 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
     this.winHeight = window.innerHeight;
     this.slider = document.querySelector(this.DOM.slider);
     this.slidesWrapper = document.querySelector(this.DOM.slidesWrapper);
+    this.sliderProgress = document.querySelector(this.DOM.sliderProgress);
+    this.sliderPagination = document.querySelector(this.DOM.sliderPagination);
     this.canvasWrapper = document.querySelector(this.DOM.canvasWrapper);
     this.renderer = undefined;
     this.camera = undefined;
@@ -392,6 +396,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       // video.autoplay = true;
       // video.controls = true;
 
+      video.muted = true;
       this.videoSliderWrapper.appendChild(video);
       video.classList.add("js-home-slider-video", "c-homepage__video");
       this.videoPlayers.push(video);
@@ -485,27 +490,22 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
         freeModeMomentumBounce: true,
         freeModeMomentumBounceRatio: 1,
         freeModeMinimumVelocity: 0.02,
-        // effect: "fade",
-        // fadeEffect: {
-        //     crossFade: true,
-        // },
-        // navigation: {
-        // nextEl: this.timelineSliderNext,
-        // prevEl: this.timelineSliderPrev,
-        // },
-        // pagination: {
-        //     el: ".js-timeline-pagination",
-        //     clickable: true,
-        //     renderBullet: (index, className) => {
-        //         return `<span class="c-timeline__pagination-bullet ${className}">${this.data[index].year}</span>`;
-        //     },
-        // },
+        pagination: {
+          el: this.DOM.sliderPagination,
+          clickable: true,
+          renderBullet: function renderBullet(index, className) {
+            return "<span class=\"u-uppercase u-b0 u-fw-bold c-homepage__pagination-bullet ".concat(className, "\">\n                                <i></i>\n                                ").concat(_this4.data[index].title, "\n                            </span>");
+          }
+        },
         on: {
           progress: function progress() {
-            var swiper = this; // console.log(swiper.progress);
-            // gsap.to(self.progressDot, {
-            //     x: swiper.progress * progressWidth,
-            // });
+            var swiper = this;
+
+            _gsap.gsap.to(self.sliderProgress, {
+              duration: 0.8,
+              y: swiper.progress / swiper.slides.length * (swiper.slides.length - 1) * self.sliderPagination.clientHeight,
+              ease: "power3.inOut"
+            });
 
             self.progressController(swiper, fullCircleOffset);
             _progress = (swiper.slides.length - 1) / 10 * (swiper.progress * 10) % 1;
@@ -612,8 +612,6 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
     value: function videoController(swiper) {
       var index = swiper.activeIndex;
       this.videoPlayers.forEach(function (video) {
-        console.log(video.dataset.index);
-
         if (parseInt(video.dataset.index) === index) {
           video.play();
         } else {

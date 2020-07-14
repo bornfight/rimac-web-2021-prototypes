@@ -1184,6 +1184,48 @@ a {
   width: 100vw;
   height: 100vh; }
 
+.c-homepage__pagination {
+  position: fixed;
+  left: 40px;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+          transform: translateY(-50%);
+  z-index: 1; }
+
+.c-homepage__pagination-progress {
+  position: absolute;
+  top: 9px;
+  left: -6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid #ffffff; }
+
+.c-homepage__pagination-bullet.swiper-pagination-bullet {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: transparent;
+  border-radius: 0;
+  position: relative;
+  padding: 7px 0 5px 20px;
+  opacity: 1; }
+
+.c-homepage__pagination-bullet.swiper-pagination-bullet.swiper-pagination-bullet-active {
+  pointer-events: none; }
+
+.c-homepage__pagination-bullet.swiper-pagination-bullet i {
+  display: inline-block;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+          transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: #ffffff; }
+
 .c-home-slider-item {
   width: 100vw;
   height: 100vh;
