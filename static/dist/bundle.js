@@ -387,11 +387,13 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       video.appendChild(sourceMP4);
       video.dataset.index = index;
       video.muted = true;
+      video.loop = true;
       this.videoSliderWrapper.appendChild(video);
       video.classList.add("js-home-slider-video", "c-homepage__video");
       this.videoPlayers.push(video);
 
       if (index === 0) {
+        // play only first video
         setTimeout(function () {
           video.play();
         }, 1000);

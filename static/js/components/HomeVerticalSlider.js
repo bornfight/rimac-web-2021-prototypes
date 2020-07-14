@@ -231,6 +231,7 @@ export default class HomeVerticalSlider {
         video.appendChild(sourceMP4);
         video.dataset.index = index;
         video.muted = true;
+        video.loop = true;
         this.videoSliderWrapper.appendChild(video);
         video.classList.add("js-home-slider-video", "c-homepage__video");
         this.videoPlayers.push(video);
