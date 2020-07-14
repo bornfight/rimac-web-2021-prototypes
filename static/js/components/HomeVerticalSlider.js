@@ -236,6 +236,7 @@ export default class HomeVerticalSlider {
         this.videoPlayers.push(video);
 
         if (index === 0) {
+            // play only first video
             setTimeout(() => {
                 video.play();
             }, 1000);
