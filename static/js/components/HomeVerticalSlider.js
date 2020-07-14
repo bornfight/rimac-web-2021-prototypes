@@ -31,6 +31,8 @@ export default class HomeVerticalSlider {
             return;
         }
 
+        this.videoPlayers = [];
+
         this.isZoomingIn = false;
         this.isZoomingOut = false;
 
@@ -212,7 +214,7 @@ export default class HomeVerticalSlider {
 
             const plane = new THREE.Mesh(geometry, material);
 
-            const offset = ((2 * Math.PI) / this.data.length) * index + (Math.PI / 2);
+            const offset = ((2 * Math.PI) / this.data.length) * -index + (Math.PI / 2);
 
             plane.position.set(
                 0,
@@ -232,11 +234,13 @@ export default class HomeVerticalSlider {
         sourceMP4.type = "video/mp4";
         sourceMP4.src = this.dataPath + this.data[index].video;
         video.appendChild(sourceMP4);
+        video.dataset.index = index;
         // video.preload = true;
         // video.autoplay = true;
         // video.controls = true;
         this.videoSliderWrapper.appendChild(video);
         video.classList.add("js-home-slider-video", "c-homepage__video");
+        this.videoPlayers.push(video);
         resolve();
     }
 
@@ -367,6 +371,7 @@ export default class HomeVerticalSlider {
                     }
                 },
                 init: () => {
+                    let swiper = this;
                     console.log("init");
                     self.zoomIn();
                     // let swiper = this;
@@ -374,6 +379,14 @@ export default class HomeVerticalSlider {
                     // progressWidth = self.progressWrapper.clientWidth;
                     // self.popupProgressIndicator.style.width = `${self.popupProgressWrapperWidth / swiper.slides.length}px`;
                     // }, 300);
+                },
+                slideChange: function () {
+                    let swiper = this;
+                    if (self.videoPlayers[swiper.activeIndex] != null) {
+                        setTimeout(() => {
+                            self.videoController(swiper);
+                        }, 1000);
+                    }
                 },
             },
         });
@@ -390,6 +403,12 @@ export default class HomeVerticalSlider {
                 this.isAnimating = false;
             },
         });
+
+        gsap.to(this.postprocessing.bokeh.uniforms["focus"], {
+            duration: 0.5,
+            ease: "power4.out",
+            value: 180,
+        });
     }
 
     zoomIn() {
@@ -402,6 +421,13 @@ export default class HomeVerticalSlider {
             onComplete: () => {
                 this.isAnimating = false;
             },
+        });
+
+
+        gsap.to(this.postprocessing.bokeh.uniforms["focus"], {
+            duration: 0.5,
+            ease: "power4.in",
+            value: 130,
         });
     }
 
@@ -425,6 +451,18 @@ export default class HomeVerticalSlider {
                 duration: 1,
                 ease: "power3.out",
             });
+        });
+    }
+
+    videoController(swiper) {
+        const index = swiper.activeIndex;
+        this.videoPlayers.forEach((video) => {
+            console.log(video.dataset.index);
+            if (parseInt(video.dataset.index) === index) {
+                video.play();
+            } else {
+                video.pause();
+            }
         });
     }
 }

@@ -205,6 +205,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       return;
     }
 
+    this.videoPlayers = [];
     this.isZoomingIn = false;
     this.isZoomingOut = false;
     this.postprocessing = {};
@@ -372,7 +373,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
           map: texture
         });
         var plane = new THREE.Mesh(geometry, material);
-        var offset = 2 * Math.PI / _this3.data.length * index + Math.PI / 2;
+        var offset = 2 * Math.PI / _this3.data.length * -index + Math.PI / 2;
         plane.position.set(0, Math.cos(offset) * 150, Math.sin(offset) * 150);
         plane.lookAt(_this3.camera.position);
 
@@ -386,12 +387,14 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       var sourceMP4 = document.createElement("source");
       sourceMP4.type = "video/mp4";
       sourceMP4.src = this.dataPath + this.data[index].video;
-      video.appendChild(sourceMP4); // video.preload = true;
+      video.appendChild(sourceMP4);
+      video.dataset.index = index; // video.preload = true;
       // video.autoplay = true;
       // video.controls = true;
 
       this.videoSliderWrapper.appendChild(video);
       video.classList.add("js-home-slider-video", "c-homepage__video");
+      this.videoPlayers.push(video);
       resolve();
     }
   }, {
@@ -458,6 +461,8 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
   }, {
     key: "initSlider",
     value: function initSlider() {
+      var _this4 = this;
+
       var fullCircleOffset = Math.PI * 2 / this.data.length * (this.data.length - 1);
       var _progress = 0;
       var self = this; // let progressWidth = this.progressWrapper.clientWidth;
@@ -514,12 +519,22 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
             }
           },
           init: function init() {
+            var swiper = _this4;
             console.log("init");
             self.zoomIn(); // let swiper = this;
             // setTimeout(() => {
             // progressWidth = self.progressWrapper.clientWidth;
             // self.popupProgressIndicator.style.width = `${self.popupProgressWrapperWidth / swiper.slides.length}px`;
             // }, 300);
+          },
+          slideChange: function slideChange() {
+            var swiper = this;
+
+            if (self.videoPlayers[swiper.activeIndex] != null) {
+              setTimeout(function () {
+                self.videoController(swiper);
+              }, 1000);
+            }
           }
         }
       });
@@ -527,7 +542,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
   }, {
     key: "zoomOut",
     value: function zoomOut() {
-      var _this4 = this;
+      var _this5 = this;
 
       this.isAnimating = true; // console.log("zoom out");
 
@@ -536,14 +551,20 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
         ease: "power4.out",
         z: 330,
         onComplete: function onComplete() {
-          _this4.isAnimating = false;
+          _this5.isAnimating = false;
         }
+      });
+
+      _gsap.gsap.to(this.postprocessing.bokeh.uniforms["focus"], {
+        duration: 0.5,
+        ease: "power4.out",
+        value: 180
       });
     }
   }, {
     key: "zoomIn",
     value: function zoomIn() {
-      var _this5 = this;
+      var _this6 = this;
 
       this.isAnimating = true; // console.log("zoom in");
 
@@ -552,32 +573,52 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
         ease: "power4.in",
         z: 280,
         onComplete: function onComplete() {
-          _this5.isAnimating = false;
+          _this6.isAnimating = false;
         }
+      });
+
+      _gsap.gsap.to(this.postprocessing.bokeh.uniforms["focus"], {
+        duration: 0.5,
+        ease: "power4.in",
+        value: 130
       });
     }
   }, {
     key: "mouseMove",
     value: function mouseMove() {
-      var _this6 = this;
+      var _this7 = this;
 
       window.addEventListener("mousemove", function (ev) {
-        _this6.mouse.x = 0.05 / _this6.winWidth * (ev.clientX - _this6.winWidth / 2);
-        _this6.mouse.y = 0.05 / _this6.winHeight * (ev.clientY - _this6.winHeight / 2);
+        _this7.mouse.x = 0.05 / _this7.winWidth * (ev.clientX - _this7.winWidth / 2);
+        _this7.mouse.y = 0.05 / _this7.winHeight * (ev.clientY - _this7.winHeight / 2);
 
-        _gsap.gsap.to(_this6.camera.rotation, {
-          x: -_this6.mouse.y,
-          y: -_this6.mouse.x,
+        _gsap.gsap.to(_this7.camera.rotation, {
+          x: -_this7.mouse.y,
+          y: -_this7.mouse.x,
           duration: 1.5,
           ease: "power3.out"
         });
 
-        _gsap.gsap.to(_this6.slider, {
-          x: -_this6.mouse.x * 300,
-          y: _this6.mouse.y * 300,
+        _gsap.gsap.to(_this7.slider, {
+          x: -_this7.mouse.x * 300,
+          y: _this7.mouse.y * 300,
           duration: 1,
           ease: "power3.out"
         });
+      });
+    }
+  }, {
+    key: "videoController",
+    value: function videoController(swiper) {
+      var index = swiper.activeIndex;
+      this.videoPlayers.forEach(function (video) {
+        console.log(video.dataset.index);
+
+        if (parseInt(video.dataset.index) === index) {
+          video.play();
+        } else {
+          video.pause();
+        }
       });
     }
   }]);
