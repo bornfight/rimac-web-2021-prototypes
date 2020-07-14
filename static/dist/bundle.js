@@ -257,12 +257,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
 
       // scene setup
       this.scene = new THREE.Scene();
-      this.scene.background = new THREE.Color(0x010d10); // light setup
-      // this.pointLight = new THREE.PointLight(0xffffff, 0);
-      // this.pointLight.position.set(-200, 50, 100);
-      // this.pointLight.castShadow = true;
-      // this.scene.add(this.pointLight);
-
+      this.scene.background = new THREE.Color(0x010d10);
       this.scene.add(this.slides);
       this.initCamera();
       this.initRenderer();
@@ -287,7 +282,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       gui.add(effectController, "aperture", 0, 10, 0.1).onChange(matChanger);
       gui.add(effectController, "maxblur", 0.0, 0.01, 0.001).onChange(matChanger);
       gui.close();
-      matChanger(); // end DAT gui controls
+      matChanger();
 
       for (var i = 0; i < this.data.length; i++) {
         this.addSlides(i, this.data[i]);
@@ -335,9 +330,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
     value: function render() {
       var _this2 = this;
 
-      // this.renderer.render(this.scene, this.camera);
-      this.postprocessing.composer.render(0.1); // this.slides.rotation.x += 0.005;
-
+      this.postprocessing.composer.render(0.1);
       this.updatePlaneLookAt();
       requestAnimationFrame(function () {
         return _this2.render();
@@ -392,14 +385,18 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       sourceMP4.type = "video/mp4";
       sourceMP4.src = this.dataPath + this.data[index].video;
       video.appendChild(sourceMP4);
-      video.dataset.index = index; // video.preload = true;
-      // video.autoplay = true;
-      // video.controls = true;
-
+      video.dataset.index = index;
       video.muted = true;
       this.videoSliderWrapper.appendChild(video);
       video.classList.add("js-home-slider-video", "c-homepage__video");
       this.videoPlayers.push(video);
+
+      if (index === 0) {
+        setTimeout(function () {
+          video.play();
+        }, 1000);
+      }
+
       resolve();
     }
   }, {
@@ -430,16 +427,8 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
         duration: 0.8,
         ease: "power2.out",
         x: swiper.progress * fullCircleOffset
-      }); // gsap.to(this.camera.position, {
-      //     duration: 0.8,
-      //     ease: "power4.inOut",
-      //     z: 330 - (50 * Math.sin(swiper.progress * (this.data.length - 1) + 1)),
-      // });
-      //
-      // console.log(Math.sin(swiper.progress * (this.data.length - 1) + 1));
-
-    } // slider
-
+      });
+    }
   }, {
     key: "addSlides",
     value: function addSlides(index, itemData) {
@@ -470,8 +459,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
 
       var fullCircleOffset = Math.PI * 2 / this.data.length * (this.data.length - 1);
       var _progress = 0;
-      var self = this; // let progressWidth = this.progressWrapper.clientWidth;
-
+      var self = this;
       this.swiper = new _swiper.default(this.slider, {
         loop: false,
         slidesPerView: 1,
@@ -519,13 +507,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
             }
           },
           init: function init() {
-            var swiper = _this4;
-            console.log("init");
-            self.zoomIn(); // let swiper = this;
-            // setTimeout(() => {
-            // progressWidth = self.progressWrapper.clientWidth;
-            // self.popupProgressIndicator.style.width = `${self.popupProgressWrapperWidth / swiper.slides.length}px`;
-            // }, 300);
+            self.zoomIn();
           },
           slideChange: function slideChange() {
             var swiper = this;
@@ -544,7 +526,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
     value: function zoomOut() {
       var _this5 = this;
 
-      this.isAnimating = true; // console.log("zoom out");
+      this.isAnimating = true;
 
       _gsap.gsap.to(this.camera.position, {
         duration: 0.5,
@@ -566,7 +548,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
     value: function zoomIn() {
       var _this6 = this;
 
-      this.isAnimating = true; // console.log("zoom in");
+      this.isAnimating = true;
 
       _gsap.gsap.to(this.camera.position, {
         duration: 0.5,

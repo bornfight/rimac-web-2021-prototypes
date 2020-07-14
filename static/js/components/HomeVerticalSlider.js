@@ -95,12 +95,6 @@ export default class HomeVerticalSlider {
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x010d10);
 
-        // light setup
-        // this.pointLight = new THREE.PointLight(0xffffff, 0);
-        // this.pointLight.position.set(-200, 50, 100);
-        // this.pointLight.castShadow = true;
-        // this.scene.add(this.pointLight);
-
         this.scene.add(this.slides);
 
         this.initCamera();
@@ -136,7 +130,6 @@ export default class HomeVerticalSlider {
         gui.close();
 
         matChanger();
-        // end DAT gui controls
 
         for (let i = 0; i < this.data.length; i++) {
             this.addSlides(i, this.data[i]);
@@ -179,9 +172,7 @@ export default class HomeVerticalSlider {
     }
 
     render() {
-        // this.renderer.render(this.scene, this.camera);
         this.postprocessing.composer.render(0.1);
-        // this.slides.rotation.x += 0.005;
         this.updatePlaneLookAt();
         requestAnimationFrame(() => this.render());
     }
@@ -239,13 +230,17 @@ export default class HomeVerticalSlider {
         sourceMP4.src = this.dataPath + this.data[index].video;
         video.appendChild(sourceMP4);
         video.dataset.index = index;
-        // video.preload = true;
-        // video.autoplay = true;
-        // video.controls = true;
         video.muted = true;
         this.videoSliderWrapper.appendChild(video);
         video.classList.add("js-home-slider-video", "c-homepage__video");
         this.videoPlayers.push(video);
+
+        if (index === 0) {
+            setTimeout(() => {
+                video.play();
+            }, 1000);
+        }
+
         resolve();
     }
 
@@ -278,17 +273,8 @@ export default class HomeVerticalSlider {
             ease: "power2.out",
             x: swiper.progress * fullCircleOffset,
         });
-
-        // gsap.to(this.camera.position, {
-        //     duration: 0.8,
-        //     ease: "power4.inOut",
-        //     z: 330 - (50 * Math.sin(swiper.progress * (this.data.length - 1) + 1)),
-        // });
-        //
-        // console.log(Math.sin(swiper.progress * (this.data.length - 1) + 1));
     }
 
-    // slider
     addSlides(index, itemData) {
         let item = document.createElement("div");
         item.className = "c-home-slider-item swiper-slide";
@@ -320,7 +306,6 @@ export default class HomeVerticalSlider {
         const fullCircleOffset = ((Math.PI * 2) / this.data.length) * (this.data.length - 1);
         let progress = 0;
         const self = this;
-        // let progressWidth = this.progressWrapper.clientWidth;
 
         this.swiper = new Swiper(this.slider, {
             loop: false,
@@ -372,14 +357,7 @@ export default class HomeVerticalSlider {
                     }
                 },
                 init: () => {
-                    let swiper = this;
-                    console.log("init");
                     self.zoomIn();
-                    // let swiper = this;
-                    // setTimeout(() => {
-                    // progressWidth = self.progressWrapper.clientWidth;
-                    // self.popupProgressIndicator.style.width = `${self.popupProgressWrapperWidth / swiper.slides.length}px`;
-                    // }, 300);
                 },
                 slideChange: function () {
                     let swiper = this;
@@ -395,7 +373,6 @@ export default class HomeVerticalSlider {
 
     zoomOut() {
         this.isAnimating = true;
-        // console.log("zoom out");
         gsap.to(this.camera.position, {
             duration: 0.5,
             ease: "power4.out",
@@ -414,7 +391,6 @@ export default class HomeVerticalSlider {
 
     zoomIn() {
         this.isAnimating = true;
-        // console.log("zoom in");
         gsap.to(this.camera.position, {
             duration: 0.5,
             ease: "power4.in",
