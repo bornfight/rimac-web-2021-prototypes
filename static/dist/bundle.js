@@ -205,8 +205,8 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       return;
     }
 
-    this.zoomingOut = false;
-    this.zoomedIn = false;
+    this.isZoomingIn = false;
+    this.isZoomingOut = false;
     this.postprocessing = {};
     this.winWidth = window.innerWidth;
     this.winHeight = window.innerHeight;
@@ -459,7 +459,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
     key: "initSlider",
     value: function initSlider() {
       var fullCircleOffset = Math.PI * 2 / this.data.length * (this.data.length - 1);
-      var progress = 0;
+      var _progress = 0;
       var self = this; // let progressWidth = this.progressWrapper.clientWidth;
 
       this.swiper = new _swiper.default(this.slider, {
@@ -496,47 +496,30 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
         //     },
         // },
         on: {
-          transitionEnd: function transitionEnd() {
-            console.log("transitionEnd");
-
-            if (!self.zoomedIn) {
-              self.zoomIn();
-            }
-          },
           progress: function progress() {
             var swiper = this; // console.log(swiper.progress);
             // gsap.to(self.progressDot, {
             //     x: swiper.progress * progressWidth,
             // });
 
-            if (!self.zoomingOut) {
-              self.zoomOut();
-            }
-
             self.progressController(swiper, fullCircleOffset);
-          },
-          slideChange: function slideChange() {
-            console.log("slideChange"); // add delay and detect if its zoomed in and active slide
+            _progress = (swiper.slides.length - 1) / 10 * (swiper.progress * 10) % 1;
+
+            if (_progress === 0 && !self.isZoomingIn) {
+              self.zoomIn();
+            } else if (_progress < 0.99 && !self.isZoomingOut) {
+              self.zoomOut();
+            } else if (!self.isZoomingIn) {
+              self.zoomIn();
+            }
           },
           init: function init() {
-            if (!self.zoomedIn) {
-              self.zoomIn();
-            } // let swiper = this;
+            console.log("init");
+            self.zoomIn(); // let swiper = this;
             // setTimeout(() => {
             // progressWidth = self.progressWrapper.clientWidth;
             // self.popupProgressIndicator.style.width = `${self.popupProgressWrapperWidth / swiper.slides.length}px`;
             // }, 300);
-
-          },
-          reachEnd: function reachEnd() {
-            console.log(1);
-          },
-          reachBeginning: function reachBeginning() {
-            console.log();
-
-            if (!self.zoomedIn) {
-              self.zoomIn();
-            }
           }
         }
       });
@@ -546,48 +529,52 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
     value: function zoomOut() {
       var _this4 = this;
 
-      this.zoomingOut = true;
+      this.isAnimating = true; // console.log("zoom out");
 
       _gsap.gsap.to(this.camera.position, {
         duration: 0.5,
-        ease: "power3.out",
+        ease: "power4.out",
         z: 330,
         onComplete: function onComplete() {
-          _this4.zoomingOut = false;
-          _this4.zoomedIn = false;
+          _this4.isAnimating = false;
         }
       });
     }
   }, {
     key: "zoomIn",
     value: function zoomIn() {
-      this.zoomedIn = true;
+      var _this5 = this;
+
+      this.isAnimating = true; // console.log("zoom in");
 
       _gsap.gsap.to(this.camera.position, {
         duration: 0.5,
-        ease: "power3.inOut",
-        z: 280
+        ease: "power4.in",
+        z: 280,
+        onComplete: function onComplete() {
+          _this5.isAnimating = false;
+        }
       });
     }
   }, {
     key: "mouseMove",
     value: function mouseMove() {
-      var _this5 = this;
+      var _this6 = this;
 
       window.addEventListener("mousemove", function (ev) {
-        _this5.mouse.x = 0.05 / _this5.winWidth * (ev.clientX - _this5.winWidth / 2);
-        _this5.mouse.y = 0.05 / _this5.winHeight * (ev.clientY - _this5.winHeight / 2);
+        _this6.mouse.x = 0.05 / _this6.winWidth * (ev.clientX - _this6.winWidth / 2);
+        _this6.mouse.y = 0.05 / _this6.winHeight * (ev.clientY - _this6.winHeight / 2);
 
-        _gsap.gsap.to(_this5.camera.rotation, {
-          x: -_this5.mouse.y,
-          y: -_this5.mouse.x,
+        _gsap.gsap.to(_this6.camera.rotation, {
+          x: -_this6.mouse.y,
+          y: -_this6.mouse.x,
           duration: 1.5,
           ease: "power3.out"
         });
 
-        _gsap.gsap.to(_this5.slider, {
-          x: -_this5.mouse.x * 300,
-          y: _this5.mouse.y * 300,
+        _gsap.gsap.to(_this6.slider, {
+          x: -_this6.mouse.x * 300,
+          y: _this6.mouse.y * 300,
           duration: 1,
           ease: "power3.out"
         });
@@ -828,21 +815,17 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       this.mat;
       var self = this;
       this.width = window.innerWidth;
-      this.height = window.innerHeight; //---
-
+      this.height = window.innerHeight;
       this.scene = new THREE.Scene();
-      this.scene.background = new THREE.Color(0x292733); //---
-
+      this.scene.background = new THREE.Color(0x292733);
       this.camera = new THREE.PerspectiveCamera(35, this.width / this.height, 1, 1000);
-      this.camera.position.set(0, 0, 16); //---
-
+      this.camera.position.set(0, 0, 16);
       this.renderer = new THREE.WebGLRenderer({
         antialias: true,
         alpha: false
       });
       this.renderer.setSize(this.width, this.height);
-      this.renderer.shadowMap.enabled = true; //---
-
+      this.renderer.shadowMap.enabled = true;
       document.querySelector(self.DOM.wrapper).appendChild(this.renderer.domElement);
       this.options = {
         perlin: {

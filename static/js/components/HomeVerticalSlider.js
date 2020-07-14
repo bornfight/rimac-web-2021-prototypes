@@ -31,8 +31,8 @@ export default class HomeVerticalSlider {
             return;
         }
 
-        this.zoomingOut = false;
-        this.zoomedIn = false;
+        this.isZoomingIn = false;
+        this.isZoomingOut = false;
 
         this.postprocessing = {};
 
@@ -347,12 +347,6 @@ export default class HomeVerticalSlider {
             //     },
             // },
             on: {
-                transitionEnd: () => {
-                    console.log("transitionEnd");
-                    if (!self.zoomedIn) {
-                        self.zoomIn();
-                    }
-                },
                 progress: function () {
                     let swiper = this;
                     // console.log(swiper.progress);
@@ -360,58 +354,54 @@ export default class HomeVerticalSlider {
                     //     x: swiper.progress * progressWidth,
                     // });
 
-                    if (!self.zoomingOut) {
-                        self.zoomOut();
-                    }
-
                     self.progressController(swiper, fullCircleOffset);
-                },
-                slideChange: () => {
-                    console.log("slideChange");
-                    // add delay and detect if its zoomed in and active slide
-                },
-                init: () => {
-                    if (!self.zoomedIn) {
+
+                    progress = ((swiper.slides.length - 1) / 10) * (swiper.progress * 10) % 1;
+
+                    if (progress === 0 && !self.isZoomingIn) {
+                        self.zoomIn();
+                    } else if (progress < 0.99 && !self.isZoomingOut) {
+                        self.zoomOut();
+                    } else if (!self.isZoomingIn) {
                         self.zoomIn();
                     }
+                },
+                init: () => {
+                    console.log("init");
+                    self.zoomIn();
                     // let swiper = this;
                     // setTimeout(() => {
                     // progressWidth = self.progressWrapper.clientWidth;
                     // self.popupProgressIndicator.style.width = `${self.popupProgressWrapperWidth / swiper.slides.length}px`;
                     // }, 300);
                 },
-                reachEnd: () => {
-                    console.log(1);
-                },
-                reachBeginning: () => {
-                    console.log();
-                    if (!self.zoomedIn) {
-                        self.zoomIn();
-                    }
-                },
             },
         });
     }
 
     zoomOut() {
-        this.zoomingOut = true;
+        this.isAnimating = true;
+        // console.log("zoom out");
         gsap.to(this.camera.position, {
             duration: 0.5,
-            ease: "power3.out",
+            ease: "power4.out",
             z: 330,
             onComplete: () => {
-                this.zoomingOut = false;
-                this.zoomedIn = false;
+                this.isAnimating = false;
             },
         });
     }
 
     zoomIn() {
-        this.zoomedIn = true;
+        this.isAnimating = true;
+        // console.log("zoom in");
         gsap.to(this.camera.position, {
             duration: 0.5,
-            ease: "power3.inOut",
+            ease: "power4.in",
             z: 280,
+            onComplete: () => {
+                this.isAnimating = false;
+            },
         });
     }
 
