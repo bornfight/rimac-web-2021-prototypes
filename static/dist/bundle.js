@@ -1062,6 +1062,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
           vertexShader: document.getElementById("vertexShader").textContent,
           fragmentShader: document.getElementById("fragmentShader").textContent
         });
+        console.log(self.mat);
         var geo = new THREE.IcosahedronBufferGeometry(4, 7);
         self.shape = new THREE.Mesh(geo, self.mat);
         self.shapeGroup.add(self.shape);
@@ -1083,7 +1084,6 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       window.addEventListener("mousemove", function (ev) {
         _this2.mouse.x = 0.5 / _this2.width * (ev.clientX - _this2.width / 2);
         _this2.mouse.y = 0.5 / _this2.height * (ev.clientY - _this2.height / 2);
-        console.log(_this2.mouse);
 
         _gsap.gsap.to(_this2.camera.position, {
           x: -_this2.mouse.x,

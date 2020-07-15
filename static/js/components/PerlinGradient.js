@@ -258,6 +258,8 @@ export default class HomeVerticalSlider {
                     .textContent,
             });
 
+            console.log(self.mat);
+
             const geo = new THREE.IcosahedronBufferGeometry(4, 7);
             self.shape = new THREE.Mesh(geo, self.mat);
 
@@ -278,8 +280,6 @@ export default class HomeVerticalSlider {
                 (0.5 / this.width) * (ev.clientX - this.width / 2);
             this.mouse.y =
                 (0.5 / this.height) * (ev.clientY - this.height / 2);
-
-            console.log(this.mouse);
 
             gsap.to(this.camera.position, {
                 x: -this.mouse.x,
