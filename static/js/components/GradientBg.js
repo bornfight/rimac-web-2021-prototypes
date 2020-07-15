@@ -1,5 +1,5 @@
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import {gsap} from "gsap";
+import {ScrollTrigger} from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -10,10 +10,12 @@ export default class GradientBg {
             bg: ".js-page-bg-bg",
             bgGradientMouseMove: ".js-page-bg-gradient-mousemove",
             bgChangeTrigger: ".js-page-bg-change-trigger",
+            canvasGradient: ".js-perlin-gradient",
             states: {},
         };
 
         this.bg = document.querySelector(this.DOM.bg);
+        this.canvasGradient = document.querySelector(this.DOM.canvasGradient);
         this.bgChangeTrigger = document.querySelectorAll(
             this.DOM.bgChangeTrigger,
         );
@@ -26,7 +28,7 @@ export default class GradientBg {
         console.log("GradientBg init()");
 
         this.bgColorChange();
-        this.onMouseMove();
+        // this.onMouseMove();
     }
 
     bgColorChange() {
@@ -37,8 +39,10 @@ export default class GradientBg {
                     "data-bg-opacity",
                 ),
                 ease: "none",
-                onStart: () => {},
-                onUpdate: () => {},
+                onStart: () => {
+                },
+                onUpdate: () => {
+                },
             });
 
             ScrollTrigger.create({
@@ -46,16 +50,24 @@ export default class GradientBg {
                 animation: bgChange,
                 // markers: true,
                 start: "top bottom",
-                end: "+=200",
+                end: "top top",
                 scrub: true,
                 onEnter: () => {
                     console.log("enter");
                 },
                 onEnterBack: () => {
                     console.log("enterBack");
+
+                    if (this.canvasGradient) {
+                        this.canvasGradient.style.display = "";
+                    }
                 },
                 onLeave: () => {
                     console.log("leave");
+
+                    if (this.canvasGradient) {
+                        this.canvasGradient.style.display = "none";
+                    }
                 },
                 onLeaveBack: () => {
                     console.log("leaveBack");

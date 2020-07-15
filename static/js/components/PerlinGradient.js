@@ -20,6 +20,10 @@ export default class HomeVerticalSlider {
         this.shapeGroup = new THREE.Group();
         this.start = Date.now();
         this.mat;
+        this.mouse = {
+            x: 0,
+            y: 0,
+        };
 
         const self = this;
         this.width = window.innerWidth;
@@ -62,6 +66,7 @@ export default class HomeVerticalSlider {
         this.createPrimitive();
         this.animation();
         this.colorChange();
+        this.mouseMove();
     }
 
     colorChange() {
@@ -265,5 +270,23 @@ export default class HomeVerticalSlider {
 
     getColorValue(val) {
         return 1.9 - (1.9 / 255) * val;
+    }
+
+    mouseMove() {
+        window.addEventListener("mousemove", (ev) => {
+            this.mouse.x =
+                (0.5 / this.width) * (ev.clientX - this.width / 2);
+            this.mouse.y =
+                (0.5 / this.height) * (ev.clientY - this.height / 2);
+
+            console.log(this.mouse);
+
+            gsap.to(this.camera.position, {
+                x: -this.mouse.x,
+                y: this.mouse.y,
+                duration: 1.5,
+                ease: "power3.out",
+            });
+        });
     }
 }

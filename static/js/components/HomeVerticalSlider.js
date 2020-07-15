@@ -405,7 +405,7 @@ export default class HomeVerticalSlider {
         this.isAnimating = true;
         gsap.to(this.camera.position, {
             duration: 0.8,
-            ease: "power4.out",
+            ease: "power1.out",
             z: 330,
             onComplete: () => {
                 this.isAnimating = false;
@@ -414,7 +414,7 @@ export default class HomeVerticalSlider {
 
         gsap.to(this.postprocessing.bokeh.uniforms["focus"], {
             duration: 0.8,
-            ease: "power4.out",
+            ease: "power1.out",
             value: 180,
         });
     }

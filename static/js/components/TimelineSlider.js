@@ -407,7 +407,9 @@ export default class TimelineSlider {
             grabCursor: true,
             watchSlidesProgress: true,
             mousewheelControl: true,
-            mousewheel: true,
+            mousewheel: {
+                invert: false,
+            },
             // TODO: @Tomo — proucit malo kaj i kak rade ovi optioni za freeMode
             freeMode: true,
             freeModeSticky: true,
@@ -417,10 +419,6 @@ export default class TimelineSlider {
             freeModeMomentumBounce: true,
             freeModeMomentumBounceRatio: 1,
             freeModeMinimumVelocity: 0.02,
-            // effect: "fade",
-            // fadeEffect: {
-            //     crossFade: true,
-            // },
             navigation: {
                 nextEl: this.timelineSliderNext,
                 prevEl: this.timelineSliderPrev,
@@ -841,10 +839,10 @@ export default class TimelineSlider {
             });
         }
 
-        if (this.helixItems[index].children[1]) {
+        // if (this.helixItems[index].children[1]) {
             // gsap.to(this.helixItems[index].children[1].material, {
             //     opacity: 1,
             // });
-        }
+        // }
     }
 }

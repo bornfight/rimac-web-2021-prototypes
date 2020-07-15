@@ -58,9 +58,11 @@ var GradientBg = /*#__PURE__*/function () {
       bg: ".js-page-bg-bg",
       bgGradientMouseMove: ".js-page-bg-gradient-mousemove",
       bgChangeTrigger: ".js-page-bg-change-trigger",
+      canvasGradient: ".js-perlin-gradient",
       states: {}
     };
     this.bg = document.querySelector(this.DOM.bg);
+    this.canvasGradient = document.querySelector(this.DOM.canvasGradient);
     this.bgChangeTrigger = document.querySelectorAll(this.DOM.bgChangeTrigger);
     this.bgGradientMouseMove = document.querySelector(this.DOM.bgGradientMouseMove);
   }
@@ -69,12 +71,13 @@ var GradientBg = /*#__PURE__*/function () {
     key: "init",
     value: function init() {
       console.log("GradientBg init()");
-      this.bgColorChange();
-      this.onMouseMove();
+      this.bgColorChange(); // this.onMouseMove();
     }
   }, {
     key: "bgColorChange",
     value: function bgColorChange() {
+      var _this = this;
+
       for (var i = 0, l = this.bgChangeTrigger.length; i < l; i++) {
         var bgChange = _gsap.gsap.to(this.bg, {
           duration: 0.8,
@@ -89,16 +92,24 @@ var GradientBg = /*#__PURE__*/function () {
           animation: bgChange,
           // markers: true,
           start: "top bottom",
-          end: "+=200",
+          end: "top top",
           scrub: true,
           onEnter: function onEnter() {
             console.log("enter");
           },
           onEnterBack: function onEnterBack() {
             console.log("enterBack");
+
+            if (_this.canvasGradient) {
+              _this.canvasGradient.style.display = "";
+            }
           },
           onLeave: function onLeave() {
             console.log("leave");
+
+            if (_this.canvasGradient) {
+              _this.canvasGradient.style.display = "none";
+            }
           },
           onLeaveBack: function onLeaveBack() {
             console.log("leaveBack");
@@ -109,7 +120,7 @@ var GradientBg = /*#__PURE__*/function () {
   }, {
     key: "onMouseMove",
     value: function onMouseMove() {
-      var _this = this;
+      var _this2 = this;
 
       document.addEventListener("mousemove", function (ev) {
         var mouseScale = 0.25;
@@ -128,7 +139,7 @@ var GradientBg = /*#__PURE__*/function () {
           ease: "power3.easIn"
         });
 
-        _gsap.gsap.to(_this.bgGradientMouseMove, {
+        _gsap.gsap.to(_this2.bgGradientMouseMove, {
           duration: 1.4,
           rotationY: 5 * y,
           x: 50 * decimalX,
@@ -558,7 +569,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
 
       _gsap.gsap.to(this.camera.position, {
         duration: 0.8,
-        ease: "power4.out",
+        ease: "power1.out",
         z: 330,
         onComplete: function onComplete() {
           _this5.isAnimating = false;
@@ -567,7 +578,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
 
       _gsap.gsap.to(this.postprocessing.bokeh.uniforms["focus"], {
         duration: 0.8,
-        ease: "power4.out",
+        ease: "power1.out",
         value: 180
       });
     }
@@ -862,6 +873,10 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       this.shapeGroup = new THREE.Group();
       this.start = Date.now();
       this.mat;
+      this.mouse = {
+        x: 0,
+        y: 0
+      };
       var self = this;
       this.width = window.innerWidth;
       this.height = window.innerHeight;
@@ -897,6 +912,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       this.createPrimitive();
       this.animation();
       this.colorChange();
+      this.mouseMove();
     }
   }, {
     key: "colorChange",
@@ -1058,6 +1074,24 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
     key: "getColorValue",
     value: function getColorValue(val) {
       return 1.9 - 1.9 / 255 * val;
+    }
+  }, {
+    key: "mouseMove",
+    value: function mouseMove() {
+      var _this2 = this;
+
+      window.addEventListener("mousemove", function (ev) {
+        _this2.mouse.x = 0.5 / _this2.width * (ev.clientX - _this2.width / 2);
+        _this2.mouse.y = 0.5 / _this2.height * (ev.clientY - _this2.height / 2);
+        console.log(_this2.mouse);
+
+        _gsap.gsap.to(_this2.camera.position, {
+          x: -_this2.mouse.x,
+          y: _this2.mouse.y,
+          duration: 1.5,
+          ease: "power3.out"
+        });
+      });
     }
   }]);
 
@@ -1493,7 +1527,9 @@ var TimelineSlider = /*#__PURE__*/function () {
         grabCursor: true,
         watchSlidesProgress: true,
         mousewheelControl: true,
-        mousewheel: true,
+        mousewheel: {
+          invert: false
+        },
         // TODO: @Tomo — proucit malo kaj i kak rade ovi optioni za freeMode
         freeMode: true,
         freeModeSticky: true,
@@ -1503,10 +1539,6 @@ var TimelineSlider = /*#__PURE__*/function () {
         freeModeMomentumBounce: true,
         freeModeMomentumBounceRatio: 1,
         freeModeMinimumVelocity: 0.02,
-        // effect: "fade",
-        // fadeEffect: {
-        //     crossFade: true,
-        // },
         navigation: {
           nextEl: this.timelineSliderNext,
           prevEl: this.timelineSliderPrev
@@ -1887,12 +1919,12 @@ var TimelineSlider = /*#__PURE__*/function () {
         _gsap.gsap.to(this.helixItems[index].children[0].material, {
           opacity: 1
         });
-      }
+      } // if (this.helixItems[index].children[1]) {
+      // gsap.to(this.helixItems[index].children[1].material, {
+      //     opacity: 1,
+      // });
+      // }
 
-      if (this.helixItems[index].children[1]) {// gsap.to(this.helixItems[index].children[1].material, {
-        //     opacity: 1,
-        // });
-      }
     }
   }]);
 
