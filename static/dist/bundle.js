@@ -223,30 +223,32 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
     this.slides = new THREE.Object3D();
     this.dataPath = "static/video/";
     this.data = [{
-      title: "Nevera",
+      title: "nevera",
       content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
       linkTitle: "link",
       link: "#",
-      video: "video-scrub-01.mp4"
+      video: "c_two.mp4"
     }, {
-      title: "Nevera 2",
+      title: "technology",
+      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
+      linkTitle: "link",
+      link: "#",
+      video: "technology.mp4"
+    }, {
+      title: "about us",
+      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
+      linkTitle: "link",
+      link: "#",
+      video: "about.mp4"
+    }, {
+      title: "developmet",
       content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
       linkTitle: "link",
       link: "#",
       video: "video-scrub-02.mp4"
-    }, {
-      title: "Nevera 3",
-      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
-      linkTitle: "link",
-      link: "#",
-      video: "video-scrub-03.mp4"
-    }, {
-      title: "Nevera 4",
-      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
-      linkTitle: "link",
-      link: "#",
-      video: "video-scrub-01.mp4"
     }];
+    this.slidesLength = this.data.length;
+    this.paginationHeight = 0;
     this.init();
   }
 
@@ -278,7 +280,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       };
 
       var gui = new _datGuiModule.GUI();
-      gui.add(effectController, "focus", 120, 240, 1).onChange(matChanger);
+      gui.add(effectController, "focus", 40, 200, 1).onChange(matChanger);
       gui.add(effectController, "aperture", 0, 10, 0.1).onChange(matChanger);
       gui.add(effectController, "maxblur", 0.0, 0.01, 0.001).onChange(matChanger);
       gui.close();
@@ -322,7 +324,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
     value: function initCamera() {
       // camera setup
       this.camera = new THREE.PerspectiveCamera(50, this.winWidth / this.winHeight, 1, 800);
-      this.camera.position.z = 280;
+      this.camera.position.z = 245;
       this.camera.position.y = 0;
     }
   }, {
@@ -330,7 +332,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
     value: function render() {
       var _this2 = this;
 
-      this.postprocessing.composer.render(0.1);
+      this.postprocessing.composer.render();
       this.updatePlaneLookAt();
       requestAnimationFrame(function () {
         return _this2.render();
@@ -370,7 +372,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
           map: texture
         });
         var plane = new THREE.Mesh(geometry, material);
-        var offset = 2 * Math.PI / _this3.data.length * -index + Math.PI / 2;
+        var offset = 2 * Math.PI / _this3.data.length * index + Math.PI / 2;
         plane.position.set(0, Math.cos(offset) * 150, Math.sin(offset) * 150);
         plane.lookAt(_this3.camera.position);
 
@@ -424,11 +426,11 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
     }
   }, {
     key: "progressController",
-    value: function progressController(swiper, fullCircleOffset) {
+    value: function progressController(swiper, fullCircleOffset, currentProgress) {
       _gsap.gsap.to(this.slides.rotation, {
         duration: 0.8,
         ease: "power2.out",
-        x: swiper.progress * fullCircleOffset
+        x: -currentProgress * fullCircleOffset
       });
     }
   }, {
@@ -440,7 +442,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       itemInner.className = "c-home-slider-item__inner";
       item.appendChild(itemInner);
       var title = document.createElement("p");
-      title.className = "c-home-slider-item__title u-a7";
+      title.className = "c-home-slider-item__title u-a7 u-uppercase";
       title.textContent = itemData.title;
       itemInner.appendChild(title);
       var content = document.createElement("p");
@@ -467,7 +469,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
         slidesPerView: 1,
         direction: "vertical",
         centeredSlides: true,
-        speed: 800,
+        speed: 1000,
         grabCursor: true,
         watchSlidesProgress: true,
         mousewheelControl: true,
@@ -490,15 +492,10 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
         on: {
           progress: function progress() {
             var swiper = this;
-
-            _gsap.gsap.to(self.sliderProgress, {
-              duration: 0.8,
-              y: swiper.progress / swiper.slides.length * (swiper.slides.length - 1) * self.sliderPagination.clientHeight,
-              ease: "elastic.out(1, 0.5)"
-            });
-
-            self.progressController(swiper, fullCircleOffset);
-            _progress = (swiper.slides.length - 1) / 10 * (swiper.progress * 10) % 1;
+            var currentProgress = swiper.progress;
+            self.progressCircle(swiper, currentProgress);
+            self.progressController(swiper, fullCircleOffset, currentProgress);
+            _progress = self.progressCalculation(currentProgress);
 
             if (_progress === 0 && !self.isZoomingIn) {
               self.zoomIn();
@@ -509,7 +506,18 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
             }
           },
           init: function init() {
-            self.zoomIn();
+            _this4.zoomIn();
+
+            setTimeout(function () {
+              if (_this4.paginationHeight !== _this4.sliderPagination.clientHeight) {
+                _this4.paginationHeight = _this4.sliderPagination.clientHeight;
+              }
+            }, 500);
+            setTimeout(function () {
+              if (_this4.paginationHeight !== _this4.sliderPagination.clientHeight) {
+                _this4.paginationHeight = _this4.sliderPagination.clientHeight;
+              }
+            }, 1000);
           },
           slideChange: function slideChange() {
             var swiper = this;
@@ -517,10 +525,28 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
             if (self.videoPlayers[swiper.activeIndex] != null) {
               setTimeout(function () {
                 self.videoController(swiper);
-              }, 1000);
+              }, 1500);
+            }
+
+            if (self.paginationHeight !== self.sliderPagination.clientHeight) {
+              self.paginationHeight = self.sliderPagination.clientHeight;
             }
           }
         }
+      });
+    }
+  }, {
+    key: "progressCalculation",
+    value: function progressCalculation(currentProgress) {
+      return (this.slidesLength - 1) / 10 * (currentProgress * 10) % 1;
+    }
+  }, {
+    key: "progressCircle",
+    value: function progressCircle(swiper, currentProgress) {
+      _gsap.gsap.to(this.sliderProgress, {
+        duration: 0.8,
+        y: currentProgress / this.slidesLength * (this.slidesLength - 1) * this.paginationHeight,
+        ease: "elastic.out(1, 0.5)"
       });
     }
   }, {
@@ -531,7 +557,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       this.isAnimating = true;
 
       _gsap.gsap.to(this.camera.position, {
-        duration: 0.5,
+        duration: 0.8,
         ease: "power4.out",
         z: 330,
         onComplete: function onComplete() {
@@ -540,7 +566,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       });
 
       _gsap.gsap.to(this.postprocessing.bokeh.uniforms["focus"], {
-        duration: 0.5,
+        duration: 0.8,
         ease: "power4.out",
         value: 180
       });
@@ -553,18 +579,18 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       this.isAnimating = true;
 
       _gsap.gsap.to(this.camera.position, {
-        duration: 0.5,
+        duration: 0.8,
         ease: "power4.in",
-        z: 280,
+        z: 245,
         onComplete: function onComplete() {
           _this6.isAnimating = false;
         }
       });
 
       _gsap.gsap.to(this.postprocessing.bokeh.uniforms["focus"], {
-        duration: 0.5,
+        duration: 0.8,
         ease: "power4.in",
-        value: 130
+        value: 90
       });
     }
   }, {
