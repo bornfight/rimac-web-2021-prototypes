@@ -362,7 +362,7 @@ export default class HomeVerticalSliderLooped {
                 slideChange: function () {
                     const swiper = this;
                     console.log("slide change");
-                    if (self.videoPlayers[swiper.activeIndex] != null) {
+                    if (self.videoPlayers[swiper.realIndex] != null) {
                         setTimeout(() => {
                             self.videoController(swiper);
                         }, 1500);
