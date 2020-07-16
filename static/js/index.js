@@ -9,6 +9,7 @@ import Dummy from "./components/Dummy";
 import GradientBg from "./components/GradientBg";
 import HomeVerticalSlider from "./components/HomeVerticalSlider";
 import PerlinGradient from "./components/PerlinGradient";
+import HomeVerticalSliderLooped from "./components/HomeVerticalSliderLooped";
 
 const ready = (callbackFunc) => {
     if (document.readyState !== "loading") {
@@ -66,6 +67,8 @@ ready(() => {
     const perlinGradient = new PerlinGradient();
 
     const homeVerticalSlider = new HomeVerticalSlider();
+
+    const homeVerticalSliderLooped = new HomeVerticalSliderLooped();
 
     if (document.getElementById("timeline-slider") !== null) {
         const timelineSlider = new TimelineSlider();

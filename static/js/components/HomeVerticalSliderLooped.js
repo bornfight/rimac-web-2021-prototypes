@@ -10,9 +10,9 @@ import {gsap} from "gsap";
 
 import Swiper from "swiper";
 
-export default class HomeVerticalSlider {
+export default class HomeVerticalSliderLooped {
     constructor() {
-        if (document.querySelector(".is-looped")) {
+        if (!document.querySelector(".is-looped")) {
             return;
         }
 
@@ -276,14 +276,6 @@ export default class HomeVerticalSlider {
         this.postprocessing.bokeh = bokehPass;
     }
 
-    progressController(swiper, fullCircleOffset, currentProgress) {
-        gsap.to(this.slides.rotation, {
-            duration: 0.8,
-            ease: "power2.out",
-            x: -currentProgress * fullCircleOffset,
-        });
-    }
-
     addSlides(index, itemData) {
         let item = document.createElement("div");
         item.className = "c-home-slider-item swiper-slide";
@@ -313,11 +305,11 @@ export default class HomeVerticalSlider {
 
     initSlider() {
         const fullCircleOffset = ((Math.PI * 2) / this.data.length) * (this.data.length - 1);
-        let progress = 0;
+        let counter = 0;
         const self = this;
 
         this.swiper = new Swiper(this.slider, {
-            loop: false,
+            loop: true,
             slidesPerView: 1,
             direction: "vertical",
             centeredSlides: true,
@@ -326,42 +318,32 @@ export default class HomeVerticalSlider {
             watchSlidesProgress: true,
             mousewheelControl: true,
             mousewheel: true,
-            freeMode: true,
-            freeModeSticky: true,
-            freeModeMomentum: false,
-            freeModeMomentumRatio: 1,
-            freeModeMomentumVelocityRatio: 1,
-            freeModeMomentumBounce: true,
-            freeModeMomentumBounceRatio: 1,
-            freeModeMinimumVelocity: 0.02,
-            pagination: {
-                el: this.DOM.sliderPagination,
-                clickable: true,
-                renderBullet: (index, className) => {
-                    return `<span class="u-uppercase u-b0 u-fw-bold c-homepage__pagination-bullet ${className}">
-                                <i></i>
-                                ${this.data[index].title}
-                            </span>`;
-                },
-            },
+            // freeMode: true,
+            // freeModeSticky: true,
+            // freeModeMomentum: false,
+            // freeModeMomentumRatio: 1,
+            // freeModeMomentumVelocityRatio: 1,
+            // freeModeMomentumBounce: true,
+            // freeModeMomentumBounceRatio: 1,
+            // freeModeMinimumVelocity: 0.02,
+            // pagination: {
+            //     el: this.DOM.sliderPagination,
+            //     clickable: true,
+            //     renderBullet: (index, className) => {
+            //         if (this.data[index]) {
+            //             return `<span class="u-uppercase u-b0 u-fw-bold c-homepage__pagination-bullet ${className}">
+            //                     <i></i>
+            //                     ${this.data[index].title}
+            //                 </span>`;
+            //         }
+            //     },
+            // },
             on: {
                 progress: function () {
                     const swiper = this;
                     const currentProgress = swiper.progress;
 
-                    self.progressCircle(swiper, currentProgress);
-
-                    self.progressController(swiper, fullCircleOffset, currentProgress);
-
-                    progress = self.progressCalculation(currentProgress);
-
-                    if (progress === 0 && !self.isZoomingIn) {
-                        self.zoomIn();
-                    } else if (progress < 0.99 && !self.isZoomingOut) {
-                        self.zoomOut();
-                    } else if (!self.isZoomingIn) {
-                        self.zoomIn();
-                    }
+                    // self.progressCircle(swiper, currentProgress);
                 },
                 init: () => {
                     this.zoomIn();
@@ -379,6 +361,7 @@ export default class HomeVerticalSlider {
                 },
                 slideChange: function () {
                     const swiper = this;
+                    console.log("slide change");
                     if (self.videoPlayers[swiper.activeIndex] != null) {
                         setTimeout(() => {
                             self.videoController(swiper);
@@ -389,7 +372,41 @@ export default class HomeVerticalSlider {
                         self.paginationHeight = self.sliderPagination.clientHeight;
                     }
                 },
+                slideNextTransitionStart: () => {
+                    console.log("slideNextTransitionStart");
+                    if (counter !== 0) {
+                        this.zoomOut(fullCircleOffset, false);
+                    }
+
+                    counter++;
+                },
+                slidePrevTransitionStart: () => {
+                    console.log("slidePrevTransitionStart");
+                    if (counter !== 0) {
+                        this.zoomOut(fullCircleOffset, true);
+                    }
+
+                    counter++;
+                },
+                transitionEnd: () => {
+                    console.log("transitionEnd");
+                    this.zoomIn();
+                },
             },
+        });
+    }
+
+    progressController(fullCircleOffset, direction) {
+        let offset = "";
+        if (direction) {
+            offset = this.slides.rotation.x + (((this.slidesLength - 1) / 9) * fullCircleOffset)
+        } else {
+            offset = this.slides.rotation.x - (((this.slidesLength - 1) / 9) * fullCircleOffset)
+        }
+        gsap.to(this.slides.rotation, {
+            duration: 0.8,
+            ease: "power2.out",
+            x: offset,
         });
     }
 
@@ -405,7 +422,7 @@ export default class HomeVerticalSlider {
         });
     }
 
-    zoomOut() {
+    zoomOut(fullCircleOffset, direction) {
         this.isAnimating = true;
         gsap.to(this.camera.position, {
             duration: 0.8,
@@ -413,6 +430,7 @@ export default class HomeVerticalSlider {
             z: 330,
             onComplete: () => {
                 this.isAnimating = false;
+                this.progressController(fullCircleOffset, direction);
             },
         });
 
@@ -465,7 +483,8 @@ export default class HomeVerticalSlider {
     }
 
     videoController(swiper) {
-        const index = swiper.activeIndex;
+        const index = swiper.realIndex;
+        console.log(index);
         this.videoPlayers.forEach((video) => {
             if (parseInt(video.dataset.index) === index) {
                 video.play();
