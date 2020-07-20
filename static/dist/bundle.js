@@ -2071,12 +2071,12 @@ var TimelineSlider = /*#__PURE__*/function () {
         },
         freeMode: true,
         freeModeSticky: true,
-        freeModeMomentum: false,
-        freeModeMomentumRatio: 1,
+        freeModeMomentum: true,
+        freeModeMomentumRatio: 0.25,
         freeModeMomentumVelocityRatio: 1,
-        freeModeMomentumBounce: true,
+        freeModeMomentumBounce: false,
         freeModeMomentumBounceRatio: 1,
-        freeModeMinimumVelocity: 0.02,
+        freeModeMinimumVelocity: 0.22,
         navigation: {
           nextEl: this.timelineSliderNext,
           prevEl: this.timelineSliderPrev
@@ -2289,7 +2289,7 @@ var TimelineSlider = /*#__PURE__*/function () {
         duration: 0.4,
         scale: 0.5,
         x: "-25%",
-        ease: "power3.out"
+        ease: "power3.inOut"
       }).to(this.popup, {
         autoAlpha: 1,
         delay: 0.5,
@@ -2332,14 +2332,14 @@ var TimelineSlider = /*#__PURE__*/function () {
       }).to(this.timeline, {
         duration: 0.3,
         x: "0%",
-        ease: "power3.out",
+        ease: "power3.inOut",
         onComplete: function onComplete() {
           _this9.slideZoom();
         }
       }, "-=0.3").to(this.timeline, {
         duration: 0.3,
         scale: 1,
-        ease: "power3.out"
+        ease: "power3.inOut"
       }, "-=0.3").to([".js-timeline-pagination", ".js-back-btn", this.swiper.slides, this.progressWrapper], {
         autoAlpha: 1,
         duration: 0.2,
@@ -2382,19 +2382,19 @@ var TimelineSlider = /*#__PURE__*/function () {
       _gsap.gsap.to(this.camera.position, {
         duration: 0.8,
         z: 850,
-        ease: "power4.out"
+        ease: "power4.inOut"
       });
 
       _gsap.gsap.to(this.cameraWrapper.position, {
         duration: 0.8,
         y: currentCameraWrapperYPosition + 50,
-        ease: "power4.out"
+        ease: "power4.inOut"
       });
 
       _gsap.gsap.to(this.postprocessing.bokeh.uniforms["focus"], {
         duration: 0.8,
         value: 200,
-        ease: "power4.out"
+        ease: "power4.inOut"
       });
     }
   }, {
