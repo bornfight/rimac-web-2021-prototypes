@@ -1,42 +1,103 @@
-// COLORS
+/**
+ * Colors
+ */
+$teal: #0d2936;
+$teal-60: rgba(0, 18, 23, 0.6);
+$dark-teal: #0a222e;
+$blue: #1da5f9;
+$blue-50: transparentize($blue, 0.5);
+$light-blue: #7bccf6;
+$grey: #a7b7bf;
+$dark-teal: #0a222e;
+$black: #001217;
+$dark-grey: #011218;
 $white: #ffffff;
-$black: #000000;
+$faded-white: #f1f5f7;
+$red: #ff055f;
+$green: #00dbb3;
+$green-50: transparentize($green, 0.5);
 
-$white-0: rgba(#ffffff, 0);
-$white-10: rgba(#ffffff, 0.1);
-$white-20: rgba(#ffffff, 0.2);
-$white-30: rgba(#ffffff, 0.3);
-$white-40: rgba(#ffffff, 0.4);
-$white-50: rgba(#ffffff, 0.5);
-$white-60: rgba(#ffffff, 0.6);
-$white-70: rgba(#ffffff, 0.7);
-$white-80: rgba(#ffffff, 0.8);
-$white-90: rgba(#ffffff, 0.9);
-$white-100: rgba(#ffffff, 1);
+$black-0: rgba($black, 0);
+$black-10: rgba($black, 0.1);
+$black-20: rgba($black, 0.2);
+$black-30: rgba($black, 0.3);
+$black-40: rgba($black, 0.4);
+$black-50: rgba($black, 0.5);
+$black-60: rgba($black, 0.6);
+$black-70: rgba($black, 0.7);
+$black-80: rgba($black, 0.8);
+$black-90: rgba($black, 0.9);
+$black-100: rgba($black, 1);
 
-$black-0: rgba(#000000, 0);
-$black-10: rgba(#000000, 0.1);
-$black-20: rgba(#000000, 0.2);
-$black-30: rgba(#000000, 0.3);
-$black-40: rgba(#000000, 0.4);
-$black-50: rgba(#000000, 0.5);
-$black-60: rgba(#000000, 0.6);
-$black-70: rgba(#000000, 0.7);
-$black-80: rgba(#000000, 0.8);
-$black-90: rgba(#000000, 0.9);
-$black-100: rgba(#000000, 1);
+$white-0: rgba($white, 0);
+$white-10: rgba($white, 0.1);
+$white-20: rgba($white, 0.2);
+$white-30: rgba($white, 0.3);
+$white-40: rgba($white, 0.4);
+$white-50: rgba($white, 0.5);
+$white-60: rgba($white, 0.6);
+$white-70: rgba($white, 0.7);
+$white-80: rgba($white, 0.8);
+$white-90: rgba($white, 0.9);
+$white-100: rgba($white, 1);
 
 $mango: #f7b334;
 $slate: #3c5163;
 
-$blue: #0097dc;
+/**
+ * Colors - re-assigning
+ */
+$primary-color: $black;
+$secondary-color: $white;
 $accent-color: $blue;
-$gray: #c2c2c2;
-$brown-gray: #b1b1b1;
 
-// COLORS - RE-ASSIGNING
-$primary-color: $mango;
-$secondary-color: $slate;
-$tertiary-color: $white;
+$light-bg-color: $white;
+$light-bg-color--faded: $faded-white;
 
-// COLORS - COMPONENTS
+$dark-bg-color: $teal;
+$accent-bg-color: $blue;
+
+$dark-text: $black;
+$body-text: transparentize($black, 0.4);
+$light-text: $white;
+$faded-text: $black-60;
+
+$error-color: $red;
+
+/**
+ * Colors - components
+ */
+$button-border-color: $white-50;
+$button-background-color: $blue;
+
+$button-border-color--full: $white;
+$button-border-color--full-hover: $blue-50;
+
+$button-border-color--accent: $blue-50;
+$button-border-color--accent-hover: $blue;
+$button-background-color--accent: $blue-50;
+
+$button-background-color--success: $green;
+$button-color--success: $green;
+$button-border-color--success: $green-50;
+
+$link-color: $white;
+$link-color--hover: $blue;
+
+$link-color--editor: $blue;
+$link-color--editor-hover: $blue-50;
+
+$navigation-bg-color: $dark-teal;
+$footer-bg-color: $dark-teal;
+
+$overlay-bg-color: $teal-60;
+
+$page-bg-color: $white;
+$page-bg-color--dark: $dark-teal;
+$page-bg-color--accent: $teal;
+$page-bg-color--dimmed: $faded-white;
+$page-bg-color--light: $white;
+
+:root {
+	--navigation-color: #ffffff;
+}

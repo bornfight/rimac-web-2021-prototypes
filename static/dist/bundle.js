@@ -238,29 +238,29 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
     this.slides = new THREE.Object3D();
     this.dataPath = "static/video/";
     this.data = [{
-      title: "nevera",
-      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
-      linkTitle: "link",
+      title: "Nevera",
+      content: "Dolor sit amet, cons ctetur adipi scing elit, sed do eiusmod tempor incid idunt ut labore na aliqua.",
+      linkTitle: "View Nevera",
       link: "#",
       video: "c_two.mp4"
     }, {
-      title: "technology",
-      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
-      linkTitle: "link",
+      title: "Developmet",
+      content: "Dolor sit amet, cons ctetur adipi scing elit, sed do eiusmod tempor incid idunt ut labore na aliqua.",
+      linkTitle: "View development",
+      link: "#",
+      video: "video-scrub-02.mp4"
+    }, {
+      title: "Technology",
+      content: "Dolor sit amet, cons ctetur adipi scing elit, sed do eiusmod tempor incid idunt ut labore na aliqua.",
+      linkTitle: "View technology",
       link: "#",
       video: "technology.mp4"
     }, {
-      title: "about us",
-      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
-      linkTitle: "link",
+      title: "About us",
+      content: "Dolor sit amet, cons ctetur adipi scing elit, sed do eiusmod tempor incid idunt ut labore na aliqua.",
+      linkTitle: "View about us",
       link: "#",
       video: "about.mp4"
-    }, {
-      title: "developmet",
-      content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
-      linkTitle: "link",
-      link: "#",
-      video: "video-scrub-02.mp4"
     }];
     this.slidesLength = this.data.length;
     this.paginationHeight = 0;
@@ -292,13 +292,18 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
         _this.postprocessing.bokeh.uniforms["focus"].value = effectController.focus;
         _this.postprocessing.bokeh.uniforms["aperture"].value = effectController.aperture * 0.00001;
         _this.postprocessing.bokeh.uniforms["maxblur"].value = effectController.maxblur;
-      };
+      }; // const gui = new GUI();
+      // gui.add(effectController, "focus", 40, 200, 1).onChange(
+      //     matChanger,
+      // );
+      // gui.add(effectController, "aperture", 0, 10, 0.1).onChange(matChanger);
+      // gui.add(effectController, "maxblur", 0.0, 0.01, 0.001).onChange(
+      //     matChanger,
+      // );
+      // gui.close();
+      //
 
-      var gui = new _datGuiModule.GUI();
-      gui.add(effectController, "focus", 40, 200, 1).onChange(matChanger);
-      gui.add(effectController, "aperture", 0, 10, 0.1).onChange(matChanger);
-      gui.add(effectController, "maxblur", 0.0, 0.01, 0.001).onChange(matChanger);
-      gui.close();
+
       matChanger();
 
       for (var i = 0; i < this.data.length; i++) {
@@ -454,18 +459,18 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       var item = document.createElement("div");
       item.className = "c-home-slider-item swiper-slide";
       var itemInner = document.createElement("div");
-      itemInner.className = "c-home-slider-item__inner";
+      itemInner.className = "c-home-slider-item__inner u-text-center";
       item.appendChild(itemInner);
-      var title = document.createElement("p");
-      title.className = "c-home-slider-item__title u-a7 u-uppercase";
+      var title = document.createElement("h2");
+      title.className = "c-home-slider-item__title u-a8 u-uppercase";
       title.textContent = itemData.title;
       itemInner.appendChild(title);
       var content = document.createElement("p");
-      content.className = "c-home-slider-item__content";
+      content.className = "c-home-slider-item__content u-b0";
       content.textContent = itemData.content;
       itemInner.appendChild(content);
       var link = document.createElement("a");
-      link.className = "c-home-slider-item__link";
+      link.className = "c-home-slider-item__link c-button";
       link.href = itemData.link;
       link.textContent = itemData.linkTitle;
       itemInner.appendChild(link);
@@ -501,7 +506,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
           el: this.DOM.sliderPagination,
           clickable: true,
           renderBullet: function renderBullet(index, className) {
-            return "<span class=\"u-uppercase u-b0 u-fw-bold c-homepage__pagination-bullet ".concat(className, "\">\n                                <i></i>\n                                ").concat(_this4.data[index].title, "\n                            </span>");
+            return "<span class=\"u-uppercase u-b1 u-fw-bold c-homepage__pagination-bullet ".concat(className, "\">\n                                <i></i>\n                                ").concat(_this4.data[index].title, "\n                            </span>");
           }
         },
         on: {
@@ -540,7 +545,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
             if (self.videoPlayers[swiper.activeIndex] != null) {
               setTimeout(function () {
                 self.videoController(swiper);
-              }, 1500);
+              }, 800);
             }
 
             if (self.paginationHeight !== self.sliderPagination.clientHeight) {
@@ -559,7 +564,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
     key: "progressCircle",
     value: function progressCircle(swiper, currentProgress) {
       _gsap.gsap.to(this.sliderProgress, {
-        duration: 0.8,
+        duration: 1,
         y: currentProgress / this.slidesLength * (this.slidesLength - 1) * this.paginationHeight,
         ease: "elastic.out(1, 0.5)"
       });
@@ -572,18 +577,18 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       this.isAnimating = true;
 
       _gsap.gsap.to(this.camera.position, {
-        duration: 0.8,
-        ease: "power1.out",
-        z: 330,
+        duration: 1,
+        ease: "quad.inOut",
+        z: 430,
         onComplete: function onComplete() {
           _this5.isAnimating = false;
         }
       });
 
       _gsap.gsap.to(this.postprocessing.bokeh.uniforms["focus"], {
-        duration: 0.8,
-        ease: "power1.out",
-        value: 180
+        duration: 1,
+        ease: "quad.inOut",
+        value: 120
       });
     }
   }, {
@@ -594,9 +599,9 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       this.isAnimating = true;
 
       _gsap.gsap.to(this.camera.position, {
-        duration: 0.8,
-        ease: "power4.in",
-        z: 245,
+        duration: 1.2,
+        ease: "quad.inOut",
+        z: 255,
         onComplete: function onComplete() {
           _this6.isAnimating = false;
         }
@@ -625,8 +630,8 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
         });
 
         _gsap.gsap.to(_this7.slider, {
-          x: -_this7.mouse.x * 300,
-          y: _this7.mouse.y * 300,
+          x: -_this7.mouse.x * 200,
+          y: _this7.mouse.y * 200,
           duration: 1,
           ease: "power3.out"
         });
@@ -1016,7 +1021,7 @@ var HomeVerticalSliderLooped = /*#__PURE__*/function () {
             var swiper = this;
             console.log("slide change");
 
-            if (self.videoPlayers[swiper.activeIndex] != null) {
+            if (self.videoPlayers[swiper.realIndex] != null) {
               setTimeout(function () {
                 self.videoController(swiper);
               }, 1500);

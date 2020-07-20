@@ -1,6 +1,6 @@
 html,
 body {
-    font-family: $font-primary;
+    font-family: $font-body;
     width: 100%;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
@@ -16,7 +16,7 @@ html {
 }
 
 body {
-    font-family: $font-primary;
+    font-family: $font-body;
     background-color: $black;
     color: $white;
     position: relative;

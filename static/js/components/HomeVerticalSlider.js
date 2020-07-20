@@ -62,32 +62,32 @@ export default class HomeVerticalSlider {
         this.dataPath = "static/video/";
         this.data = [
             {
-                title: "nevera",
-                content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
-                linkTitle: "link",
+                title: "Nevera",
+                content: "Dolor sit amet, cons ctetur adipi scing elit, sed do eiusmod tempor incid idunt ut labore na aliqua.",
+                linkTitle: "View Nevera",
                 link: "#",
                 video: "c_two.mp4",
             },
             {
-                title: "technology",
-                content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
-                linkTitle: "link",
+                title: "Developmet",
+                content: "Dolor sit amet, cons ctetur adipi scing elit, sed do eiusmod tempor incid idunt ut labore na aliqua.",
+                linkTitle: "View development",
+                link: "#",
+                video: "video-scrub-02.mp4",
+            },
+            {
+                title: "Technology",
+                content: "Dolor sit amet, cons ctetur adipi scing elit, sed do eiusmod tempor incid idunt ut labore na aliqua.",
+                linkTitle: "View technology",
                 link: "#",
                 video: "technology.mp4",
             },
             {
-                title: "about us",
-                content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
-                linkTitle: "link",
+                title: "About us",
+                content: "Dolor sit amet, cons ctetur adipi scing elit, sed do eiusmod tempor incid idunt ut labore na aliqua.",
+                linkTitle: "View about us",
                 link: "#",
                 video: "about.mp4",
-            },
-            {
-                title: "developmet",
-                content: "Makes example posts, pages, custom terms, helps to style and develop new and current themes.",
-                linkTitle: "link",
-                link: "#",
-                video: "video-scrub-02.mp4",
             }
         ];
 
@@ -126,16 +126,16 @@ export default class HomeVerticalSlider {
                 effectController.maxblur;
         };
 
-        const gui = new GUI();
-        gui.add(effectController, "focus", 40, 200, 1).onChange(
-            matChanger,
-        );
-        gui.add(effectController, "aperture", 0, 10, 0.1).onChange(matChanger);
-        gui.add(effectController, "maxblur", 0.0, 0.01, 0.001).onChange(
-            matChanger,
-        );
-        gui.close();
-
+        // const gui = new GUI();
+        // gui.add(effectController, "focus", 40, 200, 1).onChange(
+        //     matChanger,
+        // );
+        // gui.add(effectController, "aperture", 0, 10, 0.1).onChange(matChanger);
+        // gui.add(effectController, "maxblur", 0.0, 0.01, 0.001).onChange(
+        //     matChanger,
+        // );
+        // gui.close();
+        //
         matChanger();
 
         for (let i = 0; i < this.data.length; i++) {
@@ -289,21 +289,21 @@ export default class HomeVerticalSlider {
         item.className = "c-home-slider-item swiper-slide";
 
         let itemInner = document.createElement("div");
-        itemInner.className = "c-home-slider-item__inner";
+        itemInner.className = "c-home-slider-item__inner u-text-center";
         item.appendChild(itemInner);
 
-        let title = document.createElement("p");
-        title.className = "c-home-slider-item__title u-a7 u-uppercase";
+        let title = document.createElement("h2");
+        title.className = "c-home-slider-item__title u-a8 u-uppercase";
         title.textContent = itemData.title;
         itemInner.appendChild(title);
 
         let content = document.createElement("p");
-        content.className = "c-home-slider-item__content";
+        content.className = "c-home-slider-item__content u-b0";
         content.textContent = itemData.content;
         itemInner.appendChild(content);
 
         let link = document.createElement("a");
-        link.className = "c-home-slider-item__link";
+        link.className = "c-home-slider-item__link c-button";
         link.href = itemData.link;
         link.textContent = itemData.linkTitle;
         itemInner.appendChild(link);
@@ -338,7 +338,7 @@ export default class HomeVerticalSlider {
                 el: this.DOM.sliderPagination,
                 clickable: true,
                 renderBullet: (index, className) => {
-                    return `<span class="u-uppercase u-b0 u-fw-bold c-homepage__pagination-bullet ${className}">
+                    return `<span class="u-uppercase u-b1 u-fw-bold c-homepage__pagination-bullet ${className}">
                                 <i></i>
                                 ${this.data[index].title}
                             </span>`;
@@ -382,7 +382,7 @@ export default class HomeVerticalSlider {
                     if (self.videoPlayers[swiper.activeIndex] != null) {
                         setTimeout(() => {
                             self.videoController(swiper);
-                        }, 1500);
+                        }, 800);
                     }
 
                     if (self.paginationHeight !== self.sliderPagination.clientHeight) {
@@ -399,7 +399,7 @@ export default class HomeVerticalSlider {
 
     progressCircle(swiper, currentProgress) {
         gsap.to(this.sliderProgress, {
-            duration: 0.8,
+            duration: 1,
             y: ((currentProgress / this.slidesLength) * (this.slidesLength - 1)) * this.paginationHeight,
             ease: "elastic.out(1, 0.5)",
         });
@@ -408,27 +408,27 @@ export default class HomeVerticalSlider {
     zoomOut() {
         this.isAnimating = true;
         gsap.to(this.camera.position, {
-            duration: 0.8,
-            ease: "power1.out",
-            z: 330,
+            duration: 1,
+            ease: "quad.inOut",
+            z: 430,
             onComplete: () => {
                 this.isAnimating = false;
             },
         });
 
         gsap.to(this.postprocessing.bokeh.uniforms["focus"], {
-            duration: 0.8,
-            ease: "power1.out",
-            value: 180,
+            duration: 1,
+            ease: "quad.inOut",
+            value: 120,
         });
     }
 
     zoomIn() {
         this.isAnimating = true;
         gsap.to(this.camera.position, {
-            duration: 0.8,
-            ease: "power4.in",
-            z: 245,
+            duration: 1.2,
+            ease: "quad.inOut",
+            z: 255,
             onComplete: () => {
                 this.isAnimating = false;
             },
@@ -456,8 +456,8 @@ export default class HomeVerticalSlider {
             });
 
             gsap.to(this.slider, {
-                x: -this.mouse.x * 300,
-                y: this.mouse.y * 300,
+                x: -this.mouse.x * 200,
+                y: this.mouse.y * 200,
                 duration: 1,
                 ease: "power3.out",
             });

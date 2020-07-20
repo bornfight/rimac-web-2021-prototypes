@@ -1,0 +1,160 @@
+//BUTTONS
+.c-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    min-width: 180px;
+    background-color: transparent;
+    border: none;
+    border-top: 1px solid $button-border-color;
+    border-bottom: 1px solid $button-border-color;
+    color: $white;
+    cursor: pointer;
+    position: relative;
+    transition: $button-hover;
+    font-family: $font-heading;
+    font-size: 11px;
+    line-height: 12px;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+
+    @include mq("lg") {
+        min-width: 140px;
+    }
+
+    &__prepend {
+    }
+
+    &__label {
+        margin: 0 10px;
+    }
+
+    &__append {
+    }
+
+    &:before,
+    &:after {
+        content: "";
+        position: absolute;
+        display: block;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background-color: $button-border-color;
+        transition: $button-hover;
+        transform: scaleY(0.78);
+    }
+
+    &:before {
+        left: 0;
+    }
+
+    &:after {
+        right: 0;
+    }
+
+    //states
+    &:hover {
+        border-color: $button-border-color--accent;
+        background-color: $button-background-color;
+
+        &:before,
+        &:after {
+            background-color: $button-border-color--accent;
+            transform: scaleY(1);
+        }
+    }
+
+    &--accent {
+        border-color: $button-border-color--accent;
+        color: $accent-color;
+
+        &:before,
+        &:after {
+            background-color: $button-border-color--accent;
+        }
+
+        &:hover {
+            background-color: $button-background-color--accent;
+            color: $white;
+
+            &:before,
+            &:after {
+                background-color: $button-border-color--accent-hover;
+                transform: scaleY(0.78);
+            }
+        }
+    }
+
+    &--play {
+        .c-button__prepend {
+            transform: translateX(-20px);
+        }
+    }
+
+    &--full {
+        border-top: 1px solid $button-border-color--full;
+        border-bottom: 1px solid $button-border-color--full;
+        background-color: $button-border-color--full;
+
+        &:before,
+        &:after {
+            background-color: $button-border-color--full;
+            transform: scaleY(1);
+        }
+
+        &:hover {
+            border-top: 1px solid $button-border-color--full-hover;
+            border-bottom: 1px solid $button-border-color--full-hover;
+            background-color: $button-border-color--full-hover;
+
+            &:before,
+            &:after {
+                background-color: $button-border-color--full-hover;
+            }
+        }
+    }
+
+    &--social {
+        min-width: 60px;
+        @include spacing("padding-left", "xxs");
+        @include spacing("padding-right", "xxs");
+
+        .c-button__label {
+            .u-icon {
+                font-size: 17px;
+                color: $teal;
+            }
+        }
+
+        &:hover {
+            .c-button__label {
+                .u-icon {
+                    color: $white;
+                }
+            }
+        }
+    }
+}
+
+//PLAY BUTTON
+.c-play-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: $button-hover;
+
+    &--round {
+        @include spacing("height", "md");
+        @include spacing("width", "md");
+        border: 1px solid $button-border-color;
+        border-radius: 100px;
+    }
+
+    &:hover {
+        border-color: $button-background-color--accent;
+        background-color: $button-background-color--accent;
+        color: $white;
+    }
+}
