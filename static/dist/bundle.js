@@ -1923,7 +1923,7 @@ var TimelineSlider = /*#__PURE__*/function () {
       this.scene.add(this.cameraWrapper);
       this.vector = new THREE.Vector3();
       var planeBackMaterial = new THREE.MeshBasicMaterial({
-        color: 0x333333,
+        color: 0x0d2936,
         transparent: true
       });
       this.geometryAspectRatio = 16 / 9;
@@ -1959,13 +1959,17 @@ var TimelineSlider = /*#__PURE__*/function () {
         _this.postprocessing.bokeh.uniforms["focus"].value = effectController.focus;
         _this.postprocessing.bokeh.uniforms["aperture"].value = effectController.aperture * 0.00001;
         _this.postprocessing.bokeh.uniforms["maxblur"].value = effectController.maxblur;
-      };
+      }; // const gui = new GUI();
+      // gui.add(effectController, "focus", 10.0, 3000.0, 10).onChange(
+      //     matChanger,
+      // );
+      // gui.add(effectController, "aperture", 0, 10, 0.1).onChange(matChanger);
+      // gui.add(effectController, "maxblur", 0.0, 0.01, 0.001).onChange(
+      //     matChanger,
+      // );
+      // gui.close();
 
-      var gui = new _datGuiModule.GUI();
-      gui.add(effectController, "focus", 10.0, 3000.0, 10).onChange(matChanger);
-      gui.add(effectController, "aperture", 0, 10, 0.1).onChange(matChanger);
-      gui.add(effectController, "maxblur", 0.0, 0.01, 0.001).onChange(matChanger);
-      gui.close();
+
       matChanger(); // end DAT gui controls
 
       this.animate();
@@ -2051,20 +2055,23 @@ var TimelineSlider = /*#__PURE__*/function () {
       var progressWidth = this.progressWrapper.clientWidth;
       this.swiper = new _swiper.default(this.slider, {
         loop: false,
+        effect: "fade",
+        fadeEffect: {
+          crossFade: true
+        },
         slidesPerView: 1,
-        // direction: "vertical",
+        direction: "horizontal",
         centeredSlides: true,
-        speed: 800,
+        speed: 1000,
         grabCursor: true,
         watchSlidesProgress: true,
         mousewheelControl: true,
         mousewheel: {
           invert: false
         },
-        // TODO: @Tomo — proucit malo kaj i kak rade ovi optioni za freeMode
         freeMode: true,
         freeModeSticky: true,
-        freeModeMomentum: true,
+        freeModeMomentum: false,
         freeModeMomentumRatio: 1,
         freeModeMomentumVelocityRatio: 1,
         freeModeMomentumBounce: true,
@@ -2074,20 +2081,22 @@ var TimelineSlider = /*#__PURE__*/function () {
           nextEl: this.timelineSliderNext,
           prevEl: this.timelineSliderPrev
         },
+        scrollbar: {
+          el: '.js-timeline-pagination-progress-wrapper',
+          draggable: true
+        },
         pagination: {
           el: ".js-timeline-pagination",
           clickable: true,
           renderBullet: function renderBullet(index, className) {
-            return "<span class=\"c-timeline__pagination-bullet ".concat(className, "\">").concat(_this4.timelineItems[index].year, "</span>");
+            return "<span class=\"c-timeline__pagination-bullet u-b1 ".concat(className, "\">").concat(_this4.timelineItems[index].year, "</span>");
           }
         },
         on: {
           progress: function progress() {
-            var swiper = this;
-
-            _gsap.gsap.to(self.progressDot, {
-              x: swiper.progress * progressWidth
-            });
+            var swiper = this; // gsap.to(self.progressDot, {
+            //     x: swiper.progress * progressWidth,
+            // });
 
             if (!self.popupOpened) {
               self.progressController(swiper);

@@ -228,7 +228,7 @@ export default class TimelineSlider {
         this.vector = new THREE.Vector3();
 
         const planeBackMaterial = new THREE.MeshBasicMaterial({
-            color: 0x333333,
+            color: 0x0d2936,
             transparent: true,
         });
 
@@ -289,15 +289,15 @@ export default class TimelineSlider {
                 effectController.maxblur;
         };
 
-        const gui = new GUI();
-        gui.add(effectController, "focus", 10.0, 3000.0, 10).onChange(
-            matChanger,
-        );
-        gui.add(effectController, "aperture", 0, 10, 0.1).onChange(matChanger);
-        gui.add(effectController, "maxblur", 0.0, 0.01, 0.001).onChange(
-            matChanger,
-        );
-        gui.close();
+        // const gui = new GUI();
+        // gui.add(effectController, "focus", 10.0, 3000.0, 10).onChange(
+        //     matChanger,
+        // );
+        // gui.add(effectController, "aperture", 0, 10, 0.1).onChange(matChanger);
+        // gui.add(effectController, "maxblur", 0.0, 0.01, 0.001).onChange(
+        //     matChanger,
+        // );
+        // gui.close();
 
         matChanger();
         // end DAT gui controls
@@ -400,20 +400,23 @@ export default class TimelineSlider {
 
         this.swiper = new Swiper(this.slider, {
             loop: false,
+            effect: "fade",
+            fadeEffect: {
+                crossFade: true
+            },
             slidesPerView: 1,
-            // direction: "vertical",
+            direction: "horizontal",
             centeredSlides: true,
-            speed: 800,
+            speed: 1000,
             grabCursor: true,
             watchSlidesProgress: true,
             mousewheelControl: true,
             mousewheel: {
                 invert: false,
             },
-            // TODO: @Tomo — proucit malo kaj i kak rade ovi optioni za freeMode
             freeMode: true,
             freeModeSticky: true,
-            freeModeMomentum: true,
+            freeModeMomentum: false,
             freeModeMomentumRatio: 1,
             freeModeMomentumVelocityRatio: 1,
             freeModeMomentumBounce: true,
@@ -423,19 +426,23 @@ export default class TimelineSlider {
                 nextEl: this.timelineSliderNext,
                 prevEl: this.timelineSliderPrev,
             },
+            scrollbar: {
+                el: '.js-timeline-pagination-progress-wrapper',
+                draggable: true,
+            },
             pagination: {
                 el: ".js-timeline-pagination",
                 clickable: true,
                 renderBullet: (index, className) => {
-                    return `<span class="c-timeline__pagination-bullet ${className}">${this.timelineItems[index].year}</span>`;
+                    return `<span class="c-timeline__pagination-bullet u-b1 ${className}">${this.timelineItems[index].year}</span>`;
                 },
             },
             on: {
                 progress: function () {
                     let swiper = this;
-                    gsap.to(self.progressDot, {
-                        x: swiper.progress * progressWidth,
-                    });
+                    // gsap.to(self.progressDot, {
+                    //     x: swiper.progress * progressWidth,
+                    // });
 
                     if (!self.popupOpened) {
                         self.progressController(swiper);
