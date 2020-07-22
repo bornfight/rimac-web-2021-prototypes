@@ -32,7 +32,7 @@ export default class HomeVerticalSlider {
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x292733);
 
-        this.camera = new THREE.PerspectiveCamera(35, this.width / this.height, 1, 1000);
+        this.camera = new THREE.PerspectiveCamera(40, this.width / this.height, 1, 1000);
         this.camera.position.set(0, 0, 16);
 
         this.renderer = new THREE.WebGLRenderer({
@@ -46,14 +46,14 @@ export default class HomeVerticalSlider {
 
         this.options = {
             perlin: {
-                speed: 0.00003,
+                speed: 0.00002,
                 size: 0.5,
-                perlins: 2.0,
+                perlins: 5.0,
                 decay: 1.5,
                 displace: 0.1,
                 complex: 0.1,
-                waves: 5,
-                eqcolor: 3.0,
+                waves: 8,
+                eqcolor: 6.0,
                 r_color: this.getColorValue(46),
                 g_color: this.getColorValue(74),
                 b_color: this.getColorValue(85),
@@ -120,48 +120,48 @@ export default class HomeVerticalSlider {
     }
 
     createGUI() {
-        this.gui = new GUI();
-
-        const perlinGUI = this.gui.addFolder("Shape Setup");
-        perlinGUI
-            .add(this.options.perlin, "speed", 0.00001, 0.0001)
-            .name("Speed")
-            .listen();
-        perlinGUI
-            .add(this.options.perlin, "size", 0.0, 3.0)
-            .name("Size")
-            .listen();
-        perlinGUI
-            .add(this.options.perlin, "waves", 0.0, 20.0)
-            .name("Waves")
-            .listen();
-        perlinGUI
-            .add(this.options.perlin, "complex", 0.1, 1.0)
-            .name("Complex")
-            .listen();
-        perlinGUI
-            .add(this.options.perlin, "displace", 0.1, 2.5)
-            .name("Displacement")
-            .listen();
-
-        const colorGUI = this.gui.addFolder("Color");
-        colorGUI
-            .add(this.options.perlin, "eqcolor", 0.0, 30.0)
-            .name("Hue")
-            .listen();
-        colorGUI
-            .add(this.options.perlin, "r_color", 0.0, 2.55)
-            .name("R")
-            .listen();
-        colorGUI
-            .add(this.options.perlin, "g_color", 0.0, 2.55)
-            .name("G")
-            .listen();
-        colorGUI
-            .add(this.options.perlin, "b_color", 0.0, 2.55)
-            .name("B")
-            .listen();
-        colorGUI.add(this.options.perlin, "redhell", true).name("Electroflow");
+        // this.gui = new GUI();
+        //
+        // const perlinGUI = this.gui.addFolder("Shape Setup");
+        // perlinGUI
+        //     .add(this.options.perlin, "speed", 0.00001, 0.0001)
+        //     .name("Speed")
+        //     .listen();
+        // perlinGUI
+        //     .add(this.options.perlin, "size", 0.0, 3.0)
+        //     .name("Size")
+        //     .listen();
+        // perlinGUI
+        //     .add(this.options.perlin, "waves", 0.0, 20.0)
+        //     .name("Waves")
+        //     .listen();
+        // perlinGUI
+        //     .add(this.options.perlin, "complex", 0.1, 1.0)
+        //     .name("Complex")
+        //     .listen();
+        // perlinGUI
+        //     .add(this.options.perlin, "displace", 0.1, 2.5)
+        //     .name("Displacement")
+        //     .listen();
+        //
+        // const colorGUI = this.gui.addFolder("Color");
+        // colorGUI
+        //     .add(this.options.perlin, "eqcolor", 0.0, 30.0)
+        //     .name("Hue")
+        //     .listen();
+        // colorGUI
+        //     .add(this.options.perlin, "r_color", 0.0, 2.55)
+        //     .name("R")
+        //     .listen();
+        // colorGUI
+        //     .add(this.options.perlin, "g_color", 0.0, 2.55)
+        //     .name("G")
+        //     .listen();
+        // colorGUI
+        //     .add(this.options.perlin, "b_color", 0.0, 2.55)
+        //     .name("B")
+        //     .listen();
+        // colorGUI.add(this.options.perlin, "redhell", true).name("Electroflow");
     }
 
     animation() {

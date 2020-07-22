@@ -60,6 +60,11 @@
         &.c-link {
             color: $white;
         }
+
+        &.swiper-button-disabled {
+            opacity: 0.2;
+            pointer-events: none;
+        }
     }
 
     &__pagination {
@@ -225,6 +230,7 @@
         height: 40px;
         cursor: pointer;
         top: 100px;
+        transition: getTransition();
 
         &:after,
         &:before {
@@ -243,6 +249,11 @@
 
         &:before {
             transform: translate(-50%, -50%) rotate(45deg);
+        }
+
+        &:hover {
+            opacity: 0.2;
+            transform: scale(0.9);
         }
     }
 

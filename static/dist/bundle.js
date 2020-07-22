@@ -93,7 +93,7 @@ var GradientBg = /*#__PURE__*/function () {
           // markers: true,
           start: "top bottom",
           end: "top top",
-          scrub: true,
+          scrub: 0.4,
           onEnter: function onEnter() {
             console.log("enter");
           },
@@ -1413,7 +1413,7 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       this.height = window.innerHeight;
       this.scene = new THREE.Scene();
       this.scene.background = new THREE.Color(0x292733);
-      this.camera = new THREE.PerspectiveCamera(35, this.width / this.height, 1, 1000);
+      this.camera = new THREE.PerspectiveCamera(40, this.width / this.height, 1, 1000);
       this.camera.position.set(0, 0, 16);
       this.renderer = new THREE.WebGLRenderer({
         antialias: true,
@@ -1424,14 +1424,14 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
       document.querySelector(self.DOM.wrapper).appendChild(this.renderer.domElement);
       this.options = {
         perlin: {
-          speed: 0.00003,
+          speed: 0.00002,
           size: 0.5,
-          perlins: 2.0,
+          perlins: 5.0,
           decay: 1.5,
           displace: 0.1,
           complex: 0.1,
-          waves: 5,
-          eqcolor: 3.0,
+          waves: 8,
+          eqcolor: 6.0,
           r_color: this.getColorValue(46),
           g_color: this.getColorValue(74),
           b_color: this.getColorValue(85),
@@ -1480,20 +1480,48 @@ var HomeVerticalSlider = /*#__PURE__*/function () {
     }
   }, {
     key: "createGUI",
-    value: function createGUI() {
-      this.gui = new _datGuiModule.GUI();
-      var perlinGUI = this.gui.addFolder("Shape Setup");
-      perlinGUI.add(this.options.perlin, "speed", 0.00001, 0.0001).name("Speed").listen();
-      perlinGUI.add(this.options.perlin, "size", 0.0, 3.0).name("Size").listen();
-      perlinGUI.add(this.options.perlin, "waves", 0.0, 20.0).name("Waves").listen();
-      perlinGUI.add(this.options.perlin, "complex", 0.1, 1.0).name("Complex").listen();
-      perlinGUI.add(this.options.perlin, "displace", 0.1, 2.5).name("Displacement").listen();
-      var colorGUI = this.gui.addFolder("Color");
-      colorGUI.add(this.options.perlin, "eqcolor", 0.0, 30.0).name("Hue").listen();
-      colorGUI.add(this.options.perlin, "r_color", 0.0, 2.55).name("R").listen();
-      colorGUI.add(this.options.perlin, "g_color", 0.0, 2.55).name("G").listen();
-      colorGUI.add(this.options.perlin, "b_color", 0.0, 2.55).name("B").listen();
-      colorGUI.add(this.options.perlin, "redhell", true).name("Electroflow");
+    value: function createGUI() {// this.gui = new GUI();
+      //
+      // const perlinGUI = this.gui.addFolder("Shape Setup");
+      // perlinGUI
+      //     .add(this.options.perlin, "speed", 0.00001, 0.0001)
+      //     .name("Speed")
+      //     .listen();
+      // perlinGUI
+      //     .add(this.options.perlin, "size", 0.0, 3.0)
+      //     .name("Size")
+      //     .listen();
+      // perlinGUI
+      //     .add(this.options.perlin, "waves", 0.0, 20.0)
+      //     .name("Waves")
+      //     .listen();
+      // perlinGUI
+      //     .add(this.options.perlin, "complex", 0.1, 1.0)
+      //     .name("Complex")
+      //     .listen();
+      // perlinGUI
+      //     .add(this.options.perlin, "displace", 0.1, 2.5)
+      //     .name("Displacement")
+      //     .listen();
+      //
+      // const colorGUI = this.gui.addFolder("Color");
+      // colorGUI
+      //     .add(this.options.perlin, "eqcolor", 0.0, 30.0)
+      //     .name("Hue")
+      //     .listen();
+      // colorGUI
+      //     .add(this.options.perlin, "r_color", 0.0, 2.55)
+      //     .name("R")
+      //     .listen();
+      // colorGUI
+      //     .add(this.options.perlin, "g_color", 0.0, 2.55)
+      //     .name("G")
+      //     .listen();
+      // colorGUI
+      //     .add(this.options.perlin, "b_color", 0.0, 2.55)
+      //     .name("B")
+      //     .listen();
+      // colorGUI.add(this.options.perlin, "redhell", true).name("Electroflow");
     }
   }, {
     key: "animation",
@@ -2288,8 +2316,9 @@ var TimelineSlider = /*#__PURE__*/function () {
       _gsap.gsap.timeline().to(this.timeline, {
         duration: 0.4,
         scale: 0.5,
-        x: "-25%",
-        ease: "power3.inOut"
+        delay: 0.6,
+        x: "-22.5%",
+        ease: "quad.out"
       }).to(this.popup, {
         autoAlpha: 1,
         delay: 0.5,
@@ -2365,36 +2394,36 @@ var TimelineSlider = /*#__PURE__*/function () {
         _gsap.gsap.timeline({}).add("start").to(this.camera.position, {
           duration: 0.8,
           z: this.initialCameraZPosition,
-          ease: "power4.inOut"
+          ease: "quad.in"
         }, "start").to(this.cameraWrapper.position, {
           duration: 0.8,
           y: currentCameraWrapperYPosition,
-          ease: "power4.inOut"
+          ease: "quad.inOut"
         }, "start").to(this.postprocessing.bokeh.uniforms["focus"], {
           duration: 0.8,
           value: 360,
-          ease: "power4.inOut"
+          ease: "quad.inOut"
         }, "start");
 
         return;
       }
 
       _gsap.gsap.to(this.camera.position, {
-        duration: 0.8,
+        duration: 0.6,
         z: 850,
-        ease: "power4.inOut"
+        ease: "quad.inOut"
       });
 
       _gsap.gsap.to(this.cameraWrapper.position, {
         duration: 0.8,
         y: currentCameraWrapperYPosition + 50,
-        ease: "power4.inOut"
+        ease: "quad.inOut"
       });
 
       _gsap.gsap.to(this.postprocessing.bokeh.uniforms["focus"], {
         duration: 0.8,
         value: 200,
-        ease: "power4.inOut"
+        ease: "quad.inOut"
       });
     }
   }, {

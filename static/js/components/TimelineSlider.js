@@ -635,8 +635,9 @@ export default class TimelineSlider {
             .to(this.timeline, {
                 duration: 0.4,
                 scale: 0.5,
-                x: "-25%",
-                ease: "power3.inOut",
+                delay: 0.6,
+                x: "-22.5%",
+                ease: "quad.out",
             })
             .to(this.popup, {
                 autoAlpha: 1,
@@ -742,7 +743,7 @@ export default class TimelineSlider {
                     {
                         duration: 0.8,
                         z: this.initialCameraZPosition,
-                        ease: "power4.inOut",
+                        ease: "quad.in",
                     },
                     "start",
                 )
@@ -751,7 +752,7 @@ export default class TimelineSlider {
                     {
                         duration: 0.8,
                         y: currentCameraWrapperYPosition,
-                        ease: "power4.inOut",
+                        ease: "quad.inOut",
                     },
                     "start",
                 )
@@ -760,7 +761,7 @@ export default class TimelineSlider {
                     {
                         duration: 0.8,
                         value: 360,
-                        ease: "power4.inOut",
+                        ease: "quad.inOut",
                     },
                     "start",
                 );
@@ -769,21 +770,21 @@ export default class TimelineSlider {
         }
 
         gsap.to(this.camera.position, {
-            duration: 0.8,
+            duration: 0.6,
             z: 850,
-            ease: "power4.inOut",
+            ease: "quad.inOut",
         });
 
         gsap.to(this.cameraWrapper.position, {
             duration: 0.8,
             y: currentCameraWrapperYPosition + 50,
-            ease: "power4.inOut",
+            ease: "quad.inOut",
         });
 
         gsap.to(this.postprocessing.bokeh.uniforms["focus"], {
             duration: 0.8,
             value: 200,
-            ease: "power4.inOut",
+            ease: "quad.inOut",
         });
     }
 

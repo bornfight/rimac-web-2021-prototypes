@@ -51,7 +51,7 @@ export default class GradientBg {
                 // markers: true,
                 start: "top bottom",
                 end: "top top",
-                scrub: true,
+                scrub: 0.4,
                 onEnter: () => {
                     console.log("enter");
                 },
