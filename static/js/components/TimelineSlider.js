@@ -282,15 +282,15 @@ export default class TimelineSlider {
                 effectController.maxblur;
         };
 
-        const gui = new GUI();
-        gui.add(effectController, "focus", 10.0, 3000.0, 10).onChange(
-            matChanger,
-        );
-        gui.add(effectController, "aperture", 0, 10, 0.1).onChange(matChanger);
-        gui.add(effectController, "maxblur", 0.0, 0.01, 0.001).onChange(
-            matChanger,
-        );
-        gui.close();
+        // const gui = new GUI();
+        // gui.add(effectController, "focus", 10.0, 3000.0, 10).onChange(
+        //     matChanger,
+        // );
+        // gui.add(effectController, "aperture", 0, 10, 0.1).onChange(matChanger);
+        // gui.add(effectController, "maxblur", 0.0, 0.01, 0.001).onChange(
+        //     matChanger,
+        // );
+        // gui.close();
 
         matChanger();
         // end DAT gui controls
