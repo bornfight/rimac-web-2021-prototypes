@@ -1842,70 +1842,60 @@ var TimelineSlider = /*#__PURE__*/function () {
     this.popupOpened = false;
     this.timelineItemsImagePath = "static/images/";
     this.timelineItems = [{
-      image: "timeline-01.jpg",
+      image: "timeline-img-01.jpg",
+      year: "2006",
+      title: "Against all odds",
+      text: "As a high school student, Mate wins international awards for innovation in electronics with the iGlove, a device that replaced a keyboard and a mouse.\n\n" + "He writes two patent applications for the iGlove and the Active Mirror System."
+    }, {
+      image: "timeline-img-02.jpg",
       year: "2008",
-      title: "Lorem ipsum dolor sit.",
-      text: "Makes example posts, pages, custom terms, helps to style and develop new and current themes."
+      title: "One-Man Band Show",
+      text: "After the engine failure on his first car, the 1984 BMW E30, Mate continues dreaming and tinkering in his garage, converting it to electric propulsion. He re-joins the drift races and takes the competition by storm.\n\n" + "The idea of an electric supercar is conceived."
     }, {
-      image: "timeline-02.jpg",
-      year: "2009",
-      title: "Rimac grows to over 100 employees.",
-      text: "A simple to use Lorem Ipsum generator. A simple to use Lorem Ipsum generator."
-    }, {
-      image: "timeline-03.jpg",
-      year: "2010",
-      title: "Rimac has 1914HP.",
-      text: "It's based on the Lolita framework. A simple to use Lorem Ipsum generator."
-    }, {
-      image: "timeline-01.jpg",
+      image: "timeline-img-03.jpg",
       year: "2011",
-      title: "Lorem ipsum dolor sit.",
-      text: "Makes example posts, pages, custom terms, helps to style and develop new and current themes."
+      title: "The dawn of a New Era",
+      text: "The prototype Concept_One was launched at IAA Frankfurt as the World’s first all-electric hypercar. The car was made in 5 months by a team of 8, the company’s first official employees."
     }, {
-      image: "timeline-02.jpg",
+      image: "timeline-img-04.jpg",
       year: "2012",
-      title: "Rimac grows to over 100 employees.",
-      text: "A simple to use Lorem Ipsum generator. A simple to use Lorem Ipsum generator."
+      title: "Setting World Records",
+      text: "Mate sets 5 FIA and Guinness World Records for the fastest accelerating electric car with the green monster, the Rimac BMW E30, the company’s first mule car."
     }, {
-      image: "timeline-03.jpg",
-      year: "2013",
-      title: "Rimac has 1914HP.",
-      text: "It's based on the Lolita framework. A simple to use Lorem Ipsum generator."
-    }, {
-      image: "timeline-01.jpg",
+      image: "timeline-img-05.jpg",
       year: "2014",
-      title: "Lorem ipsum dolor sit.",
-      text: "Makes example posts, pages, custom terms, helps to style and develop new and current themes."
+      title: "Accelerating the Electrification",
+      text: "Rimac sets out on a mission to trickle down the Hypercar technology to other uses, helping customers electrify their products.\n\n" + "Two prototype high-performance electric cars are delivered to clients in China and Spain.\n\n" + "Rimac R&D vehicle travels the world as is FIA Formula E race director’s car."
     }, {
-      image: "timeline-02.jpg",
+      image: "timeline-img-06.jpg",
       year: "2015",
-      title: "Rimac grows to over 100 employees.",
-      text: "A simple to use Lorem Ipsum generator. A simple to use Lorem Ipsum generator."
+      title: "Racing to the Clouds",
+      text: "Rimac designs, engineers and manufactures the Rimac Tajima e-Runner, to tackle the famous mountain track – Pikes Peak International Hillclimb. The team achieves second best time, ahead of all the combustion-engine race cars."
     }, {
-      image: "timeline-03.jpg",
+      image: "timeline-img-07.jpg",
       year: "2016",
-      title: "Rimac has 1914HP.",
-      text: "It's based on the Lolita framework. A simple to use Lorem Ipsum generator."
+      title: "First car delivered",
+      text: "The first customer Concept_One delivered, with 7 more units to follow. Concept_One proves its power and acceleration dominance and beats some of the most powerful cars to that day in a ¼ mile race."
     }, {
-      image: "timeline-01.jpg",
+      image: "timeline-img-08.jpg",
       year: "2017",
+      title: "Breaking new ground",
+      text: "New venture capital round by Asia’s largest battery manufacturer. Due to newly signed collaborations, Rimac intensifies the work on new projects for the global OEMs.\n\n" + "A near miss in the Swiss mountains.\n\n" + "Dealer network expansion on three continents - North America, Europe and Asia."
+    }, {
+      image: "timeline-img-09.jpg",
+      year: "2018",
+      title: "The Next Generation",
+      text: "The C_Two is launched at Geneva Motor Show with performance and character that elevates the genre.\n\n" + "Porsche AG closes series B investment with a 10% stake in the company.\n\n" + "Rimac numbers  450+ employees."
+    }, {
+      image: "timeline-img-10.jpg",
+      year: "2019",
       title: "Lorem ipsum dolor sit.",
-      text: "Makes example posts, pages, custom terms, helps to style and develop new and current themes."
+      text: "C_Two prototypes built, and the homologation process starts."
     }, {
       image: "timeline-02.jpg",
-      year: "2018",
-      title: "Rimac grows to over 100 employees.",
-      text: "A simple to use Lorem Ipsum generator. A simple to use Lorem Ipsum generator."
-    }, {
-      image: "timeline-03.jpg",
-      year: "2019",
-      title: "Rimac has 1914HP.",
-      text: "It's based on the Lolita framework. A simple to use Lorem Ipsum generator."
-    }, {
-      image: "timeline-01.jpg",
       year: "2020",
-      title: "Lorem ipsum dolor sit.",
-      text: "Makes example posts, pages, custom terms, helps to style and develop new and current themes."
+      title: "The Next Generation",
+      text: "Rimac starts serial production of components for many partners in the industry: Aston Martin, CUPRA, Automobili Pininfarina, Koenigsegg, and more."
     }];
     this.timelineSliderPrev = document.querySelector(this.DOM.timelineSliderPrev);
     this.timelineSliderNext = document.querySelector(this.DOM.timelineSliderNext);
@@ -1954,7 +1944,7 @@ var TimelineSlider = /*#__PURE__*/function () {
         color: 0x0d2936,
         transparent: true
       });
-      this.geometryAspectRatio = 16 / 9;
+      this.geometryAspectRatio = 1280 / 835;
       var planeGeometry = new THREE.PlaneGeometry(330, 186, 1, 1);
       var planeGeometryBack = planeGeometry.clone();
       planeGeometryBack.applyMatrix(new THREE.Matrix4().makeRotationY(Math.PI)); // create items
@@ -1978,26 +1968,22 @@ var TimelineSlider = /*#__PURE__*/function () {
       this.dof(); // DAT gui controls
 
       var effectController = {
-        focus: 360,
-        aperture: 4.7,
-        maxblur: 0.007
+        focus: 330,
+        aperture: 1.7,
+        maxblur: 0.01
       };
 
       var matChanger = function matChanger() {
         _this.postprocessing.bokeh.uniforms["focus"].value = effectController.focus;
         _this.postprocessing.bokeh.uniforms["aperture"].value = effectController.aperture * 0.00001;
         _this.postprocessing.bokeh.uniforms["maxblur"].value = effectController.maxblur;
-      }; // const gui = new GUI();
-      // gui.add(effectController, "focus", 10.0, 3000.0, 10).onChange(
-      //     matChanger,
-      // );
-      // gui.add(effectController, "aperture", 0, 10, 0.1).onChange(matChanger);
-      // gui.add(effectController, "maxblur", 0.0, 0.01, 0.001).onChange(
-      //     matChanger,
-      // );
-      // gui.close();
+      };
 
-
+      var gui = new _datGuiModule.GUI();
+      gui.add(effectController, "focus", 10.0, 3000.0, 10).onChange(matChanger);
+      gui.add(effectController, "aperture", 0, 10, 0.1).onChange(matChanger);
+      gui.add(effectController, "maxblur", 0.0, 0.01, 0.001).onChange(matChanger);
+      gui.close();
       matChanger(); // end DAT gui controls
 
       this.animate();

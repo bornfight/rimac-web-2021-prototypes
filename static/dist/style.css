@@ -1252,6 +1252,10 @@ a {
   max-width: 350px;
   width: 100%; }
 
+.c-timeline__popup-content br {
+  display: block;
+  margin-bottom: 0.6em; }
+
 .c-timeline__popup-close {
   position: absolute;
   right: 8.33333%;

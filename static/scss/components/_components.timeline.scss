@@ -221,6 +221,11 @@
     &__popup-content {
         max-width: 350px;
         width: 100%;
+
+        br {
+            display: block;
+            margin-bottom: 0.6em;
+        }
     }
 
     &__popup-close {
